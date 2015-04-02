@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>cmail: Overview</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link rel="icon" href="static/cmail_logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="static/cmail_logo.png" type="image/x-icon" />
+		<link rel="stylesheet" type="text/css" href="static/cmail.css" />
+		<meta name="description" content="cmail - Internet mail processing suite with SQLite backend" />
+		<meta name="keywords" content="cmail, smtp, email, pop, webmail, messaging" />
+		<meta name="robots" content="index,follow" />
+	</head>
+	<body>
+
+		<p>
+			<h1>cmail</h1>
+			<h3>Internet mail processing suite with SQLite backend</h3>
+			cmail is an implementation of multiple protocols to fulfill most, if not all
+			functions commonly expected in internet message exchange - commonly known as
+			&quot;mail server&quot;.
+		</p>
+
+		<p>
+			  Architecturally, cmail is split into several modules which interface through
+			  a central SQLite database (the master database).
+			  <ul>
+				  <li>cmail-api <i>HTTP API to the master database</i></li>
+				  <li>cmail-msa <i>SMTP server (Accept incoming / originated mails)</i></li>
+				  <li>cmail-popd <i>POP server (Access mailboxes via POP)</i></li>
+				  <li>cmail-imapd <i>IMAP server (Access mailboxes via IMAP)</i></li>
+				  <li>cmail-mta <i>SMTP client (Delivers outgoing mails to remote servers)</i></li>
+				  <li>cmail-webadmin <i>HTTP Administration interface</i></li>
+				  <li>cmail-webmailer <i>Web mailer interface</i></li>
+			  </ul>
+		</p>
+
+		<p>
+			<h2>Links</h2>
+		</p>
+	</body>
+</html>
