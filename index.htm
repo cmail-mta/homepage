@@ -12,15 +12,15 @@
 	</head>
 	<body>
 
-		<p>
+		<div>
 			<h1>cmail</h1>
 			<h3>Internet mail processing suite with SQLite backend</h3>
 			cmail is an implementation of multiple protocols to fulfill most, if not all
 			functions commonly expected in internet message exchange - commonly known as
 			&quot;mail server&quot;.
-		</p>
+		</div>
 
-		<p>
+		<div>
 			  Architecturally, cmail is split into several modules which interface through
 			  a central SQLite database (the master database).
 			  <ul>
@@ -32,10 +32,36 @@
 				  <li>cmail-webadmin <i>HTTP Administration interface</i></li>
 				  <li>cmail-webmailer <i>Web mailer interface</i></li>
 			  </ul>
-		</p>
+		</div>
 
-		<p>
+		<div>
+			<h2>Development Rationale</h2>
+			cmail was started out of resignation over the complexity involved in configuring and running
+			many other MTAs. As such, the configuration file format is relatively simple and only affects
+			the specifics of the module it is written for. For the most part the configuration files consist
+			of directives specifying on which ports the module should provide its service.
+
+			<p>
+			The common configuration, such as local addresses, routing decisions and user data are kept in
+			the master database. This provides flexibility of reconfiguration without restarting the modules,
+			as well as allowing for the use of a variety of interfaces to configure the server, such as the
+			provided Web Panel or an SQLite database editor.
+			</p>
+			<p>
+			cmail was intentionally kept simple in terms of configuration as well as features. It might not
+			support some features experienced administrators may be accustomed to, for example in large-scale
+		       	deployments, out-of-the-box but most of it can be enabled or emulated with sufficient thought.
+			</p>
+			<p>
+			Should that not be enough, cmail provides an internal API for modifying its behaviour with 
+			runtime-loaded shared libraries (plugins).
+			</p>
+			If cmail still does not meet your expectations after that, you might be better of using another
+			MTA :)
+		</div>
+
+		<div>
 			<h2>Links</h2>
-		</p>
+		</div>
 	</body>
 </html>
