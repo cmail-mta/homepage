@@ -61,6 +61,38 @@
 		</div>
 
 		<div>
+			<h2>Common use cases</h2>
+			
+			<h3>Receive-only server, mail is sent via external servers</h3>
+			The following modules are involved
+			<ul>
+				<li>cmail-msa for receiving incoming mail</li>
+				<li>cmail-popd or cmail-imapd for access to mailboxes</li>
+				<li>Optionally: cmail-api and cmail-webadmin for easier administration</li>
+				<li>Optionally: cmail-api and cmail-webmailer for web access to mailboxes</li>
+			</ul>
+
+			<h3>Send-only server</h3>
+			This use case might be better served by nullmailer. Should you chose to want to implement
+			it using cmail, you'd need
+			<ul>
+				<li>cmail-msa for accepting originated mail</li>
+				<li>cmail-mta for delivering the outbound mail</li>
+				<li>Optionally: cmail-api and cmail-webadmin for easier administration</li>
+			</ul>
+
+			<h3>Full-feature send- and receive-server</h3>
+			This setup involves the following modules
+			<ul>
+				<li>cmail-msa for receiving incoming mail</li>
+				<li>cmail-popd and/or cmail-imapd for access to mailboxes</li>
+				<li>cmail-mta for delivering the outbound mail</li>
+				<li>Optionally: cmail-api and cmail-webadmin for easier administration</li>
+				<li>Optionally: cmail-api and cmail-webmailer for web access to mailboxes</li>
+			</ul>
+		</div>
+
+		<div>
 			<h2>Contributing</h2>
 
 		</div>
