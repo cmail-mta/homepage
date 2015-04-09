@@ -13,6 +13,7 @@
 	<body>
 
 		<div>
+			<img src="static/cmail_logo.svg" style="height:7em;float:left;padding:1em;" />
 			<h1>cmail</h1>
 			<h3>Internet mail processing suite with SQLite backend</h3>
 			cmail is an implementation of multiple protocols to fulfill most, if not all
@@ -20,7 +21,7 @@
 			&quot;mail server&quot;.
 		</div>
 
-		<div>
+		<div style="clear:both;">
 			  Architecturally, cmail is split into several modules which interface through
 			  a central SQLite database (the master database).
 			  <ul>
@@ -40,6 +41,12 @@
 			many other MTAs. As such, the configuration file format is relatively simple and only affects
 			the specifics of the module it is written for. For the most part the configuration files consist
 			of directives specifying on which ports the module should provide its service.
+			
+			<p>
+			The primary objective of the project is to provide an easy-to-setup, easy-to-configure and secure
+			mail server for end-users that simply want to send and receive mails on their domains.
+			Other use cases are, of course, supported, but not with as high a priority.
+			</p>
 
 			<p>
 			The common configuration, such as local addresses, routing decisions and user data are kept in
@@ -49,15 +56,31 @@
 			</p>
 			<p>
 			cmail was intentionally kept simple in terms of configuration as well as features. It might not
-			support some features experienced administrators may be accustomed to, for example in large-scale
-		       	deployments, out-of-the-box but most of it can be enabled or emulated with sufficient thought.
+			support some features experienced administrators may be accustomed to out-of-the-box. 
+			Most of it can probably be enabled or emulated with sufficient thought, though.
 			</p>
 			<p>
 			Should that not be enough, cmail provides an internal API for modifying its behaviour with 
 			runtime-loaded shared libraries (plugins).
 			</p>
-			If cmail still does not meet your expectations after that, you might be better of using another
+			If cmail still does not meet your expectations after that, you might be better off using another
 			MTA :)
+		</div>
+
+		<div>
+			<h2>Coarse roadmap</h2>
+			<ol>
+				<li><i>cmail-mta</i> Basic functionality</li>
+				<li><i>cmail-msa</i> Plugin API specification</li>
+				<li><i>cmail</i> Initial packaging &amp; setup scripts</li>
+				<li><i>cmail-imapd</i> Basic implementation</li>
+			</ol>
+			This listing should not be taken at face value. Development pace is not easy to estimate,
+			and features may be postponed because of lack of interest or more pressing issues.
+			<p>
+			For finer grained To-Do lists, check the individual module folders in the repository
+			for files named TODO.
+			</p>
 		</div>
 
 		<div>
@@ -92,18 +115,57 @@
 			</ul>
 		</div>
 
+		<!-- Currently commented out. There should be some more text here.
+		<div>
+			<h2>Reasons for choosing cmail</h2>
+			<div>
+				<h3>Easy setup</h3>
+			</div>
+
+			<div>
+				<h3>Easy configuration</h3>
+				Mail server configuration is normally a task best left to experts. Feedback upon
+				wrong configuration is scarce, and introducing security problems is easy.
+				Configuration files for cmail modules are scarcely more than port bind directives
+				and logging options, reducing the amount of things that can go wrong at module
+				configuration time. Even at run-time, cmail makes it really hard to configure it
+				to do dangerous things, such as presenting an open relay, while keeping it easy
+				to add new addresses, domains and users.
+			</div>
+
+			<div>
+				<h3>Small codebase</h3>
+				The cmail codebase is considerably smaller than that of most other MTAs, making it
+				easier to understand, debug and fix problems that may arise.
+			</div>
+
+			<div>
+				<h3>Simple storage</h3>
+			</div>
+		</div>
+		//-->
+
 		<div>
 			<h2>Contributing</h2>
-
+			cmail is distributed under the <a href="http://opensource.org/licenses/BSD-2-Clause">BSD 2-Clause license</a>. 
+			Any contributors must agree to have their code placed under that same license.
+			The main development languages are C (daemons), PHP (API backend) and
+			JavaScript/HTML (web panels). 
+			
+			<p>
+			Contributions are very welcome! You may either submit pull requests or issues on 
+			<a href="http://github.com/cmail-mta/">github</a> or send patches, ideas, requests, 
+			praise or experiences to <a href="mailto:devel@cmail.rocks">devel@cmail.rocks</a> :)
+			</p>
 		</div>
 
 		<div>
 			<h2>Resources</h2>
 			<ul>
-				<li>The project homepage: <a href="http://cmail.rocks/">http://cmail.rocks/</a></li>
-				<li>The Github organisation of the cmail project: <a href="https://github.com/cmail-mta/">cmail-mta</a></li>
-				<li>git repository: <i>git clone</i> <a href="http://git.services.cbcdn.com/cmail">http://git.services.cbcdn.com/cmail</a></li>
-				<li>Contrib git repository: <i>git clone</i> <a href="http://git.services.cbcdn.com/cmail-contrib">http://git.services.cbcdn.com/cmail-contrib</a></li>
+				<li>Project homepage: <a href="http://cmail.rocks/">cmail.rocks</a></li>
+				<li>Github organisation: <a href="https://github.com/cmail-mta/">github.com/cmail-mta</a></li>
+				<li>git repository (main): <i>git clone</i> <a href="http://git.services.cbcdn.com/cmail">git.services.cbcdn.com/cmail</a></li>
+				<li>git repository (contrib): <i>git clone</i> <a href="http://git.services.cbcdn.com/cmail-contrib">git.services.cbcdn.com/cmail-contrib</a></li>
 			</ul>
 		</div>
 	</body>
