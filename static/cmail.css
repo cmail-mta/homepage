@@ -1,0 +1,13 @@
+.screenshot {
+	display:inline-block;
+	text-align:center;
+	border:1px solid #0fefe0;
+	padding:1em;
+	margin:0.2em;
+	vertical-align:top;
+}
+
+.screenshot img {
+	width:10em;
+	display:block;
+}
