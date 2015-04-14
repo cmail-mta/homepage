@@ -26,14 +26,14 @@
 
 		<div>
 			<h2>Building &amp; Prerequisites</h2>
-			The following packages are required for building (Debian packages are listed)
+			The following packages are required for building this module (Debian packages are listed)
 			<ul>
 				<li>libgnutls28-dev <i>(Handling of TLS connections, not needed when compiling with <code>-DCMAIL_NO_TLS</code>)</i></li>
 				<li>libnettle-dev <i>(Cryptographic functions for password hashing)</i></li>
 				<li>libsqlite3-dev <i>(Database interface)</i></li>
 			</ul>
 
-			A build of this specific module can be initiated by running <code>make</code> in cmail-msa/
+			A build of only this specific module can be initiated by running <code>make</code> in cmail-msa/
 		</div>
 
 		<div>
@@ -97,7 +97,7 @@
 					<td>The executing user needs read AND write access to the master database file as well as the folder containing it</td>
 				</tr>
 				<tr>
-					<td rowspan="8"><code>bind</code></td>
+					<td rowspan="9"><code>bind</code></td>
 					<td>Address to bind to</td>
 					<td>
 						<code>::</code> and <code>*</code> bind all interfaces for IPv6 and IPv4 respectively
@@ -105,7 +105,15 @@
 				</tr>
 				<tr>
 					<td>Port to listen on</td>
-					<td>Privileged ports (Numbers smaller than 1024) usually need root privileges to bind to</td>
+					<td>
+						The widely-known ports for SMTP are
+						<ul>
+							<li><b>25</b> - SMTP</li>
+							<li><b>465</b> - SSMTP (tls-only, nonstandard)</li>
+							<li><b>587</b> - Submission</li>
+						</ul>
+						Privileged ports (Numbers smaller than 1024) usually need root privileges to bind to
+					</td>
 				</tr>
 				<tr>
 					<td>
@@ -134,6 +142,13 @@
 						<code>key=</code> TLS key file location
 					</td>
 					<td>Specifying both <code>cert</code> and <code>key</code> automatically enables opportunistic encryption via STARTTLS</td>
+				</tr>
+				<tr>
+					<td>
+						<i>(optional, not available when compiled with <code>CMAIL_NO_TLS</code>)</i><br/>
+						<code>ciphers=</code> GnuTLS cipher priority listing
+					</td>
+					<td>This parameter can be used to disable or force specific ciphers or protocol versions</td>
 				</tr>
 				<tr>
 					<td>
