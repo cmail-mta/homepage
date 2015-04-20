@@ -1,0 +1,181 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>cmail-popd: Provide access to mailboxes via POP3</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link rel="icon" href="../static/cmail_logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../static/cmail_logo.png" type="image/x-icon" />
+		<link rel="stylesheet" type="text/css" href="../static/cmail.css" />
+		<meta name="description" content="cmail - Internet mail processing suite with SQLite backend" />
+		<meta name="keywords" content="cmail, smtp, email, pop, webmail, messaging" />
+		<meta name="robots" content="index,follow" />
+	</head>
+	<body>
+		<div>
+			<a href="../index.htm">Back</a> to the main page
+		</div>
+
+		<div>
+			<h1>cmail-popd</h1>
+			<h3>Provide mailbox access via POP3</h3>
+			The Post Office Protocol Version 3 (POP3) allows users to access their mailboxes
+			from remote computers. POP3 does itself only provide basic message download options,
+			message status handling must be done client-side and can usually not be synchronized
+			between multiple clients.
+		</div>
+
+		<div>
+			<h2>Building &amp; Prerequisites</h2>
+			The following packages are required for building this module (Debian packages are listed)
+			<ul>
+				<li>libgnutls28-dev <i>(Handling of TLS connections, not needed when compiling with <code>-DCMAIL_NO_TLS</code>)</i></li>
+				<li>libnettle-dev <i>(Cryptographic functions for password hashing)</i></li>
+				<li>libsqlite3-dev <i>(Database interface)</i></li>
+			</ul>
+
+			A build of only this specific module can be initiated by running <code>make</code> in cmail-popd/
+		</div>
+
+		<div>
+			<h2>Setup information</h2>
+			This module needs read and write access to the master database AS WELL AS the folder containing it.
+			Recommended practice is creating a dedicated user and specifying that in the configuration in order to
+			have the module drop its privileges after binding the ports.
+			
+			<p>
+			Run the module without specifying a logfile in the configuration at first, in order to test its operation
+			and track down any misconfigurations. Specifying a logfile allows the module to daemonize itself and detach
+			from the starting shell.
+			</p>
+		</div>
+
+		<div>
+			<h2>Configuration</h2>
+			The configuration file contains multiple lines, each specifying one of the following configuration
+			directives. Lines are read from this file consecutively. Most directives become active the moment 
+			they are read. An example configuration file with sane defaults (save for the banner announce) can
+			be found in the example-configs/ folder in the main repo.
+			
+			<table border="1">
+				<tr>
+					<th>Directive</th>
+					<th>
+						Parameters
+						<div style="font-weight:normal;font-size:80%;font-decoration:none;">
+							<i>Comments</i> <code>Verbatim</code>
+						</div>
+					</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td><code>verbosity</code></td>
+					<td>Integer between 0 and 4</td>
+					<td>
+						Set log output verbosity. Higher values include messages
+						for lower values.
+						<ul>
+							<li><b>0</b> - Errors &amp; Warnings only (Default)</li>
+							<li><b>1</b> - Informational messages</li>
+							<li><b>2</b> - Currently not specified</li>
+							<li><b>3</b> - Debug messages</li>
+							<li><b>4</b> - All input and output</li>
+						</ul>
+					</td>
+				</tr>
+				<tr>
+					<td><code>logfile</code></td>
+					<td>Path to log file</td>
+					<td>If not specified, cmail-popd will log to stderr and will not be able to detach from the calling shell</td>
+				</tr>
+				<tr>
+					<td><code>user</code></td>
+					<td>Username to switch to</td>
+					<td>The module will change its executing user to the one specified. Only works when started as root.</td>
+				</tr>
+				<tr>
+					<td><code>group</code></td>
+					<td>Group name to switch to</td>
+					<td>The module will change its executing group to the on specified. Only works when started as root.</td>
+				</tr>
+				<tr>
+					<td><code>database</code></td>
+					<td>Path to master database</td>
+					<td>The executing user needs read AND write access to the master database file as well as the folder containing it</td>
+				</tr>
+				<tr>
+					<td rowspan="8"><code>bind</code></td>
+					<td>Address to bind to</td>
+					<td>
+						<code>::</code> and <code>*</code> bind all interfaces for IPv6 and IPv4 respectively
+					</td>
+				</tr>
+				<tr>
+					<td>Port to listen on</td>
+					<td>
+						The widely-known ports for POP are
+						<ul>
+							<li><b>110</b> - POP3</li>
+							<li><b>995</b> - POP3S (tls-only)</li>
+						</ul>
+						Privileged ports (Numbers smaller than 1024) usually need root privileges to bind to
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<i>(optional)</i><br/>
+						<code>announce=</code> Server name to announce to clients in the banner
+					</td>
+					<td>The announced name should preferrably have a valid DNS record pointing to the machine</td>
+				</tr>
+				<tr>
+					<td>
+						<i>(optional, not available when compiled with <code>CMAIL_NO_TLS</code>)</i><br/>
+						<code>cert=</code> TLS certificate file location
+					</td>
+					<td>Specifying both <code>cert</code> and <code>key</code> automatically enables opportunistic encryption via STARTTLS</td>
+				</tr>
+				<tr>
+					<td>
+						<i>(optional, not available when compiled with <code>CMAIL_NO_TLS</code>)</i><br/>
+						<code>key=</code> TLS key file location
+					</td>
+					<td>Specifying both <code>cert</code> and <code>key</code> automatically enables opportunistic encryption via STARTTLS</td>
+				</tr>
+				<tr>
+					<td>
+						<i>(optional, not available when compiled with <code>CMAIL_NO_TLS</code>)</i><br/>
+						<code>ciphers=</code> GnuTLS cipher priority listing
+					</td>
+					<td>This parameter can be used to disable or force specific ciphers or protocol versions</td>
+				</tr>
+				<tr>
+					<td>
+						<i>(optional, not available when compiled with <code>CMAIL_NO_TLS</code>)</i><br/>
+						<code>tlsonly</code>
+					</td>
+					<td>Connections on this port are expected to immediately negotiate a TLS session, never exchanging plain text data</td>
+				</tr>
+				<tr>
+					<td>
+						<i>(optional, not available when compiled with <code>CMAIL_NO_TLS</code>)</i><br/>
+						<code>tlsrequire</code>
+					</td>
+					<td>Clients will be denied authentication unless communication is secured by TLS</td>
+				</tr>
+			</table>
+		</div>
+
+		<div>
+			<h2>Debugging</h2>
+		</div>
+
+		<div>
+			<h2>Resources &amp; Further reading</h2>
+			<ul>
+				<li><a href="https://tools.ietf.org/html/rfc1939">RFC 1939</a> - POP3 (Implemented)</li>
+				<li><a href="https://tools.ietf.org/html/rfc2449">RFC 2449</a> - POP3 Extensions (Implemented)</li>
+				<li><a href="https://tools.ietf.org/html/rfc2595">RFC 2595</a> - POP3 STARTTLS (Implemented)</li>
+			</ul>
+		</div>
+	</body>
+</html>

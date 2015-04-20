@@ -1,4 +1,42 @@
 table {
 
 	border: 1px solid black;
+	width: 100%;
+}
+
+td, th {
+	border: 1px solid black;
+	padding: 0.2em;
+}
+
+tr:nth-child(even) {
+	background-color: #AAA;
+}
+
+h1{
+	margin:0.4em 0 0 0;
+}
+
+h2, h3 {
+	margin:0.5em 0 0 0;
+}
+
+#logo {
+	height:7em;
+	float:left;
+	padding:0 1em 0 0;
+}
+
+.screenshot {
+	display:inline-block;
+	text-align:center;
+	border:1px solid #0fefe0;
+	padding:1em;
+	margin:0.2em;
+	vertical-align:top;
+}
+
+.screenshot img {
+	width:10em;
+	display:block;
 }

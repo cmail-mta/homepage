@@ -9,11 +9,12 @@
 		<meta name="description" content="cmail - Internet mail processing suite with SQLite backend" />
 		<meta name="keywords" content="cmail, smtp, email, pop, webmail, messaging" />
 		<meta name="robots" content="index,follow" />
+		<meta name="google-site-verification" content="LhCD1XfN6u3dGL8xSrm7-Xi6-z_STIS_pqVky8NNgUY" />
 	</head>
 	<body>
 
 		<div>
-			<img src="static/cmail_logo.svg" style="height:7em;float:left;padding:1em;" />
+			<img src="static/cmail_logo.svg" id="logo" />
 			<h1>cmail</h1>
 			<h3>Internet mail processing suite with SQLite backend</h3>
 			cmail is an implementation of multiple protocols to fulfill most, if not all
@@ -22,17 +23,18 @@
 		</div>
 
 		<div style="clear:both;">
-			  Architecturally, cmail is split into several modules which interface through
-			  a central SQLite database (the master database).
-			  <ul>
-				  <li><a href="api.htm">cmail-api</a>			<i>HTTP API to the master database</i></li>
-				  <li><a href="msa.htm">cmail-msa</a>			<i>SMTP server (Accept incoming / originated mails)</i></li>
-				  <li><a href="popd.htm">cmail-popd</a>			<i>POP server (Access mailboxes via POP)</i></li>
-				  <li><a href="imapd.htm">cmail-imapd</a>		<i>IMAP server (Access mailboxes via IMAP)</i></li>
-				  <li><a href="mta.htm">cmail-mta</a>			<i>SMTP client (Delivers outgoing mails to remote servers)</i></li>
-				  <li><a href="webadmin.htm">cmail-webadmin</a>		<i>HTTP Administration interface</i></li>
-				  <li><a href="webmailer.htm">cmail-webmailer</a>	<i>Web mailer interface</i></li>
-			  </ul>
+			Architecturally, cmail is split into several modules which interface through
+			a central SQLite database (the master database).
+			<ul>
+				<li><a href="modules/api.htm">cmail-api</a>			<i>HTTP API to the master database</i></li>
+				<li><a href="modules/msa.htm">cmail-msa</a>			<i>SMTP server (Accept incoming / originated mails)</i></li>
+				<li><a href="modules/popd.htm">cmail-popd</a>			<i>POP server (Access mailboxes via POP)</i></li>
+				<li><a href="modules/imapd.htm">cmail-imapd</a>			<i>IMAP server (Access mailboxes via IMAP)</i></li>
+				<li><a href="modules/mta.htm">cmail-mta</a>			<i>SMTP client (Delivers outgoing mails to remote servers)</i></li>
+				<li><a href="modules/webadmin.htm">cmail-webadmin</a>		<i>HTTP Administration interface</i></li>
+				<li><a href="modules/webmailer.htm">cmail-webmailer</a>		<i>Web mailer interface</i></li>
+			</ul>
+			Read more about the system architecture in the <a href="architecture.htm">architecture information section</a>.
 		</div>
 
 		<div>
@@ -164,8 +166,8 @@
 			<ul>
 				<li>Project homepage: <a href="http://cmail.rocks/">cmail.rocks</a></li>
 				<li>Github organisation: <a href="https://github.com/cmail-mta/">github.com/cmail-mta</a></li>
-				<li>git repository (main): <i>git clone</i> <a href="http://git.services.cbcdn.com/cmail">git.services.cbcdn.com/cmail</a></li>
-				<li>git repository (contrib): <i>git clone</i> <a href="http://git.services.cbcdn.com/cmail-contrib">git.services.cbcdn.com/cmail-contrib</a></li>
+				<li>git repository (main): <i>git clone</i> <a href="http://git.services.cbcdn.com/cmail">http://git.services.cbcdn.com/cmail</a></li>
+				<li>git repository (contrib): <i>git clone</i> <a href="http://git.services.cbcdn.com/cmail-contrib">http://git.services.cbcdn.com/cmail-contrib</a></li>
 			</ul>
 		</div>
 	</body>

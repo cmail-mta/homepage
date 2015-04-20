@@ -1,0 +1,44 @@
+digraph G {
+	graph [fontsize=12 fontname="Verdana" compound=true];
+	node [shape=record fontsize=12 fontname="Verdana"];
+	edge [fontsize=10 fontname="Verdana"];
+	rankdir=BT;
+
+	Remote[label="Remote mail server"];
+
+	subgraph cluster_cmail {
+		node [style=filled];
+		MTA[label="cmail-mta\n(SMTP client)"];
+		Master[label="Master\ndatabase"];
+		MSA[label="cmail-msa\n(SMTP server)"];
+		Access[label="cmail-popd\ncmail-imapd\ncmail-webmailer"];
+		Admin[label="cmail-api"];
+		color=blue;
+		label="cmail Server";
+		{rank=same; MTA; MSA; Master;}
+		//{rank=same; Admin; Access;}
+		//{rank=same; MTA; MSA; }
+	}
+
+	subgraph cluster_client {
+		label="Client";
+		MUA[label="MUA"];
+		Browser[label="Browser"];
+	}
+
+	MSA -> Master [label="Store"];
+	Master -> MTA [label="Fetch"];
+	Master -> Access [label="Fetch mail"];
+	Admin -> Master [label="Configuration\ndata"];
+
+	Remote -> MSA [label="Incoming\nmail"];
+	MTA -> Remote [label="Outbound\nmail"];
+
+	MUA -> MSA [label="Originated\nmail"];
+	Access -> MUA [label="Mailbox\naccess"];
+	Browser -> Admin [label="API Access\n(HTTP)"];
+
+//	Client -> MSA [label="Message submission\n(SMTP client)"];
+//	Access -> Client [label="Mailbox access"];
+//	Client -> Admin [label="API Access\n(HTTP)"];
+}

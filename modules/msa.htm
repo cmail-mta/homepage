@@ -1,0 +1,208 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>cmail-msa: Accept incoming/originating mails</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link rel="icon" href="../static/cmail_logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../static/cmail_logo.png" type="image/x-icon" />
+		<link rel="stylesheet" type="text/css" href="../static/cmail.css" />
+		<meta name="description" content="cmail - Internet mail processing suite with SQLite backend" />
+		<meta name="keywords" content="cmail, smtp, email, pop, webmail, messaging" />
+		<meta name="robots" content="index,follow" />
+	</head>
+	<body>
+		<div>
+			<a href="../index.htm">Back</a> to the main page
+		</div>
+
+		<div>
+			<h1>cmail-msa</h1>
+			<h3>Accept incoming/originated mails via SMTP</h3>
+			This component provides the services that most accurately matches the
+			common perception of a mail server. It accepts incoming mail via SMTP
+			(usually on port 25) and allows new mail to be submitted for delivery 
+			(SMTP Submission, port 587) by authenticated users.
+		</div>
+
+		<div>
+			<h2>Building &amp; Prerequisites</h2>
+			The following packages are required for building this module (Debian packages are listed)
+			<ul>
+				<li>libgnutls28-dev <i>(Handling of TLS connections, not needed when compiling with <code>-DCMAIL_NO_TLS</code>)</i></li>
+				<li>libnettle-dev <i>(Cryptographic functions for password hashing)</i></li>
+				<li>libsqlite3-dev <i>(Database interface)</i></li>
+			</ul>
+
+			A build of only this specific module can be initiated by running <code>make</code> in cmail-msa/
+		</div>
+
+		<div>
+			<h2>Setup information</h2>
+			This module needs read and write access to the master database AS WELL AS the folder containing it.
+			Recommended practice is creating a dedicated user and specifying that in the configuration in order to
+			have the module drop its privileges after binding the ports.
+			
+			<p>
+			Run the module without specifying a logfile in the configuration at first, in order to test its operation
+			and track down any misconfigurations. Specifying a logfile allows the module to daemonize itself and detach
+			from the starting shell.
+			</p>
+		</div>
+
+		<div>
+			<h2>Configuration file</h2>
+			The configuration file contains multiple lines, each specifying one of the following configuration
+			directives. Lines are read from this file consecutively. Most directives become active the moment 
+			they are read. An example configuration file with sane defaults (save for the banner announce) can
+			be found in the example-configs/ folder in the main repo.
+
+			<table border="1">
+				<tr>
+					<th>Directive</th>
+					<th>
+						Parameters
+						<div style="font-weight:normal;font-size:80%;font-decoration:none;">
+							<i>Comments</i> <code>Verbatim</code>
+						</div>
+					</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td><code>verbosity</code></td>
+					<td>Integer between 0 and 4</td>
+					<td>
+						Set log output verbosity. Higher values include messages
+						for lower values.
+						<ul>
+							<li><b>0</b> - Errors &amp; Warnings only (Default)</li>
+							<li><b>1</b> - Informational messages</li>
+							<li><b>2</b> - Currently not specified</li>
+							<li><b>3</b> - Debug messages</li>
+							<li><b>4</b> - All input and output</li>
+						</ul>
+					</td>
+				</tr>
+				<tr>
+					<td><code>logfile</code></td>
+					<td>Path to log file</td>
+					<td>If not specified, cmail-msa will log to stderr and will not be able to detach from the calling shell</td>
+				</tr>
+				<tr>
+					<td><code>user</code></td>
+					<td>Username to switch to</td>
+					<td>The module will change its executing user to the one specified. Only works when started as root.</td>
+				</tr>
+				<tr>
+					<td><code>group</code></td>
+					<td>Group name to switch to</td>
+					<td>The module will change its executing group to the on specified. Only works when started as root.</td>
+				</tr>
+				<tr>
+					<td><code>database</code></td>
+					<td>Path to master database</td>
+					<td>The executing user needs read AND write access to the master database file as well as the folder containing it</td>
+				</tr>
+				<tr>
+					<td rowspan="9"><code>bind</code></td>
+					<td>Address to bind to</td>
+					<td>
+						<code>::</code> and <code>*</code> bind all interfaces for IPv6 and IPv4 respectively
+					</td>
+				</tr>
+				<tr>
+					<td>Port to listen on</td>
+					<td>
+						The widely-known ports for SMTP are
+						<ul>
+							<li><b>25</b> - SMTP</li>
+							<li><b>465</b> - SSMTP (tls-only, nonstandard)</li>
+							<li><b>587</b> - Submission</li>
+						</ul>
+						Privileged ports (Numbers smaller than 1024) usually need root privileges to bind to
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<i>(optional)</i><br/>
+						<code>size=</code> Maximum accepted mail size in bytes
+					</td>
+					<td>Default is 0, indicating no limit</td>
+				</tr>
+				<tr>
+					<td>
+						<i>(optional)</i><br/>
+						<code>announce=</code> Server name to announce to clients in the banner
+					</td>
+					<td>The announced name should preferrably have a valid DNS record pointing to the machine</td>
+				</tr>
+				<tr>
+					<td>
+						<i>(optional, not available when compiled with <code>CMAIL_NO_TLS</code>)</i><br/>
+						<code>cert=</code> TLS certificate file location
+					</td>
+					<td>Specifying both <code>cert</code> and <code>key</code> automatically enables opportunistic encryption via STARTTLS</td>
+				</tr>
+				<tr>
+					<td>
+						<i>(optional, not available when compiled with <code>CMAIL_NO_TLS</code>)</i><br/>
+						<code>key=</code> TLS key file location
+					</td>
+					<td>Specifying both <code>cert</code> and <code>key</code> automatically enables opportunistic encryption via STARTTLS</td>
+				</tr>
+				<tr>
+					<td>
+						<i>(optional, not available when compiled with <code>CMAIL_NO_TLS</code>)</i><br/>
+						<code>ciphers=</code> GnuTLS cipher priority listing
+					</td>
+					<td>This parameter can be used to disable or force specific ciphers or protocol versions</td>
+				</tr>
+				<tr>
+					<td>
+						<i>(optional, not available when compiled with <code>CMAIL_NO_TLS</code>)</i><br/>
+						<code>tlsonly</code>
+					</td>
+					<td>Connections on this port are expected to immediately negotiate a TLS session, never exchanging plain text data</td>
+				</tr>
+				<tr>
+					<td>
+						<i>(optional)</i><br/>
+						<code>auth</code><br/>
+						<code>auth=strict,tlsonly</code><br/>
+						<code>auth=fixed@</code> Name of user to automatically be authenticated on this port
+					</td>
+					<td>
+						Enable SMTP authentication on this port. Authentication is required for sending mail to non-local addresses.<br/> 
+						<code>tlsonly</code> requires the connection to be secured by TLS in order to be able to authenticate.<br/>
+						<code>strict</code> requires authentication before allowing any mail-related commands to succeed (SMTP submission mode).<br/>
+						<code>fixed@<i>user</i></code> can potentially be used to create an open relay. Be careful when using it.
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<div>
+			<h2>Database configuration</h2>
+		</div>
+
+		<div>
+			<h2>Debugging</h2>
+		</div>
+
+		<div>
+			<h2>Plugin API</h2>
+		</div>
+
+		<div>
+			<h2>Resources &amp; Further reading</h2>
+			<ul>
+				<li><a href="http://tools.ietf.org/html/rfc5321">RFC 5321</a> - SMTP &amp; ESMTP (Implemented)</li>
+				<li><a href="http://tools.ietf.org/html/rfc4954">RFC 4954</a> - SMTP Authentication (Mostly implemented)</li>
+				<li><a href="https://tools.ietf.org/html/rfc6409">RFC 6409</a> - SMTP Submission (Implemented)</li>
+				<li><a href="https://tools.ietf.org/html/rfc1870">RFC 1870</a> - ESMTP SIZE extension (Mostly Implemented)</li>
+				<li><a href="http://tools.ietf.org/html/rfc6152">RFC 6152</a> - ESMTP 8BITMIME extension (Implemented)</li>
+				<li><a href="https://tools.ietf.org/html/rfc6531">RFC 6531</a> - ESMTP SMTPUTF8 extension (Implemented)</li>
+				<li><a href="http://tools.ietf.org/html/rfc3207">RFC 3207</a> - ESMTP STARTTLS extension (Implemented)</li>
+			</ul>
+		</div>
+	</body>
+</html>
