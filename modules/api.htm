@@ -18,15 +18,95 @@
 		<div>
 			<h1>cmail-api</h1>
 			<h3>HTTP API to the master database</h3>
-			Some description text
+			This api adds webaccess to the master and configured user databases. 
 		</div>
 
 		<div>
 			<h2>Setup information</h2>
+
+			<h3>Requirements</h3>
+			<ul>
+				<li>Webserver (lighttpd, apache, ...)</li>
+				<li>PHP</li>
+				<li>Sqlite-PDO Extension</li>
+			</ul>
 		</div>
 
 		<div>
 			<h2>Configuration</h2>
+
+			<ol>
+				<li>Copy/Move the config.php.sample to config.php.</li>
+				<li>Edit the config file (see config options for more infos).</li>
+				<li>Link or Copy code to your htdocs path.</li>
+			</ol>
+
+			<h3>Config.php</h3>
+			
+			<table>
+				<tr>
+					<th>Name</th><th>Parameters</th><th>Description</th>
+				</tr>
+
+				<tr>
+					<td>$dbpath</td><td>String</td><td>Path to master database.</td>
+				</tr>
+				<tr>
+					<td>$modulelist</td><td>Array</td>
+					<td>
+						List of active Modules. This map has as key the module class name
+						and the value as path to the module php file. <br />
+						Here is a list of valid modules which we provide:
+					</td>
+				</tr>
+				<tr>
+					<td rowspan="6">Modules</td>
+					<td>Address</td>
+					<td>
+						With this module you can modify addresses the server will accept and map these to users.
+					</td>
+				</tr>
+				<tr>
+					<td>User (required)</td>
+					<td>
+						This Module controls all user related stuff and provides the authorization and rights for users.
+					</td>
+				</tr>
+				<tr>
+					<td>Delegate</td>
+					<td>
+						This Module manages user and address delegations. 
+						If you use the delegate right (see "Rights") you need this module.
+					</td>
+				</tr>
+				<tr>
+					<td>MSA</td>
+					<td>
+						This Module manages routing decisions for users.
+					</td>
+				</tr>
+				<tr>
+					<td>POP</td>
+					<td>
+						This Module manages access to the pop service and can unlock pop locks.
+						If you don't need the pop service you can disable it.
+					</td>
+				</tr>
+				<tr>
+					<td>Mailbox</td>
+					<td>
+						This Module manages the access to the webmailer.
+						Enabled user can read and write mails with the webmailer.
+						If you don't need the webmailer then disable the webmailer module.
+					</td>
+				</tr>
+
+			</table>
+
+		</div>
+
+		<div>
+			<h2>Manual</h2>
 		</div>
 
 	</body>
