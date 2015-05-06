@@ -1,0 +1,105 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>cmail: Step-by-step setup</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link rel="icon" href="static/cmail_logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="static/cmail_logo.png" type="image/x-icon" />
+		<link rel="stylesheet" type="text/css" href="static/cmail.css" />
+		<meta name="description" content="cmail - Internet mail processing suite with SQLite backend" />
+		<meta name="keywords" content="cmail, smtp, email, pop, webmail, messaging, setup from source, step by step" />
+		<meta name="robots" content="index,follow" />
+	</head>
+	<body>
+		<div>
+			<a href="index.htm">Back</a> to the main page
+		</div>
+
+		<div>
+			<h1>Step by step setup</h1>
+			This page details the process of installing and configuring
+			a functional cmail server.
+		</div>
+
+		<div>
+			<h2>1a Setup from packages</h2>
+			Install the package with your package manager of choice (eg. dpkg, pacman).
+			Depending on the package maintainer, this process may already run a dialog
+			of some sorts querying basic configuration information.
+		</div>
+
+		<div>
+			<h2>1b Setup from source</h2>
+			<i>(Examples given for debian-based systems)</i>
+			<p>
+			We're going to assume the system already sports a working C compiler
+			as well as the git version control system. First, we're going to install the
+			build prerequisites. 
+			</p>
+			<p>
+			<code style="display:block;">
+				~# apt-get install libsqlite3-dev<br/>
+				~# apt-get install libnettle-dev<br/>
+				~# apt-get install libgnutls28-dev<br/>
+				~# apt-get install libadns1-dev
+			</code>
+			</p>
+
+			<p>
+			Clone the cmail repository
+			</p>
+			<p>
+			<code style="display:block;">
+				~# git clone https://github.com/cmail-mta/cmail
+			</code>
+			</p>
+
+			<p>
+			In the cloned directory, run <code>make</code> to build all modules, followed
+			by <code>make install</code> to copy the binaries to a system path (by default
+			<code>/usr/sbin/</code>, this may be changed by supplying the environment variable
+			<code>PREFIX</code>) 
+			</p>
+			<p>
+			<code style="display:block;">
+				~# cd cmail<br/>
+				~/cmail# make<br/>
+				~/cmail# make install
+			</code>
+			</p>
+		</div>
+
+		<div>
+			<h2>2 Setting up a cmail user</h2>
+			In order to minimize the attack surface presented by cmail, it supports a mechanism
+			to change its running user to a less privileged one after performing privileged operations
+			(which consist mainly of binding to privileged ports). Use of this facility is highly 
+			encouraged. This user needs write access to all databases used at run time, as explained
+			in a later section. Most of these databases should also be exclusively writable by this user,
+			to prevent non-privileged users from injecting mail or altering the configuration.
+			<p>
+			<code style="display:block;">
+				~# adduser --disabled-login cmail
+			</code>
+			</p>
+		</div>
+
+		<div>
+			<h2>3 Configuring the modules</h2>
+		</div>
+
+		<div>
+			<h2>4 Setting up the master database</h2>
+			cmail uses <a href="https://sqlite.org/">SQLite</a>, a file-based database to store
+			most of its running configuration and data.
+		</div>
+
+		<div>
+			<h2>5 Testing the server</h2>
+		</div>
+
+		<div>
+			<h2>6 Logging and debugging</h2>
+		</div>
+	</body>
+</html>
