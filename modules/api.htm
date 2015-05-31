@@ -106,7 +106,88 @@
 		</div>
 
 		<div>
-			<h2>Manual</h2>
+			<h2>Endpoints</h2>
+
+			<table>
+				<thead>
+					<tr>
+						<th>Module</th><th>Endpoint</th><th>Right</th><th>Description</th>
+					</tr>
+				</thead>
+
+				<tbody>
+					<tr>
+						<td>General</td>
+						<td>/?get-modules</td>
+						<td>*</td>
+						<td>
+							Returns all active modules.
+						</td>
+
+					</tr>
+					<tr>
+						<td rowspan="9">User</td>
+						<td rowspan="3">users/?get</td>
+						<td>admin</td>
+						<td>Return all users.</td>
+					</tr>
+					<tr>
+						<td>delegate</td>
+						<td>
+							Return all delegeted users.
+						</td>
+					</tr>
+					<tr>
+						<td>*</td>
+						<td>
+							Return the authenticated user.
+						</td>
+					</tr>
+					<tr>
+						<td>users/?add</td>
+						<td>admin</td>
+						<td>
+							Adds an user.
+						</td>
+					</tr>
+					<tr>
+						<td>users/?delete</td>
+						<td>admin</td>
+						<td>
+							Delete the given user.
+						</td>
+					</tr>
+					<tr>
+						<td>users/?set_password</td>
+						<td>admin, delegate (only delegated users) or user (only user)</td>
+						<td>
+							Sets the password of the user.
+						</td>
+					</tr>
+					<tr>
+						<td>users/?add_right</td>
+						<td>admin</td>
+						<td>
+
+							Adds a right to a user.
+						</td>
+					</tr>
+					<tr>
+						<td>users/?delete_right</td>
+						<td>admin</td>
+						<td>
+							Deletes a right of a user.
+						</td>
+					</tr>
+					<tr>
+						<td>users/?update-rights</td>
+						<td>admin</td>
+						<td>
+							Updates rights for a user.
+						</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 
 	</body>
