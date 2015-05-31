@@ -1,13 +1,13 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>cmail-mta: Deliver outbound mails</title>
+		<title>cmail-mta: Deliver outbound mail</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<link rel="icon" href="../static/cmail_logo.png" type="image/x-icon" />
 		<link rel="shortcut icon" href="../static/cmail_logo.png" type="image/x-icon" />
 		<link rel="stylesheet" type="text/css" href="../static/cmail.css" />
-		<meta name="description" content="cmail - Internet mail processing suite with SQLite backend" />
-		<meta name="keywords" content="cmail, smtp, email, pop, webmail, messaging" />
+		<meta name="description" content="cmail-mta: cmail component delivering outbound mail" />
+		<meta name="keywords" content="cmail, mailserver, email, messaging, outbound mail delivery, smtp client" />
 		<meta name="robots" content="index,follow" />
 	</head>
 	<body>
@@ -17,24 +17,185 @@
 
 		<div>
 			<h1>cmail-mta</h1>
-			<h3>Deliver outbound messages to remote SMTP servers</h3>
+			<h3>Deliver outbound mail via SMTP</h3>
+			This component delivers outbound mail to remote servers (and, in some cases, the local server)
+			as well as generating bounce notification message upon failure of delivery.
 		</div>
 
 		<div>
 			<h2>Building &amp; Prerequisites</h2>
+			The following packages are required for building this module (Debian packages are listed)
+			<ul>
+				<li>libadns1-dev <i>(Used for resolving remote paths to mail servers)</i></li>
+				<li>libgnutls28-dev <i>(Handling of TLS connections, not needed when compiling with <code>-DCMAIL_NO_TLS</code>)</i></li>
+				<li>libnettle-dev <i>(Cryptographic functions for password hashing)</i></li>
+				<li>libsqlite3-dev <i>(Database interface)</i></li>
+			</ul>
+
+			A build of only this specific module can be initiated by running <code>make</code> in cmail-mta/
 		</div>
 
 		<div>
 			<h2>Setup information</h2>
+			This module needs read and write access to the master database AS WELL AS the folder containing it.
+			Recommended practice is creating a dedicated user and specifying that in the configuration in order to
+			have the module drop its privileges after binding the ports.
+			
+			<p>
+			Run the module without specifying a logfile in the configuration at first, in order to test its operation
+			and track down any misconfigurations. Specifying a logfile allows the module to daemonize itself and detach
+			from the starting shell.
+			</p>
 		</div>
 
 		<div>
-			<h2>Configuration</h2>
+			<h2>Configuration file</h2>
+			The configuration file contains multiple lines, each specifying one of the following configuration
+			directives. Lines are read from this file consecutively. Most directives become active the moment 
+			they are read. An example configuration file with sane defaults (save for the <code>announce</code>
+			and <code>bounce_from</code> options) can be found in the example-configs/ folder in the main repo.
+
+			<table border="1">
+				<tr>
+					<th>Directive</th>
+					<th>
+						Parameters
+						<div style="font-weight:normal;font-size:80%;font-decoration:none;">
+							<i>Comments</i> <code>Verbatim</code>
+						</div>
+					</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td><code>verbosity</code></td>
+					<td>Integer between 0 and 4</td>
+					<td>
+						Set log output verbosity. Higher values include messages
+						for lower values.
+						<ul>
+							<li><b>0</b> - Errors &amp; Warnings only (Default)</li>
+							<li><b>1</b> - Informational messages</li>
+							<li><b>2</b> - Currently not specified</li>
+							<li><b>3</b> - Debug messages</li>
+							<li><b>4</b> - All input and output</li>
+						</ul>
+					</td>
+				</tr>
+				<tr>
+					<td><code>logfile</code></td>
+					<td>Path to log file</td>
+					<td>If not specified, cmail-mta will log to stderr and will not be able to detach from the calling shell</td>
+				</tr>
+				<tr>
+					<td><code>user</code></td>
+					<td>Username to switch to</td>
+					<td>The module will change its executing user to the one specified. Only works when started as root.</td>
+				</tr>
+				<tr>
+					<td><code>group</code></td>
+					<td>Group name to switch to</td>
+					<td>The module will change its executing group to the on specified. Only works when started as root.</td>
+				</tr>
+				<tr>
+					<td><code>database</code></td>
+					<td>Path to master database</td>
+					<td>The executing user needs read AND write access to the master database file as well as the folder containing it</td>
+				</tr>
+				<tr>
+					<td><code>announce</code></td>
+					<td>Hostname to announce</td>
+					<td>This parameter will be announced to remote SMTP servers in the HELO/EHLO command. It is good practice to have this resolve back to the connecting host</td>
+				</tr>
+				<tr>
+					<td><code>bounce_from</code></td>
+					<td>Bounce originator address</td>
+					<td>The sending address to appear in bounce notifications</td>
+				</tr>
+				<tr>
+					<td><code>interval</code></td>
+					<td>Database check interval in seconds</td>
+					<td>This option configures the interval in which cmail-mta checks the database for outbound mail</td>
+				</tr>
+				<tr>
+					<td><code>retries</code></td>
+					<td>Maximum number of delivery attempts</td>
+					<td>Configure how many times cmail-mta will retry mail delivery upon encountering a temporary failure</td>
+				
+				</tr>
+				<tr>
+					<td><code>retryinterval</code></td>
+					<td>Mail retry interval in seconds</td>
+					<td>The minimum time between two delivery attempts for a single mail item</td>
+				</tr>
+				<!--
+	    			<tr>
+					<td><code>ratelimit</code></td>
+					<td>Maximum number of mails to deliver in one interval</td>
+					<td>Limits the amount of mail delivered during one interval</td>
+				</tr>
+	    			<tr>
+					<td><code>tls_priorities</code></td>
+					<td>GnuTLS priority declaration</td>
+					<td>Protocols and ciphers to be used by GnuTLS when negotiating TLS sessions</td>
+				</tr>
+				//-->
+				<tr>
+					<td><code>tls_padding</code></td>
+					<td>
+						<i>(optional)</i><br/>
+						Maximum number of TLS padding operations
+					</td>
+					<td>
+						In order to provide some obfuscation to counter a passive attacker, cmail-mta can run a random number of
+						useless operations (NOOP/RSET) over the TLS layer before actually starting the mail transaction.
+					</td>
+				</tr>
+				<tr>
+					<td><code>tls_trustfile</code></td>
+					<td>
+						<i>(required when compiled without -DCMAIL_NO_TLS)</i><br/>
+						CA certificate file
+					</td>
+					<td>Trust roots to be used for certificate validation. Currently not practically used as email certificates are usually self-signed.</td>
+				</tr>
+				<tr>
+					<td><code>bounce_copy</code></td>
+					<td>
+						<i>(optional)</i><br/>
+						Space separated list of additional recipients for bounce notifications
+					</td>
+					<td>Bounce notifications may be sent to additional recipients (such as the system administrator) in order to detect problems</td>
+				</tr>
+				<tr>
+					<td><code>portprio</code></td>
+					<td>Space separated list of port specifications</td>
+					<td>
+						The ports to be tried on remote servers, prioritized from left to right. 
+						Port specifications are supplied in the form <i>&lt;Port number&gt;</i><code>[@(tls|starttls)]</code>, e.g.
+						<ul>
+							<li><code>465@tls</code></li>
+							<li><code>25@starttls</code></li>
+							<li><code>25</code></li>
+						</ul>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<div>
+			<h2>Database configuration</h2>
 		</div>
 
 		<div>
 			<h2>Debugging</h2>
 		</div>
 
+		<div>
+			<h2>Resources &amp; Further reading</h2>
+			<ul>
+				<li><a href="http://tools.ietf.org/html/rfc5321">RFC 5321</a> - SMTP &amp; ESMTP (Implemented)</li>
+				<li><a href="http://tools.ietf.org/html/rfc3207">RFC 3207</a> - ESMTP STARTTLS extension (Implemented)</li>
+			</ul>
+		</div>
 	</body>
 </html>

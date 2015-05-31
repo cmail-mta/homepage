@@ -18,30 +18,42 @@
 		<div>
 			<h1>cmail-api</h1>
 			<h3>HTTP API to the master database</h3>
-			This api adds webaccess to the master and configured user databases. 
+			This module provides an HTTP API into the master database as well
+			as configured user databases. It can be used to enable graphical or automated
+			configuration of the system, such as setting up users, adressses and routing.
 		</div>
 
 		<div>
-			<h2>Setup information</h2>
-
-			<h3>Requirements</h3>
+			<h2>Requirements</h2>
+			In order to be able to run the API server, you need the following technologies
 			<ul>
-				<li>Webserver (lighttpd, apache, ...)</li>
-				<li>PHP</li>
-				<li>Sqlite-PDO Extension</li>
+				<li>
+					A web server/httpd (eg. 
+						<a href="http://www.lighttpd.net/">lighttpd</a>, 
+						<a href="http://nginx.org/">nginx</a>, ...)
+				</li>
+				<li>with <a href="http://php.net/">PHP</a> support (eg. php5-fcgi, php5-fpm)</li>
+				<li>
+					the <a href="http://php.net/manual/de/book.pdo.php">PDO</a> 
+					<a href="http://php.net/manual/de/ref.pdo-sqlite.php">driver</a> for 
+					<a href="http://sqlite.org/">sqlite</a> (eg. php5-sqlite)
+				</li>
 			</ul>
 		</div>
 
 		<div>
-			<h2>Configuration</h2>
-
+			<h2>Basic Configuration</h2>
 			<ol>
-				<li>Copy/Move the config.php.sample to config.php.</li>
-				<li>Edit the config file (see config options for more infos).</li>
-				<li>Link or Copy code to your htdocs path.</li>
+				<li>Edit the <code>config.php.sample</code> to your liking and configuration</li>
+				<li>Copy or rename <code>config.php.sample</code> to <code>config.php</code></li>
+				<li>
+					Make sure the httpd has read and write access to the folder 
+					containing the database as well as the database file itself
+				</li>
+				<li>Link or copy the API module's folder into the httpd's served directory tree</li>
 			</ol>
 
-			<h3>Config.php</h3>
+			<h3>Options available in config.php</h3>
 			
 			<table>
 				<tr>
