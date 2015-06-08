@@ -1,0 +1,58 @@
+root@s3:~# apt-get install sqlite3 libsqlite3-dev nettle-dev libgnutls28-dev libadns1-dev ca-certificates
+root@s3:~# adduser --disabled-login cmail
+Adding user `cmail' ...
+[...]
+Enter the new value, or press ENTER for the default
+	Full Name []: 
+	Room Number []: 
+	Work Phone []: 
+	Home Phone []: 
+	Other []: 
+Is the information correct? [Y/n] y
+root@s3:~# git clone https://github.com/cmail-mta/cmail
+Cloning into 'cmail'...
+[...]
+root@s3:~# cd cmail
+root@s3:~/cmail# make
+make[1]: Entering directory '/root/cmail/cmail-msa'
+[...]
+root@s3:~/cmail# make install
+Installing to /usr/sbin
+[...]
+root@s3:~# mkdir /var/log/cmail
+root@s3:~# mkdir /etc/cmail
+root@s3:~# cp cmail/example-configs/* /etc/cmail/
+root@s3:~# cd /etc/cmail/
+root@s3:/etc/cmail# mkdir keys
+root@s3:/etc/cmail# chmod 700 keys/
+root@s3:/etc/cmail# mkdir databases
+root@s3:/etc/cmail# chmod 770 databases/
+root@s3:/etc/cmail# chown root:cmail databases/
+root@s3:/etc/cmail# cd databases/
+root@s3:/etc/cmail# cat ~/cmail/sql-update/install_master.sql | sqlite3 master.db3
+BEGIN TRANSACTION;
+[...]
+COMMIT;
+root@s3:/etc/cmail/databases# chmod 770 master.db3
+root@s3:/etc/cmail/databases# cd ..
+root@s3:/etc/cmail# cd keys/
+root@s3:/etc/cmail/keys# openssl req -x509 -newkey rsa:8192 -keyout mail.key -out mail.cert -days 100 -nodes
+Generating a 8192 bit RSA private key
+[...]
+root@s3:/etc/cmail/keys# chmod 600 *
+root@s3:/etc/cmail/keys# cd ..
+root@s3:/etc/cmail# ls
+databases  keys  msa.conf  mta.conf  popd.conf
+[update banners tls files, logfiles etc in config]
+
+# set up mx records
+# check log files
+root@s3:/var/log/cmail# htop
+root@s3:/var/log/cmail# ss -l
+State      Recv-Q Send-Q                                                  Local Address:Port                                                      Peer Address:Port   
+LISTEN     0      0                                                                   *:2222                                                                 *:*       
+LISTEN     0      0                                                                   *:smtps                                                                  *:*       
+LISTEN     0      0                                                                   *:smtp                                                                 *:*       
+LISTEN     0      0                                                                  :::2222                                                                :::*       
+LISTEN     0      0                                                                  :::smtps                                                                 :::*       
+LISTEN     0      0                                                                  :::smtp                                                                :::*       
