@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>cmail: Architecture information</title>
+		<title>cmail: Development &amp; Architecture information</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<link rel="icon" href="static/cmail_logo.png" type="image/x-icon" />
 		<link rel="shortcut icon" href="static/cmail_logo.png" type="image/x-icon" />
@@ -16,9 +16,10 @@
 		</div>
 
 		<div>
-			<h1>cmail architecture information</h1>
-			This section discusses general architectural decisions and
-			structures used in the development of cmail.
+			<h1>Architecture &amp; development information</h1>
+			This section discusses general architectural decisions, tools
+			and structures used in the development of cmail and strives to
+			be an informational guide for first-time contributors.
 		</div>
 
 		<div>
@@ -29,8 +30,56 @@
 			<a href="static/generated/system.svg">
 				<img src="static/generated/system.svg" style="height:15em;" />
 			</a>
+			<p>
+			The system structure diagram describes how the various modules of
+			cmail interact with eachother as well as remote systems.
+			</p>
 		</div>
 
+		<div>
+			<h2>Development tooling</h2>
+			cmail uses a variety of tools to help maintain code quality,
+			automate tasks and aid development.
+			
+			<p>
+				At the most basic level, this means cmail is regularly built
+				and checked for compile-time warnings using a variety of compilers, 
+				and operating systems, including
+				<ul>
+					<li>gcc</li>
+					<li>clang</li>
+					<li>tcc</li>
+				</ul>
+			</p>
+
+			<p>
+				Code quality is regularly being analyzed by
+				<ul>
+					<li>
+						Running development test builds within <a href="http://valgrind.org/">
+						<code>valgrind</code></a> to check for access violations and memory leaks 
+						at run-time (invoked via <code>make run</code>)
+					</li>
+					<li>
+						Running <code><a href="http://cppcheck.sourceforge.net/">cppcheck</a></code>
+						to gather a quick list of warnings from the source (via <code>make cppcheck</code>)
+					</li>
+					<li>
+						Using clangs <code><a href="http://clang-analyzer.llvm.org/scan-build.html">scan-build</a></code>
+						static analyzer to generate warnings from the source (invoked via <code>scan-build make</code>)
+					</li>
+					<li>
+						Scanning builds with the free offer of the <a href="https://scan.coverity.com/">Coverity</a>
+						static analyzer solution (<a href="https://scan.coverity.com/projects/5438">Coverity Scan</a>)
+					</li>
+					<li>
+						Stress-testing selected interfaces with fuzzers (eg. 
+						<a href="http://lcamtuf.coredump.cx/afl/">afl-fuzz</a>, further information about
+						how to invoke fuzzing are in the works)
+					</li>
+				</ul>
+			</p>
+		</div>
 
 	</body>
 </html>
