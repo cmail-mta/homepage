@@ -29,7 +29,7 @@ root@s3:/etc/cmail# mkdir databases
 root@s3:/etc/cmail# chmod 770 databases/
 root@s3:/etc/cmail# chown root:cmail databases/
 root@s3:/etc/cmail# cd databases/
-root@s3:/etc/cmail# cat ~/cmail/sql-update/install_master.sql | sqlite3 master.db3
+root@s3:/etc/cmail/databases# cat ~/cmail/sql-update/install_master.sql | sqlite3 master.db3
 BEGIN TRANSACTION;
 [...]
 COMMIT;

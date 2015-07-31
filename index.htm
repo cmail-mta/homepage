@@ -34,7 +34,7 @@
 				<li><a href="modules/webadmin.htm">cmail-webadmin</a>		<i>HTTP Administration interface</i></li>
 				<li><a href="modules/webmailer.htm">cmail-webmailer</a>		<i>Web mailer interface</i></li>
 			</ul>
-			Read more about the system architecture in the <a href="architecture.htm">architecture information section</a>.
+			Read more about the system architecture in the <a href="architecture.htm">architecture &amp; development information section</a>.
 		</div>
 
 		<div>
@@ -43,7 +43,7 @@
 			many other MTAs. As such, the configuration file format is relatively simple and only affects
 			the specifics of the module it is written for. For the most part the configuration files consist
 			of directives specifying on which ports the module should provide its service.
-			
+	
 			<p>
 			The primary objective of the project is to provide an <a href="stepbystep.htm">easy-to-setup, 
 			easy-to-configure</a> and secure mail server for end-users that simply want to send and receive 
@@ -85,7 +85,7 @@
 
 		<div>
 			<h2>Common use cases</h2>
-			
+
 			<h3>Receive-only server, mail is sent via external servers</h3>
 			The following modules are involved
 			<ul>
@@ -147,13 +147,18 @@
 
 		<div>
 			<h2>Contributing</h2>
+			Our main development languages are C (daemons), PHP (API backend) and
+			JavaScript/HTML (web panels). To get acquainted with the tools we use,
+			our methodology, architecture and codebase, we have aggregated some
+			resources on our <a href="architecture.htm">architecture &amp; development information</a> page
+
+			<p>
 			cmail is distributed under the <a href="http://opensource.org/licenses/BSD-2-Clause">BSD 2-Clause license</a>. 
 			Any contributors must agree to have their code placed under that same license.
-			The main development languages are C (daemons), PHP (API backend) and
-			JavaScript/HTML (web panels). 
-			
+			</p>
+
 			<p>
-			Contributions are very welcome! You may either submit pull requests or issues on 
+			Your contributions are very welcome! You may either submit pull requests or issues on 
 			<a href="http://github.com/cmail-mta/">github</a> or send patches, ideas, requests, 
 			praise or experiences to <a href="mailto:devel@cmail.rocks">devel@cmail.rocks</a> :)
 			</p>
