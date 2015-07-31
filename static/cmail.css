@@ -40,3 +40,19 @@ h2, h3 {
 	width:10em;
 	display:block;
 }
+
+html{
+	background-color:#fafafa;
+	color:#444;
+}
+
+.section {
+	background-color:#eee;
+	padding:0.3em;
+	margin-top:1em;
+}
+
+.section h2 {
+	padding-bottom:0.5em;
+	color:#66a;
+}
