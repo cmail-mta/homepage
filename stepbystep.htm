@@ -57,49 +57,43 @@
 			<p>
 			In the cloned directory, run <code>make</code> to build all modules, followed
 			by <code>make install</code> to copy the binaries to a system path (by default
-			<code>/usr/sbin/</code>, this may be changed by supplying the environment variable
-			<code>PREFIX</code>) 
+			<code>/usr/local/sbin/</code>, this may be changed by supplying the environment variable
+			<code>PREFIX</code>). Running <code>make init</code> after this step will create a
+			new user for cmail (in order to minimize attack surface, cmail is not usually run as root
+			and instead drops its privileges after initialization), copy over default configuration files,
+			correctly set privileges and generally set up the basic structure needed for operation. 
+			Alternatively, the <code>make tls-init</code> command does all that and also generates a temporary TLS
+			certificate and key for initial usage and testing (openssl required).
 			</p>
 			<p>
 			<code style="display:block;">
 				~# cd cmail<br/>
 				~/cmail# make<br/>
-				~/cmail# make install
+				~/cmail# make install<br/>
+				~/cmail# make tls-init
 			</code>
 			</p>
 		</div>
 
 		<div>
-			<h2>2 Setting up a cmail user</h2>
-			In order to minimize the attack surface presented by cmail, it supports a mechanism
-			to change its running user to a less privileged one after performing privileged operations
-			(which consist mainly of binding to privileged ports). Use of this facility is highly 
-			encouraged. This user needs write access to all databases used at run time, as explained
-			in a later section. Most of these databases should also be exclusively writable by this user,
-			to prevent non-privileged users from injecting mail or altering the configuration.
-			<p>
-			<code style="display:block;">
-				~# adduser --disabled-login cmail
-			</code>
-			</p>
+			<h2>2 Check the generated configuration files</h2>
+			... or copy them over from <code>example-configs/</code> if you do not want to use the
+			provided setup mechanisms. Make sure to edit the BANNER parameters to <code>bind</code> directives
+			to read something sensible (Most likely, this should be the hostname of your new mailserver).
 		</div>
 
 		<div>
-			<h2>3 Configuring the modules</h2>
-		</div>
-
-		<div>
-			<h2>4 Setting up the master database</h2>
+			<h2>3 Setting up the master database</h2>
 			cmail uses <a href="https://sqlite.org/">SQLite</a>, a file-based database to store
 			most of its running configuration and data.
 		</div>
 
 		<div>
-			<h2>5 Testing the server</h2>
+			<h2>4 Testing the server</h2>
 		</div>
 
 		<div>
-			<h2>6 Logging and debugging</h2>
+			<h2>5 Logging and debugging</h2>
 		</div>
 	</body>
 </html>
