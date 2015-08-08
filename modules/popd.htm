@@ -152,6 +152,13 @@
 				<tr>
 					<td>
 						<i>(optional, not available when compiled with <code>CMAIL_NO_TLS</code>)</i><br/>
+						<code>dhparams=</code> Diffie-Hellman parameter file location
+					</td>
+					<td>Use this parameter to read the Diffie-Hellman parameters from a file instead of generating new parameters upon starting (which is time consuming). The file is expected to be in PEM format.</td>
+				</tr>
+				<tr>
+					<td>
+						<i>(optional, not available when compiled with <code>CMAIL_NO_TLS</code>)</i><br/>
 						<code>tlsonly</code>
 					</td>
 					<td>Connections on this port are expected to immediately negotiate a TLS session, never exchanging plain text data</td>
