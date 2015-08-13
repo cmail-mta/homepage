@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>cmail-msa: Accept incoming/originating mails</title>
+		<title>cmail-smtpd: Accept incoming/originating mails</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<link rel="icon" href="../static/cmail_logo.png" type="image/x-icon" />
 		<link rel="shortcut icon" href="../static/cmail_logo.png" type="image/x-icon" />
@@ -17,7 +17,7 @@
 		</div>
 
 		<div>
-			<h1>cmail-msa</h1>
+			<h1>cmail-smtpd</h1>
 			<h3>Accept incoming/originated mails via SMTP</h3>
 			This component provides the services that most accurately matches the
 			common perception of a mail server. It accepts incoming mail via SMTP
@@ -34,7 +34,7 @@
 				<li>libsqlite3-dev <i>(Database interface)</i></li>
 			</ul>
 
-			A build of only this specific module can be initiated by running <code>make</code> in cmail-msa/
+			A build of only this specific module can be initiated by running <code>make</code> in cmail-smtpd/
 		</div>
 
 		<div class="section">
@@ -86,7 +86,7 @@
 				<tr>
 					<td><code>logfile</code></td>
 					<td>Path to log file</td>
-					<td>If not specified, cmail-msa will log to stderr and will not be able to detach from the calling shell</td>
+					<td>If not specified, cmail-smtpd will log to stderr and will not be able to detach from the calling shell</td>
 				</tr>
 				<tr>
 					<td><code>user</code></td>

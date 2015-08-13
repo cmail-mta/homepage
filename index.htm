@@ -28,7 +28,7 @@
 			a central SQLite database (the <a href="database.htm">master database</a>).
 			<ul>
 				<li><a href="modules/api.htm">cmail-api</a>			<i>HTTP API to the master database</i></li>
-				<li><a href="modules/msa.htm">cmail-msa</a>			<i>SMTP server (Accept incoming / originated mails)</i></li>
+				<li><a href="modules/smtpd.htm">cmail-smtpd</a>			<i>SMTP server (Accept incoming / originated mails)</i></li>
 				<li><a href="modules/popd.htm">cmail-popd</a>			<i>POP server (Access mailboxes via POP)</i></li>
 				<li><a href="modules/imapd.htm">cmail-imapd</a>			<i>IMAP server (Access mailboxes via IMAP)</i></li>
 				<li><a href="modules/mta.htm">cmail-mta</a>			<i>SMTP client (Deliver outgoing mails to remote servers)</i></li>
@@ -72,7 +72,7 @@
 		<div class="section">
 			<h2>Coarse roadmap</h2>
 			<ol>
-				<li><i>cmail-msa</i> Plugin API specification (2015)</li>
+				<li><i>cmail-smtpd</i> Plugin API specification (2015)</li>
 				<li><i>cmail</i> Initial packaging &amp; setup scripts (2015)</li>
 				<li><i>cmail-imapd</i> Basic implementation (2015/2016)</li>
 			</ol>
@@ -90,7 +90,7 @@
 			<h3>Receive-only server, mail is sent via external servers</h3>
 			The following modules are involved
 			<ul>
-				<li>cmail-msa for receiving incoming mail</li>
+				<li>cmail-smtpd for receiving incoming mail</li>
 				<li>cmail-popd or cmail-imapd for access to mailboxes</li>
 				<li>Optionally: cmail-api and cmail-webadmin for easier administration</li>
 				<li>Optionally: cmail-api and cmail-webmailer for web access to mailboxes</li>
@@ -100,7 +100,7 @@
 			This use case might be better served by <a href="http://untroubled.org/nullmailer/">nullmailer</a>. 
 			Using cmail, you'd need
 			<ul>
-				<li>cmail-msa for accepting originated mail</li>
+				<li>cmail-smtpd for accepting originated mail</li>
 				<li>cmail-mta for delivering the outbound mail</li>
 				<li>Optionally: cmail-api and cmail-webadmin for easier administration</li>
 			</ul>
@@ -108,7 +108,7 @@
 			<h3>Full-feature send- and receive-server</h3>
 			This setup involves the following modules
 			<ul>
-				<li>cmail-msa for receiving incoming mail</li>
+				<li>cmail-smtpd for receiving incoming mail</li>
 				<li>cmail-popd and/or cmail-imapd for access to mailboxes</li>
 				<li>cmail-mta for delivering the outbound mail</li>
 				<li>Optionally: cmail-api and cmail-webadmin for easier administration</li>
