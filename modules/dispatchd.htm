@@ -1,12 +1,12 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>cmail-mta: Deliver outbound mail</title>
+		<title>cmail-dispatchd: Deliver outbound mail</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<link rel="icon" href="../static/cmail_logo.png" type="image/x-icon" />
 		<link rel="shortcut icon" href="../static/cmail_logo.png" type="image/x-icon" />
 		<link rel="stylesheet" type="text/css" href="../static/cmail.css" />
-		<meta name="description" content="cmail-mta: cmail component delivering outbound mail" />
+		<meta name="description" content="cmail-dispatchd: cmail component delivering outbound mail" />
 		<meta name="keywords" content="cmail, mailserver, email, messaging, outbound mail delivery, smtp client" />
 		<meta name="robots" content="index,follow" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -17,7 +17,7 @@
 		</div>
 
 		<div>
-			<h1>cmail-mta</h1>
+			<h1>cmail-dispatchd</h1>
 			<h3>Deliver outbound mail via SMTP</h3>
 			This component delivers outbound mail to remote servers (and, in some cases, the local server)
 			as well as generating bounce notification message upon failure of delivery.
@@ -33,7 +33,7 @@
 				<li>libsqlite3-dev <i>(Database interface)</i></li>
 			</ul>
 
-			A build of only this specific module can be initiated by running <code>make</code> in cmail-mta/
+			A build of only this specific module can be initiated by running <code>make</code> in cmail-dispatchd/
 		</div>
 
 		<div class="section">
@@ -85,7 +85,7 @@
 				<tr>
 					<td><code>logfile</code></td>
 					<td>Path to log file</td>
-					<td>If not specified, cmail-mta will log to stderr and will not be able to detach from the calling shell</td>
+					<td>If not specified, cmail-dispatchd will log to stderr and will not be able to detach from the calling shell</td>
 				</tr>
 				<tr>
 					<td><code>user</code></td>
@@ -115,12 +115,12 @@
 				<tr>
 					<td><code>interval</code></td>
 					<td>Database check interval in seconds</td>
-					<td>This option configures the interval in which cmail-mta checks the database for outbound mail</td>
+					<td>This option configures the interval in which cmail-dispatchd checks the database for outbound mail</td>
 				</tr>
 				<tr>
 					<td><code>retries</code></td>
 					<td>Maximum number of delivery attempts</td>
-					<td>Configure how many times cmail-mta will retry mail delivery upon encountering a temporary failure</td>
+					<td>Configure how many times cmail-dispatchd will retry mail delivery upon encountering a temporary failure</td>
 				
 				</tr>
 				<tr>
@@ -147,7 +147,7 @@
 						Maximum number of TLS padding operations
 					</td>
 					<td>
-						In order to provide some obfuscation to counter a passive attacker, cmail-mta can run a random number of
+						In order to provide some obfuscation to counter a passive attacker, cmail-dispatchd can run a random number of
 						useless operations (NOOP/RSET) over the TLS layer before actually starting the mail transaction.
 					</td>
 				</tr>

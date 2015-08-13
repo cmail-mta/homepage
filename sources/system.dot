@@ -8,7 +8,7 @@ digraph G {
 
 	subgraph cluster_cmail {
 		node [style=filled];
-		MTA[label="cmail-mta\n(SMTP client)"];
+		MTA[label="cmail-dispatchd\n(SMTP client)"];
 		Master[label="Master\ndatabase"];
 		MSA[label="cmail-smtpd\n(SMTP server)"];
 		Access[label="cmail-popd\ncmail-imapd\ncmail-webmailer"];

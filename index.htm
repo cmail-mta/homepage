@@ -31,7 +31,7 @@
 				<li><a href="modules/smtpd.htm">cmail-smtpd</a>			<i>SMTP server (Accept incoming / originated mails)</i></li>
 				<li><a href="modules/popd.htm">cmail-popd</a>			<i>POP server (Access mailboxes via POP)</i></li>
 				<li><a href="modules/imapd.htm">cmail-imapd</a>			<i>IMAP server (Access mailboxes via IMAP)</i></li>
-				<li><a href="modules/mta.htm">cmail-mta</a>			<i>SMTP client (Deliver outgoing mails to remote servers)</i></li>
+				<li><a href="modules/dispatchd.htm">cmail-dispatchd</a>		<i>SMTP client (Deliver outgoing mails to remote servers)</i></li>
 				<li><a href="modules/webadmin.htm">cmail-webadmin</a>		<i>HTTP Administration interface</i></li>
 				<li><a href="modules/webmailer.htm">cmail-webmailer</a>		<i>Web mailer interface</i></li>
 			</ul>
@@ -101,7 +101,7 @@
 			Using cmail, you'd need
 			<ul>
 				<li>cmail-smtpd for accepting originated mail</li>
-				<li>cmail-mta for delivering the outbound mail</li>
+				<li>cmail-dispatchd for delivering the outbound mail</li>
 				<li>Optionally: cmail-api and cmail-webadmin for easier administration</li>
 			</ul>
 
@@ -110,7 +110,7 @@
 			<ul>
 				<li>cmail-smtpd for receiving incoming mail</li>
 				<li>cmail-popd and/or cmail-imapd for access to mailboxes</li>
-				<li>cmail-mta for delivering the outbound mail</li>
+				<li>cmail-dispatchd for delivering the outbound mail</li>
 				<li>Optionally: cmail-api and cmail-webadmin for easier administration</li>
 				<li>Optionally: cmail-api and cmail-webmailer for web access to mailboxes</li>
 			</ul>
