@@ -88,14 +88,19 @@
 					<td>If not specified, cmail-dispatchd will log to stderr and will not be able to detach from the calling shell</td>
 				</tr>
 				<tr>
+					<td><code>pidfile</code></td>
+					<td>Path to pid file</td>
+					<td>Write the PID of the daemonized process to the specified file. If not specified, no file is created. PID files are used by daemon supervisors such as systemd for stopping services.</td>
+				</tr>
+				<tr>
 					<td><code>user</code></td>
 					<td>Username to switch to</td>
-					<td>The module will change its executing user to the one specified. Only works when started as root.</td>
+					<td>The module will change its executing user to the one specified. Only works when started as root. This is one of the few options not immediately taking effect.</td>
 				</tr>
 				<tr>
 					<td><code>group</code></td>
 					<td>Group name to switch to</td>
-					<td>The module will change its executing group to the on specified. Only works when started as root.</td>
+					<td>The module will change its executing group to the on specified. Only works when started as root. This is one of the few options not immediately taking effect.</td>
 				</tr>
 				<tr>
 					<td><code>database</code></td>
