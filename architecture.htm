@@ -115,7 +115,7 @@
 				</li>
 			</ol>
 			The latter steps can also be automated by pipelining the commands like so:
-			<code class="block">rtl2dot.py smtpd.c.170r.expand | dot -Tsvg &gt; smtpd.svg</code>.
+			<code class="block">rtl2dot.py smtpd.c.170r.expand | dot -Tsvg &gt; smtpd.svg</code>
 			</p>
 			<p>
 			The previous steps generate a full callgraph, containing all functions called via any one possible path from main.
@@ -127,7 +127,7 @@
 			<code>rtl2dot.py</code> supports exclusion of functions by their name with the <code>--ignore</code> argument,
 			as well as exclusion of library calls with the <code>--local</code> argument. A beautified callgraph can thus be
 			created by running <code class="block">rtl2dot.py smtpd.c.170r.expand --root core_loop --ignore "client_send|logprintf|common_*"
-			--local | dot -Tsvg &gt; smtpd.svg</code>. This also sets the root function of the graph to <code>core_loop</code>,
+			--local | dot -Tsvg &gt; smtpd.svg</code> This also sets the root function of the graph to <code>core_loop</code>,
 			which is where the main processing functions are called in the cmail daemons.
 			</p>
 		</div>
