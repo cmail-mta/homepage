@@ -82,5 +82,55 @@
 			</p>
 		</div>
 
+		<div class="section">
+			<h2>Generating Callgraphs</h2>
+			Call graphs are a visual representation of the architecture and are tremendously helpful in understanding
+			code and control flow in projects. This makes them highly useful to newcomers for gaining a high-level understanding
+			of how a project works, as well as to seasoned developers wanting to visualize how best to fit a particular feature
+			into the exisiting architecture.
+			</p>
+			<p>The cmail main makefile contains a special target named <code>rtldumps</code> which
+			generates GCC rtldump files into the <code>rtldumps/</code> folder. These can be used to easily create call graphs
+			for all the cmail daemons with the help of <a href="https://github.com/cbdevnet/rtl2dot">rtl2dot</a> and 
+			<a href="http://www.graphviz.org/">GraphViz</a>.
+			<p>
+			For example, to create a graph of the call hierarchy of cmail-smtpd, perform the following steps:
+			<ol>
+				<li>
+					In your cmail repository clone, run <code class="command">make rtldumps</code>. 
+					This will create a folder named <code>rtldumps</code>, containing the raw data for the graph.
+				</li>
+				<li>
+					In the <code>rtldumps</code> folder, locate the file containing the smtpd data. It will
+					usually be named something like <code>smtpd.c.170r.expand</code>.
+				</li>
+				<li>
+					Create the graph data for feeding into GraphViz with 
+					<code class="command">rtl2dot.py smtpd.c.170r.expand &gt; smtpd.dot</code>. This will create <code>smtpd.dot</code>.
+				</li>
+				<li>
+					Create the final image with GraphViz by running <code class="command">dot -Tsvg smtpd.dot &gt; smtpd.svg</code>.
+					This will create an SVG image of the call graph. Note that <code>dot</code> is also able to
+					create raster images in formats like PNG and JPG by supplying the appropriate -T&lt;type&gt; parameters.
+				</li>
+			</ol>
+			The latter steps can also be automated by pipelining the commands like so:
+			<code class="block">rtl2dot.py smtpd.c.170r.expand | dot -Tsvg &gt; smtpd.svg</code>.
+			</p>
+			<p>
+			The previous steps generate a full callgraph, containing all functions called via any one possible path from main.
+			This includes common functions such as <code>logprintf</code>, which are called from almost every function, eg. to print 
+			messages to the log files, as well as library functions which are not directly part of the project.
+			<p>
+			</p>
+			In order to create a clearer visualisation of interesting code paths, it is necessary to exclude some functions from the graph.
+			<code>rtl2dot.py</code> supports exclusion of functions by their name with the <code>--ignore</code> argument,
+			as well as exclusion of library calls with the <code>--local</code> argument. A beautified callgraph can thus be
+			created by running <code class="block">rtl2dot.py smtpd.c.170r.expand --root core_loop --ignore "client_send|logprintf|common_*"
+			--local | dot -Tsvg &gt; smtpd.svg</code>. This also sets the root function of the graph to <code>core_loop</code>,
+			which is where the main processing functions are called in the cmail daemons.
+			</p>
+		</div>
+
 	</body>
 </html>
