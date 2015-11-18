@@ -180,12 +180,13 @@
 					<td>
 						<i>(optional)</i><br/>
 						<code>auth</code><br/>
-						<code>auth=strict,tlsonly</code><br/>
+						<code>auth=strict,tlsonly,private</code><br/>
 						<code>auth=fixed@</code> Name of user to automatically be authenticated on this port
 					</td>
 					<td>
 						Enable SMTP authentication on this port. Authentication is required for sending mail to non-local addresses.<br/> 
 						<code>tlsonly</code> requires the connection to be secured by TLS in order to be able to authenticate.<br/>
+						<code>private</code> suppresses the reverse name of the submitting host being printed into the <code>Received:</code> header.<br/>
 						<code>strict</code> requires authentication before allowing any mail-related commands to succeed (SMTP submission mode).<br/>
 						<code>fixed@<i>user</i></code> can potentially be used to create an open relay. Be careful when using it.
 					</td>
