@@ -83,16 +83,43 @@
 		</div>
 
 		<div class="section">
+			<h2>Testing & Test Coverage</h2>
+			cmail features a growing suite of automated tests, written mostly in <a href="http://tcl.tk/">Tcl</a> using the
+			<a href="http://expect.sf.net/">Expect</a> toolkit. In order to run them, you'll need a complete installation of cmail
+			which is <strong>NOT</strong> in production use, as the test suite will heavily modify and overwrite any existing configuration
+			in order to exercise different parts of the code. Running the suite on a dedicated VM is probably the best way to proceed.
+			<p>
+			Coverage information can be extracted by running the test suite against a build with the <a href="https://gcc.gnu.org/onlinedocs/gcc/Gcov.html">gcov</a> 
+			coverage analyzer enabled and thereafter analyzing the output with <a href="http://ltp.sourceforge.net/coverage/lcov.php">lcov</a>.
+			As these steps need to assume a lot about the environment they are run in, there is as of yet no completely automated way of running the
+			test suite.
+			</p>
+			<h3>Coverage reports</h3>
+			You can view generated coverage reports, which will be updated at irregular intervals.
+			<ul>
+				<li><a href="coverage-reports/cmail-smtpd/index.html">cmail-smtpd (commit 013e2e9c78e956ff6acc3e3aee6c189e4a839c3f)</a></li>
+				<li><a href="coverage-reports/cmail-popd/index.html">cmail-popd (commit 013e2e9c78e956ff6acc3e3aee6c189e4a839c3f)</a></li>
+			</ul>
+			<!--
+	   			<h3>Runnning the test suite</h3>
+				TODO
+				<h3>Generating coverage reports</h3>
+				TODO
+			//-->
+		</div>
+
+		<div class="section">
 			<h2>Generating Callgraphs</h2>
 			Call graphs are a visual representation of the architecture and are tremendously helpful in understanding
 			code and control flow in projects. This makes them highly useful to newcomers for gaining a high-level understanding
 			of how a project works, as well as to seasoned developers wanting to visualize how best to fit a particular feature
 			into the exisiting architecture.
-			</p>
-			<p>The cmail main makefile contains a special target named <code>rtldumps</code> which
+			<p>
+			The cmail main makefile contains a special target named <code>rtldumps</code> which
 			generates GCC rtldump files into the <code>rtldumps/</code> folder. These can be used to easily create call graphs
 			for all the cmail daemons with the help of <a href="https://github.com/cbdevnet/rtl2dot">rtl2dot</a> and 
 			<a href="http://www.graphviz.org/">GraphViz</a>.
+			</p>
 			<p>
 			For example, to create a graph of the call hierarchy of cmail-smtpd, perform the following steps:
 			<ol>

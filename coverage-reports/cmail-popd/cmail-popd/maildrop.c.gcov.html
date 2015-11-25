@@ -1,0 +1,444 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - popd.info - cmail-popd/maildrop.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">cmail-popd</a> - maildrop.c<span style="font-size: 80%;"> (source / <a href="maildrop.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">popd.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">85</td>
+            <td class="headerCovTableEntry">196</td>
+            <td class="headerCovTableEntryLo">43.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2015-11-25 19:05:59</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">9</td>
+            <td class="headerCovTableEntryMed">88.9 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span><span class="lineCov">          7 : int maildrop_read(LOGGER log, sqlite3_stmt* stmt, MAILDROP* maildrop, char* user_name, bool is_master){</span></a>
+<span class="lineNum">       2 </span><span class="lineCov">          7 :         int status = 0;</span>
+<span class="lineNum">       3 </span>            :         char* message_id;
+<span class="lineNum">       4 </span><span class="lineCov">          7 :         unsigned rows = maildrop-&gt;count;</span>
+<span class="lineNum">       5 </span><span class="lineCov">          7 :         unsigned index = maildrop-&gt;count;</span>
+<span class="lineNum">       6 </span>            :         unsigned i;
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span><span class="lineCov">          7 :         POP_MAIL empty_mail = {</span>
+<span class="lineNum">       9 </span>            :                 .database_id = 0,
+<span class="lineNum">      10 </span>            :                 .mail_size = 0,
+<span class="lineNum">      11 </span>            :                 .flag_master = is_master,
+<span class="lineNum">      12 </span>            :                 .flag_delete = false,
+<span class="lineNum">      13 </span>            :                 .message_id = &quot;&quot;
+<span class="lineNum">      14 </span>            :         };
+<span class="lineNum">      15 </span>            : 
+<span class="lineNum">      16 </span><span class="lineCov">          7 :         if(sqlite3_bind_text(stmt, 1, user_name, -1, SQLITE_STATIC) == SQLITE_OK){</span>
+<span class="lineNum">      17 </span>            :                 do{
+<span class="lineNum">      18 </span><span class="lineCov">          7 :                         status = sqlite3_step(stmt);</span>
+<span class="lineNum">      19 </span><span class="lineCov">          7 :                         switch(status){</span>
+<span class="lineNum">      20 </span>            :                                 case SQLITE_ROW:
+<span class="lineNum">      21 </span><span class="lineNoCov">          0 :                                         if(index &gt;= maildrop-&gt;count){</span>
+<span class="lineNum">      22 </span>            :                                                 //expand the maildrop
+<span class="lineNum">      23 </span><span class="lineNoCov">          0 :                                                 rows += CMAIL_MAILDROP_CHUNK;</span>
+<span class="lineNum">      24 </span><span class="lineNoCov">          0 :                                                 maildrop-&gt;mails = realloc(maildrop-&gt;mails, rows * sizeof(POP_MAIL));</span>
+<span class="lineNum">      25 </span><span class="lineNoCov">          0 :                                                 for(i = index; i &lt; rows; i++){</span>
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :                                                         maildrop-&gt;mails[i] = empty_mail;</span>
+<span class="lineNum">      27 </span>            :                                                 }
+<span class="lineNum">      28 </span><span class="lineNoCov">          0 :                                                 maildrop-&gt;count = rows;</span>
+<span class="lineNum">      29 </span>            :                                         }
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span><span class="lineNoCov">          0 :                                         if(index &gt;= maildrop-&gt;count){</span>
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :                                                 logprintf(log, LOG_WARNING, &quot;Maildrop reading went out of bounds, this should not have happened\n&quot;);</span>
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 :                                                 break;</span>
+<span class="lineNum">      34 </span>            :                                         }
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :                                         maildrop-&gt;mails[index].database_id = sqlite3_column_int(stmt, 0);</span>
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :                                         maildrop-&gt;mails[index].mail_size = sqlite3_column_int(stmt, 1);</span>
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :                                         message_id = (char*)sqlite3_column_text(stmt, 2);</span>
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :                                         if(message_id){</span>
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :                                                 strncpy(maildrop-&gt;mails[index].message_id, message_id, POP_MESSAGEID_MAX);</span>
+<span class="lineNum">      41 </span>            :                                         }
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span><span class="lineNoCov">          0 :                                         index++;</span>
+<span class="lineNum">      44 </span><span class="lineNoCov">          0 :                                         break;</span>
+<span class="lineNum">      45 </span>            :                                 case SQLITE_ERROR:
+<span class="lineNum">      46 </span>            :                                         //FIXME handle this
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :                                         break;</span>
+<span class="lineNum">      48 </span>            :                         }
+<span class="lineNum">      49 </span>            :                 }
+<span class="lineNum">      50 </span><span class="lineCov">          7 :                 while(status == SQLITE_ROW);</span>
+<span class="lineNum">      51 </span><span class="lineCov">          7 :                 maildrop-&gt;count = index;</span>
+<span class="lineNum">      52 </span>            :         }
+<span class="lineNum">      53 </span>            :         else{
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_WARNING, &quot;Failed to bind mail query parameter\n&quot;);</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :                 status = -1;</span>
+<span class="lineNum">      56 </span>            :         }
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span><span class="lineCov">          7 :         sqlite3_reset(stmt);</span>
+<span class="lineNum">      59 </span><span class="lineCov">          7 :         sqlite3_clear_bindings(stmt);</span>
+<span class="lineNum">      60 </span><span class="lineCov">          7 :         return status;</span>
+<a name="61"><span class="lineNum">      61 </span>            : }</a>
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span><span class="lineCov">         14 : int maildrop_lock(LOGGER log, DATABASE* database, char* user_name, bool lock){</span>
+<span class="lineNum">      64 </span>            :         int status;
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span>            :         //atomically modify maildrop lock, bail out if it fails
+<span class="lineNum">      67 </span><span class="lineCov">         14 :         if(sqlite3_bind_int(database-&gt;update_lock, 1, lock ? 1:0) != SQLITE_OK</span>
+<span class="lineNum">      68 </span><span class="lineCov">         14 :                         || sqlite3_bind_text(database-&gt;update_lock, 2, user_name, -1, SQLITE_STATIC) != SQLITE_OK</span>
+<span class="lineNum">      69 </span><span class="lineCov">         14 :                         || sqlite3_bind_int(database-&gt;update_lock, 3, lock?0:1) != SQLITE_OK){</span>
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to bind lock update parameter\n&quot;);</span>
+<span class="lineNum">      71 </span><span class="lineNoCov">          0 :                 sqlite3_reset(database-&gt;update_lock);</span>
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :                 sqlite3_clear_bindings(database-&gt;update_lock);</span>
+<span class="lineNum">      73 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">      74 </span>            :         }
+<span class="lineNum">      75 </span>            : 
+<span class="lineNum">      76 </span><span class="lineCov">         14 :         status = sqlite3_step(database-&gt;update_lock);</span>
+<span class="lineNum">      77 </span><span class="lineCov">         14 :         switch(status){</span>
+<span class="lineNum">      78 </span>            :                 case SQLITE_DONE:
+<span class="lineNum">      79 </span><span class="lineCov">         14 :                         status = 0;</span>
+<span class="lineNum">      80 </span>            :                         //check if lock was updated
+<span class="lineNum">      81 </span><span class="lineCov">         14 :                         if(sqlite3_changes(database-&gt;conn) != 1){</span>
+<span class="lineNum">      82 </span><span class="lineNoCov">          0 :                                 status = -1;</span>
+<span class="lineNum">      83 </span>            :                         }
+<span class="lineNum">      84 </span><span class="lineCov">         14 :                         break;</span>
+<span class="lineNum">      85 </span>            :                 default:
+<span class="lineNum">      86 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_INFO, &quot;Unhandled return value from lock update: %d\n&quot;, status);</span>
+<span class="lineNum">      87 </span><span class="lineNoCov">          0 :                         status = 1;</span>
+<span class="lineNum">      88 </span>            :         }
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineCov">         14 :         sqlite3_reset(database-&gt;update_lock);</span>
+<span class="lineNum">      91 </span><span class="lineCov">         14 :         sqlite3_clear_bindings(database-&gt;update_lock);</span>
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span><span class="lineCov">         14 :         return status;</span>
+<a name="94"><span class="lineNum">      94 </span>            : }</a>
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span><span class="lineCov">          7 : int maildrop_user_attach(LOGGER log, DATABASE* database, MAILDROP* maildrop, char* user_name){</span>
+<span class="lineNum">      97 </span><span class="lineCov">          7 :         int status = 1;</span>
+<span class="lineNum">      98 </span><span class="lineCov">          7 :         char* dbfile = NULL;</span>
+<span class="lineNum">      99 </span><span class="lineCov">          7 :         char* err_str = NULL;</span>
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span><span class="lineCov">          7 :         char* LIST_MAILS_USER = &quot;SELECT mail_id, length(mail_data) AS length, mail_ident FROM main.mailbox WHERE mail_user=? ORDER BY mail_submission ASC;&quot;;</span>
+<span class="lineNum">     102 </span><span class="lineCov">          7 :         char* FETCH_MAIL_USER = &quot;SELECT mail_data FROM main.mailbox WHERE mail_id=?;&quot;;</span>
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span><span class="lineCov">          7 :         char* MARK_DELETION = &quot;INSERT INTO temp.deletions (user, mail) VALUES (?, ?);&quot;;</span>
+<span class="lineNum">     105 </span><span class="lineCov">          7 :         char* UNMARK_DELETIONS = &quot;DELETE FROM temp.deletions WHERE user = ?;&quot;;</span>
+<span class="lineNum">     106 </span><span class="lineCov">          7 :         char* DELETE_MAIL_USER = &quot;DELETE FROM main.mailbox WHERE mail_id IN (SELECT mail FROM temp.deletions WHERE user = ?);&quot;;</span>
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span><span class="lineCov">          7 :         char* CREATE_DELETION_TABLE = &quot;CREATE TEMPORARY TABLE temp.deletions (user TEXT NOT NULL, mail INTEGER NOT NULL);&quot;;</span>
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span>            :         //test for user databases
+<span class="lineNum">     111 </span><span class="lineCov">          7 :         if(sqlite3_bind_text(database-&gt;query_userdatabase, 1, user_name, -1, SQLITE_STATIC) == SQLITE_OK){</span>
+<span class="lineNum">     112 </span><span class="lineCov">          7 :                 switch(sqlite3_step(database-&gt;query_userdatabase)){</span>
+<span class="lineNum">     113 </span>            :                         case SQLITE_ROW:
+<span class="lineNum">     114 </span>            :                                 //attach user database
+<span class="lineNum">     115 </span><span class="lineNoCov">          0 :                                 dbfile = (char*)sqlite3_column_text(database-&gt;query_userdatabase, 0);</span>
+<span class="lineNum">     116 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_INFO, &quot;User %s has user database %s\n&quot;, user_name, dbfile);</span>
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span><span class="lineNoCov">          0 :                                 maildrop-&gt;user_conn = database_open(log, dbfile, SQLITE_OPEN_READWRITE);</span>
+<span class="lineNum">     119 </span>            : 
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :                                 if(!(maildrop-&gt;user_conn)){</span>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :                                         status = -1;</span>
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :                                         logprintf(log, LOG_ERROR, &quot;Failed to attach user database %s\n&quot;, dbfile);</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :                                         break;</span>
+<span class="lineNum">     124 </span>            :                                 }
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_INFO, &quot;User database %s attached for user %s\n&quot;, dbfile, user_name);</span>
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span>            :                                 //create the temp table to store deletions
+<span class="lineNum">     129 </span><span class="lineNoCov">          0 :                                 switch(sqlite3_exec(maildrop-&gt;user_conn, CREATE_DELETION_TABLE, NULL, NULL, &amp;err_str)){</span>
+<span class="lineNum">     130 </span>            :                                         case SQLITE_OK:
+<span class="lineNum">     131 </span>            :                                         case SQLITE_DONE:
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :                                                 break;</span>
+<span class="lineNum">     133 </span>            :                                         default:
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :                                                 logprintf(log, LOG_WARNING, &quot;Non-completion response to temp table create statement\n&quot;);</span>
+<span class="lineNum">     135 </span>            :                                 }
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :                                 if(err_str){</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :                                         logprintf(log, LOG_ERROR, &quot;Failed to create temporary deletion table: %s\n&quot;, err_str);</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :                                         sqlite3_free(err_str);</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :                                         return -1;</span>
+<span class="lineNum">     141 </span>            :                                 }
+<span class="lineNum">     142 </span>            : 
+<span class="lineNum">     143 </span>            :                                 //create user table statements
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :                                 maildrop-&gt;list_user = database_prepare(log, maildrop-&gt;user_conn, LIST_MAILS_USER);</span>
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :                                 maildrop-&gt;fetch_user = database_prepare(log, maildrop-&gt;user_conn, FETCH_MAIL_USER);</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :                                 maildrop-&gt;mark_deletion = database_prepare(log, maildrop-&gt;user_conn, MARK_DELETION);</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :                                 maildrop-&gt;unmark_deletions = database_prepare(log, maildrop-&gt;user_conn, UNMARK_DELETIONS);</span>
+<span class="lineNum">     148 </span><span class="lineNoCov">          0 :                                 maildrop-&gt;delete_user = database_prepare(log, maildrop-&gt;user_conn, DELETE_MAIL_USER);</span>
+<span class="lineNum">     149 </span>            : 
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :                                 if(!maildrop-&gt;list_user || !maildrop-&gt;fetch_user || !maildrop-&gt;delete_user || !maildrop-&gt;mark_deletion || !maildrop-&gt;unmark_deletions){</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :                                         logprintf(log, LOG_WARNING, &quot;Failed to prepare user mail access statements\n&quot;);</span>
+<span class="lineNum">     152 </span><span class="lineNoCov">          0 :                                         status = -1;</span>
+<span class="lineNum">     153 </span>            :                                 }
+<span class="lineNum">     154 </span>            :                                 else{
+<span class="lineNum">     155 </span><span class="lineNoCov">          0 :                                         status = 0;</span>
+<span class="lineNum">     156 </span>            :                                 }
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">     158 </span>            :                         case SQLITE_DONE:
+<span class="lineNum">     159 </span>            :                                 //no user database, done here
+<span class="lineNum">     160 </span><span class="lineCov">          7 :                                 break;</span>
+<span class="lineNum">     161 </span>            :                         default:
+<span class="lineNum">     162 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_WARNING, &quot;Failed to query user database for %s: %s\n&quot;, user_name, sqlite3_errmsg(database-&gt;conn));</span>
+<span class="lineNum">     163 </span><span class="lineNoCov">          0 :                                 status = -1;</span>
+<span class="lineNum">     164 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">     165 </span>            :                 }
+<span class="lineNum">     166 </span>            :         }
+<span class="lineNum">     167 </span>            :         else{
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_WARNING, &quot;Failed to bind user parameter to user database query\n&quot;);</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :                 status = -1;</span>
+<span class="lineNum">     170 </span>            :         }
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span><span class="lineCov">          7 :         sqlite3_reset(database-&gt;query_userdatabase);</span>
+<span class="lineNum">     173 </span><span class="lineCov">          7 :         sqlite3_clear_bindings(database-&gt;query_userdatabase);</span>
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span><span class="lineCov">          7 :         return status;</span>
+<a name="176"><span class="lineNum">     176 </span>            : }</a>
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span><span class="lineCov">          7 : int maildrop_acquire(LOGGER log, DATABASE* database, MAILDROP* maildrop, char* user_name){</span>
+<span class="lineNum">     179 </span><span class="lineCov">          7 :         int status = 0;</span>
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span>            :         //lock maildrop
+<span class="lineNum">     182 </span><span class="lineCov">          7 :         if(maildrop_lock(log, database, user_name, true) &lt; 0){</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_WARNING, &quot;Maildrop for user %s could not be locked\n&quot;, user_name);</span>
+<span class="lineNum">     184 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">     185 </span>            :         }
+<span class="lineNum">     186 </span>            : 
+<span class="lineNum">     187 </span>            :         //read mail data from master
+<span class="lineNum">     188 </span><span class="lineCov">          7 :         if(maildrop_read(log, database-&gt;list_master, maildrop, user_name, true) &lt; 0){</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_WARNING, &quot;Failed to read master maildrop for user %s\n&quot;, user_name);</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :                 status = -1;</span>
+<span class="lineNum">     191 </span>            :         }
+<span class="lineNum">     192 </span>            : 
+<span class="lineNum">     193 </span><span class="lineCov">          7 :         switch(maildrop_user_attach(log, database, maildrop, user_name)){</span>
+<span class="lineNum">     194 </span>            :                 case 1:
+<span class="lineNum">     195 </span><span class="lineCov">          7 :                         logprintf(log, LOG_INFO, &quot;User %s does not have a user database\n&quot;, user_name);</span>
+<span class="lineNum">     196 </span><span class="lineCov">          7 :                         break;</span>
+<span class="lineNum">     197 </span>            :                 case 0:
+<span class="lineNum">     198 </span>            :                         //read mail data from user database
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :                         if(maildrop_read(log, maildrop-&gt;list_user, maildrop, user_name, false) &lt; 0){</span>
+<span class="lineNum">     200 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_WARNING, &quot;Failed to read user maildrop for %s\n&quot;, user_name);</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :                                 status = -1;</span>
+<span class="lineNum">     202 </span>            :                         }
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :                         break;</span>
+<span class="lineNum">     204 </span>            :                 default:
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_WARNING, &quot;Failed to attach database for user %s\n&quot;, user_name);</span>
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :                         status = -1;</span>
+<span class="lineNum">     207 </span>            :         }
+<span class="lineNum">     208 </span>            : 
+<span class="lineNum">     209 </span>            :         //FIXME unlock the maildrop on error (if it was not locked beforehand)
+<span class="lineNum">     210 </span>            : 
+<span class="lineNum">     211 </span><span class="lineCov">          7 :         logprintf(log, LOG_INFO, &quot;Maildrop for user %s is at %d mails\n&quot;, user_name, maildrop-&gt;count);</span>
+<span class="lineNum">     212 </span><span class="lineCov">          7 :         return status;</span>
+<a name="213"><span class="lineNum">     213 </span>            : }</a>
+<span class="lineNum">     214 </span>            : 
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 : int maildrop_mark(LOGGER log, DATABASE* database, char* user_name, MAILDROP* maildrop, int mail_id){</span>
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :         int rv = 0;</span>
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :         sqlite3_stmt* mark_deletion = maildrop-&gt;mails[mail_id].flag_master ? database-&gt;mark_deletion:maildrop-&gt;mark_deletion;</span>
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span><span class="lineNoCov">          0 :         if(sqlite3_bind_text(mark_deletion, 1, user_name, -1, SQLITE_STATIC) == SQLITE_OK</span>
+<span class="lineNum">     220 </span><span class="lineNoCov">          0 :                         &amp;&amp; sqlite3_bind_int(mark_deletion, 2, maildrop-&gt;mails[mail_id].database_id) == SQLITE_OK){</span>
+<span class="lineNum">     221 </span><span class="lineNoCov">          0 :                 switch(sqlite3_step(mark_deletion)){</span>
+<span class="lineNum">     222 </span>            :                         case SQLITE_DONE:
+<span class="lineNum">     223 </span>            :                         case SQLITE_OK:
+<span class="lineNum">     224 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_DEBUG, &quot;Marked mail %d %s as deleted (user %s)\n&quot;, mail_id, maildrop-&gt;mails[mail_id].flag_master? &quot;in master&quot;:&quot;in userdb&quot;, user_name);</span>
+<span class="lineNum">     225 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">     226 </span>            :                         default:
+<span class="lineNum">     227 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_WARNING, &quot;Failed to mark mail as deleted: %s\n&quot;, sqlite3_errmsg(maildrop-&gt;mails[mail_id].flag_master ? database-&gt;conn:maildrop-&gt;user_conn));</span>
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :                                 rv = -1;</span>
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">     230 </span>            :                 }
+<span class="lineNum">     231 </span><span class="lineNoCov">          0 :         }</span>
+<span class="lineNum">     232 </span>            :         else{
+<span class="lineNum">     233 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to bind parameter to deletion mark query\n&quot;);</span>
+<span class="lineNum">     234 </span><span class="lineNoCov">          0 :                 rv = -1;</span>
+<span class="lineNum">     235 </span>            :         }
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span><span class="lineNoCov">          0 :         sqlite3_reset(mark_deletion);</span>
+<span class="lineNum">     238 </span><span class="lineNoCov">          0 :         sqlite3_clear_bindings(mark_deletion);</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :         return rv;</span>
+<a name="240"><span class="lineNum">     240 </span>            : }</a>
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span><span class="lineCov">          7 : int maildrop_unmark(LOGGER log, sqlite3* conn, sqlite3_stmt* unmark_deletions, char* user_name){</span>
+<span class="lineNum">     243 </span><span class="lineCov">          7 :         int rv = 0;</span>
+<span class="lineNum">     244 </span>            : 
+<span class="lineNum">     245 </span><span class="lineCov">          7 :         if(sqlite3_bind_text(unmark_deletions, 1, user_name, -1, SQLITE_STATIC) == SQLITE_OK){</span>
+<span class="lineNum">     246 </span><span class="lineCov">          7 :                 switch(sqlite3_step(unmark_deletions)){</span>
+<span class="lineNum">     247 </span>            :                         case SQLITE_DONE:
+<span class="lineNum">     248 </span>            :                         case SQLITE_OK:
+<span class="lineNum">     249 </span><span class="lineCov">          7 :                                 logprintf(log, LOG_DEBUG, &quot;Deletions table for %s cleared (%d marks deleted)\n&quot;, user_name, sqlite3_changes(conn));</span>
+<span class="lineNum">     250 </span><span class="lineCov">          7 :                                 break;</span>
+<span class="lineNum">     251 </span>            :                         default:
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_WARNING, &quot;Failed to clear deletion table: %s\n&quot;, sqlite3_errmsg(conn));</span>
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :                                 rv = -1;</span>
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">     255 </span>            :                 }
+<span class="lineNum">     256 </span>            :         }
+<span class="lineNum">     257 </span>            :         else{
+<span class="lineNum">     258 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to bind deletion user name parameter\n&quot;);</span>
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :                 rv = -1;</span>
+<span class="lineNum">     260 </span>            :         }
+<span class="lineNum">     261 </span>            : 
+<span class="lineNum">     262 </span><span class="lineCov">          7 :         sqlite3_reset(unmark_deletions);</span>
+<span class="lineNum">     263 </span><span class="lineCov">          7 :         sqlite3_clear_bindings(unmark_deletions);</span>
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span><span class="lineCov">          7 :         return rv;</span>
+<a name="266"><span class="lineNum">     266 </span>            : }</a>
+<span class="lineNum">     267 </span>            : 
+<span class="lineNum">     268 </span><span class="lineCov">          4 : int maildrop_delete(LOGGER log, sqlite3_stmt* deletion_stmt, char* user_name){</span>
+<span class="lineNum">     269 </span><span class="lineCov">          4 :         int rv = 0;</span>
+<span class="lineNum">     270 </span>            : 
+<span class="lineNum">     271 </span><span class="lineCov">          4 :         if(sqlite3_bind_text(deletion_stmt, 1, user_name, -1, SQLITE_STATIC) == SQLITE_OK){</span>
+<span class="lineNum">     272 </span><span class="lineCov">          4 :                 switch(sqlite3_step(deletion_stmt)){</span>
+<span class="lineNum">     273 </span>            :                         case SQLITE_DONE:
+<span class="lineNum">     274 </span>            :                         case SQLITE_OK:
+<span class="lineNum">     275 </span><span class="lineCov">          4 :                                 break;</span>
+<span class="lineNum">     276 </span>            :                         default:
+<span class="lineNum">     277 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_WARNING, &quot;Failed to perform deletion\n&quot;);</span>
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :                                 rv = -1;</span>
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">     280 </span>            :                 }
+<span class="lineNum">     281 </span>            :         }
+<span class="lineNum">     282 </span>            :         else{
+<span class="lineNum">     283 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to bind deletion user name parameter\n&quot;);</span>
+<span class="lineNum">     284 </span><span class="lineNoCov">          0 :                 rv = -1;</span>
+<span class="lineNum">     285 </span>            :         }
+<span class="lineNum">     286 </span>            : 
+<span class="lineNum">     287 </span><span class="lineCov">          4 :         sqlite3_reset(deletion_stmt);</span>
+<span class="lineNum">     288 </span><span class="lineCov">          4 :         sqlite3_clear_bindings(deletion_stmt);</span>
+<span class="lineNum">     289 </span><span class="lineCov">          4 :         return rv;</span>
+<a name="290"><span class="lineNum">     290 </span>            : }</a>
+<span class="lineNum">     291 </span>            : 
+<span class="lineNum">     292 </span><span class="lineCov">          4 : int maildrop_update(LOGGER log, DATABASE* database, MAILDROP* maildrop, char* user_name){</span>
+<span class="lineNum">     293 </span><span class="lineCov">          4 :         int status = 0;</span>
+<span class="lineNum">     294 </span><span class="lineCov">          4 :         logprintf(log, LOG_INFO, &quot;Performing deletions\n&quot;);</span>
+<span class="lineNum">     295 </span>            : 
+<span class="lineNum">     296 </span>            :         //delete mails from master
+<span class="lineNum">     297 </span><span class="lineCov">          4 :         if(maildrop_delete(log, database-&gt;delete_master, user_name) &lt; 0){</span>
+<span class="lineNum">     298 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to delete marked mails from master database: %s\n&quot;, sqlite3_errmsg(database-&gt;conn));</span>
+<span class="lineNum">     299 </span><span class="lineNoCov">          0 :                 status = -1;</span>
+<span class="lineNum">     300 </span>            :         }
+<span class="lineNum">     301 </span>            : 
+<span class="lineNum">     302 </span><span class="lineCov">          4 :         logprintf(log, LOG_INFO, &quot;Deleted %d mails from master database\n&quot;, sqlite3_changes(database-&gt;conn));</span>
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span>            :         //delete mails from user database if present
+<span class="lineNum">     305 </span><span class="lineCov">          4 :         if(maildrop-&gt;user_conn){</span>
+<span class="lineNum">     306 </span><span class="lineNoCov">          0 :                 if(maildrop_delete(log, maildrop-&gt;delete_user, user_name) &lt; 0){</span>
+<span class="lineNum">     307 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_ERROR, &quot;Failed to delete marked mails from user database: %s\n&quot;, sqlite3_errmsg(maildrop-&gt;user_conn));</span>
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :                         status = -1;</span>
+<span class="lineNum">     309 </span>            :                 }
+<span class="lineNum">     310 </span>            : 
+<span class="lineNum">     311 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_INFO, &quot;Deleted %d mails from user database\n&quot;, sqlite3_changes(maildrop-&gt;user_conn));</span>
+<span class="lineNum">     312 </span>            :         }
+<span class="lineNum">     313 </span>            :         else{
+<span class="lineNum">     314 </span><span class="lineCov">          4 :                 logprintf(log, LOG_DEBUG, &quot;Not deleting from user database, none attached\n&quot;);</span>
+<span class="lineNum">     315 </span>            :         }
+<span class="lineNum">     316 </span>            : 
+<span class="lineNum">     317 </span><span class="lineCov">          4 :         return status;</span>
+<a name="318"><span class="lineNum">     318 </span>            : }</a>
+<span class="lineNum">     319 </span>            : 
+<span class="lineNum">     320 </span><span class="lineCov">          7 : int maildrop_release(LOGGER log, DATABASE* database, MAILDROP* maildrop, char* user_name){</span>
+<span class="lineNum">     321 </span><span class="lineCov">          7 :         MAILDROP empty_maildrop = {</span>
+<span class="lineNum">     322 </span>            :                 .count = 0,
+<span class="lineNum">     323 </span>            :                 .mails = NULL,
+<span class="lineNum">     324 </span>            :                 .user_conn = NULL,
+<span class="lineNum">     325 </span>            :                 .list_user = NULL,
+<span class="lineNum">     326 </span>            :                 .fetch_user = NULL,
+<span class="lineNum">     327 </span>            :                 .mark_deletion = NULL,
+<span class="lineNum">     328 </span>            :                 .unmark_deletions = NULL,
+<span class="lineNum">     329 </span>            :                 .delete_user = NULL
+<span class="lineNum">     330 </span>            :         };
+<span class="lineNum">     331 </span><span class="lineCov">          7 :         int status = 0;</span>
+<span class="lineNum">     332 </span>            : 
+<span class="lineNum">     333 </span>            :         //reset master deletion tables
+<span class="lineNum">     334 </span><span class="lineCov">          7 :         if(maildrop_unmark(log, database-&gt;conn, database-&gt;unmark_deletions, user_name) &lt; 0){</span>
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to reset master deletion table\n&quot;);</span>
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :                 status = -1;</span>
+<span class="lineNum">     337 </span>            :         }
+<span class="lineNum">     338 </span>            : 
+<span class="lineNum">     339 </span>            :         //reset user deletion table
+<span class="lineNum">     340 </span><span class="lineCov">          7 :         if(maildrop-&gt;user_conn &amp;&amp; maildrop_unmark(log, maildrop-&gt;user_conn, maildrop-&gt;unmark_deletions, user_name) &lt; 0){</span>
+<span class="lineNum">     341 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to reset user database deletion table\n&quot;);</span>
+<span class="lineNum">     342 </span><span class="lineNoCov">          0 :                 status = -1;</span>
+<span class="lineNum">     343 </span>            :         }
+<span class="lineNum">     344 </span>            : 
+<span class="lineNum">     345 </span>            :         //unlock maildrop
+<span class="lineNum">     346 </span><span class="lineCov">          7 :         if(maildrop_lock(log, database, user_name, false) &lt; 0){</span>
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_WARNING, &quot;Failed to unlock maildrop for user %s\n&quot;, user_name);</span>
+<span class="lineNum">     348 </span>            :         }
+<span class="lineNum">     349 </span>            : 
+<span class="lineNum">     350 </span>            :         //free user statements
+<span class="lineNum">     351 </span><span class="lineCov">          7 :         if(maildrop-&gt;user_conn){</span>
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :                 sqlite3_finalize(maildrop-&gt;list_user);</span>
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :                 sqlite3_finalize(maildrop-&gt;fetch_user);</span>
+<span class="lineNum">     354 </span><span class="lineNoCov">          0 :                 sqlite3_finalize(maildrop-&gt;delete_user);</span>
+<span class="lineNum">     355 </span><span class="lineNoCov">          0 :                 sqlite3_finalize(maildrop-&gt;mark_deletion);</span>
+<span class="lineNum">     356 </span><span class="lineNoCov">          0 :                 sqlite3_finalize(maildrop-&gt;unmark_deletions);</span>
+<span class="lineNum">     357 </span><span class="lineNoCov">          0 :                 sqlite3_close(maildrop-&gt;user_conn);</span>
+<span class="lineNum">     358 </span>            :         }
+<span class="lineNum">     359 </span>            : 
+<span class="lineNum">     360 </span>            :         //free maildrop data
+<span class="lineNum">     361 </span><span class="lineCov">          7 :         if(maildrop-&gt;mails){</span>
+<span class="lineNum">     362 </span><span class="lineNoCov">          0 :                 free(maildrop-&gt;mails);</span>
+<span class="lineNum">     363 </span>            :         }
+<span class="lineNum">     364 </span>            : 
+<span class="lineNum">     365 </span><span class="lineCov">          7 :         *maildrop = empty_maildrop;</span>
+<span class="lineNum">     366 </span>            : 
+<span class="lineNum">     367 </span><span class="lineCov">          7 :         return status;</span>
+<span class="lineNum">     368 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.11</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

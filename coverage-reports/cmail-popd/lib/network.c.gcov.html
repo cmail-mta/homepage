@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - popd.info - lib/network.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - network.c<span style="font-size: 80%;"> (source / <a href="network.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">popd.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">34</td>
+            <td class="headerCovTableEntry">77</td>
+            <td class="headerCovTableEntryLo">44.2 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2015-11-25 19:05:59</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryLo">66.7 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* This file is part of the cmail project (http://cmail.rocks/)</a>
+<span class="lineNum">       2 </span>            :  * (c) 2015 Fabian &quot;cbdev&quot; Stumpf
+<span class="lineNum">       3 </span>            :  * License: Simplified BSD (2-Clause)
+<span class="lineNum">       4 </span>            :  * For further information, consult LICENSE.txt
+<a name="5"><span class="lineNum">       5 </span>            :  */</a>
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span><span class="lineCov">        107 : ssize_t network_read(LOGGER log, CONNECTION* client, char* buffer, unsigned bytes){</span>
+<span class="lineNum">       8 </span>            :         int status;
+<span class="lineNum">       9 </span>            : 
+<span class="lineNum">      10 </span>            :         #ifndef CMAIL_NO_TLS
+<span class="lineNum">      11 </span><span class="lineCov">        107 :         switch(client-&gt;tls_mode){</span>
+<span class="lineNum">      12 </span>            :                 case TLS_NONE:
+<span class="lineNum">      13 </span>            :                         //non-tls client
+<span class="lineNum">      14 </span><span class="lineCov">         26 :                         return recv(client-&gt;fd, buffer, bytes, 0);</span>
+<span class="lineNum">      15 </span>            :                 case TLS_NEGOTIATE:
+<span class="lineNum">      16 </span>            :                         //tls handshake not completed
+<span class="lineNum">      17 </span><span class="lineCov">         20 :                         status = gnutls_handshake(client-&gt;tls_session);</span>
+<span class="lineNum">      18 </span><span class="lineCov">         20 :                         if(status){</span>
+<span class="lineNum">      19 </span><span class="lineCov">         10 :                                 if(gnutls_error_is_fatal(status)){</span>
+<span class="lineNum">      20 </span><span class="lineNoCov">          0 :                                         logprintf(log, LOG_ERROR, &quot;TLS Handshake reported fatal error: %s\n&quot;, gnutls_strerror(status));</span>
+<span class="lineNum">      21 </span><span class="lineNoCov">          0 :                                         return -2;</span>
+<span class="lineNum">      22 </span>            :                                 }
+<span class="lineNum">      23 </span><span class="lineCov">         10 :                                 logprintf(log, LOG_WARNING, &quot;TLS Handshake reported nonfatal error: %s\n&quot;, gnutls_strerror(status));</span>
+<span class="lineNum">      24 </span><span class="lineCov">         10 :                                 return -1;</span>
+<span class="lineNum">      25 </span>            :                         }
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span><span class="lineCov">         10 :                         logprintf(log, LOG_INFO, &quot;TLS Handshake completed\n&quot;);</span>
+<span class="lineNum">      28 </span><span class="lineCov">         10 :                         return 0;</span>
+<span class="lineNum">      29 </span>            :                 case TLS_ONLY:
+<span class="lineNum">      30 </span>            :                         //read with tls
+<span class="lineNum">      31 </span><span class="lineCov">         61 :                         return gnutls_record_recv(client-&gt;tls_session, buffer, bytes);</span>
+<span class="lineNum">      32 </span>            :         }
+<span class="lineNum">      33 </span>            :         #else
+<span class="lineNum">      34 </span>            :         return recv(client-&gt;fd, buffer, bytes, 0);
+<span class="lineNum">      35 </span>            :         #endif
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :         logprintf(log, LOG_ERROR, &quot;Network read with invalid TLSMODE\n&quot;);</span>
+<span class="lineNum">      38 </span><span class="lineNoCov">          0 :         return -2;</span>
+<a name="39"><span class="lineNum">      39 </span>            : }</a>
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 : int network_connect(LOGGER log, char* host, uint16_t port){</span>
+<span class="lineNum">      42 </span><span class="lineNoCov">          0 :         int sockfd = -1, error;</span>
+<span class="lineNum">      43 </span>            :         char port_str[20];
+<span class="lineNum">      44 </span>            :         struct addrinfo hints;
+<span class="lineNum">      45 </span>            :         struct addrinfo* head;
+<span class="lineNum">      46 </span>            :         struct addrinfo* iter;
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span><span class="lineNoCov">          0 :         memset(&amp;hints, 0, sizeof hints);</span>
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :         hints.ai_family = AF_UNSPEC;</span>
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :         hints.ai_socktype = SOCK_STREAM;</span>
+<span class="lineNum">      51 </span>            : 
+<span class="lineNum">      52 </span><span class="lineNoCov">          0 :         snprintf(port_str, sizeof(port_str), &quot;%d&quot;, port);</span>
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :         error = getaddrinfo(host, port_str, &amp;hints, &amp;head);</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :         if(error){</span>
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_WARNING, &quot;getaddrinfo: %s\r\n&quot;, gai_strerror(error));</span>
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">      58 </span>            :         }
+<span class="lineNum">      59 </span>            : 
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :         for(iter = head; iter; iter = iter-&gt;ai_next){</span>
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :                 sockfd = socket(iter-&gt;ai_family, iter-&gt;ai_socktype, iter-&gt;ai_protocol);</span>
+<span class="lineNum">      62 </span><span class="lineNoCov">          0 :                 if(sockfd &lt; 0){</span>
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :                         continue;</span>
+<span class="lineNum">      64 </span>            :                 }
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span><span class="lineNoCov">          0 :                 error = connect(sockfd, iter-&gt;ai_addr, iter-&gt;ai_addrlen);</span>
+<span class="lineNum">      67 </span><span class="lineNoCov">          0 :                 if(error != 0){</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :                         close(sockfd);</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :                         continue;</span>
+<span class="lineNum">      70 </span>            :                 }
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :                 break;</span>
+<span class="lineNum">      73 </span>            :         }
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :         freeaddrinfo(head);</span>
+<span class="lineNum">      76 </span><span class="lineNoCov">          0 :         iter = NULL;</span>
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span><span class="lineNoCov">          0 :         if(sockfd &lt; 0){</span>
+<span class="lineNum">      79 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_WARNING, &quot;Failed to create client socket: %s\n&quot;, strerror(errno));</span>
+<span class="lineNum">      80 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">      81 </span>            :         }
+<span class="lineNum">      82 </span>            : 
+<span class="lineNum">      83 </span><span class="lineNoCov">          0 :         if(error != 0){</span>
+<span class="lineNum">      84 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_WARNING, &quot;Failed to connect: %s\n&quot;, strerror(errno));</span>
+<span class="lineNum">      85 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">      86 </span>            :         }
+<span class="lineNum">      87 </span>            : 
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :         return sockfd;</span>
+<a name="89"><span class="lineNum">      89 </span>            : }</a>
+<span class="lineNum">      90 </span>            : 
+<span class="lineNum">      91 </span><span class="lineCov">          4 : int network_listener(LOGGER log, char* bindhost, char* port){</span>
+<span class="lineNum">      92 </span><span class="lineCov">          4 :         int fd = -1, status, yes = 1;</span>
+<span class="lineNum">      93 </span>            :         struct addrinfo hints;
+<span class="lineNum">      94 </span>            :         struct addrinfo* info;
+<span class="lineNum">      95 </span>            :         struct addrinfo* addr_it;
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span><span class="lineCov">          4 :         memset(&amp;hints, 0, sizeof(hints));</span>
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span><span class="lineCov">          4 :         hints.ai_family = AF_UNSPEC;</span>
+<span class="lineNum">     100 </span><span class="lineCov">          4 :         hints.ai_socktype = SOCK_STREAM;</span>
+<span class="lineNum">     101 </span><span class="lineCov">          4 :         hints.ai_flags = AI_PASSIVE;</span>
+<span class="lineNum">     102 </span>            : 
+<span class="lineNum">     103 </span><span class="lineCov">          4 :         status = getaddrinfo(bindhost, port, &amp;hints, &amp;info);</span>
+<span class="lineNum">     104 </span><span class="lineCov">          4 :         if(status != 0){</span>
+<span class="lineNum">     105 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to get socket info for %s port %s: %s\n&quot;, bindhost, port, gai_strerror(status));</span>
+<span class="lineNum">     106 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">     107 </span>            :         }
+<span class="lineNum">     108 </span>            : 
+<span class="lineNum">     109 </span><span class="lineCov">          4 :         for(addr_it = info; addr_it != NULL; addr_it = addr_it-&gt;ai_next){</span>
+<span class="lineNum">     110 </span><span class="lineCov">          4 :                 fd = socket(addr_it-&gt;ai_family, addr_it-&gt;ai_socktype, addr_it-&gt;ai_protocol);</span>
+<span class="lineNum">     111 </span><span class="lineCov">          4 :                 if(fd &lt; 0){</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :                         continue;</span>
+<span class="lineNum">     113 </span>            :                 }
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span><span class="lineCov">          4 :                 if(setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, (void*)&amp;yes, sizeof(yes)) &lt; 0){</span>
+<span class="lineNum">     116 </span><span class="lineCov">          2 :                         logprintf(log, LOG_WARNING, &quot;Failed to set IPV6_V6ONLY on socket for %s port %s: %s\n&quot;, bindhost, port, strerror(errno));</span>
+<span class="lineNum">     117 </span>            :                 }
+<span class="lineNum">     118 </span>            : 
+<span class="lineNum">     119 </span><span class="lineCov">          4 :                 yes = 1;</span>
+<span class="lineNum">     120 </span><span class="lineCov">          4 :                 if(setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (void*)&amp;yes, sizeof(yes)) &lt; 0){</span>
+<span class="lineNum">     121 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_WARNING, &quot;Failed to set SO_REUSEADDR on socket\n&quot;);</span>
+<span class="lineNum">     122 </span>            :                 }
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span><span class="lineCov">          4 :                 status = bind(fd, addr_it-&gt;ai_addr, addr_it-&gt;ai_addrlen);</span>
+<span class="lineNum">     125 </span><span class="lineCov">          4 :                 if(status &lt; 0){</span>
+<span class="lineNum">     126 </span><span class="lineNoCov">          0 :                         close(fd);</span>
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :                         continue;</span>
+<span class="lineNum">     128 </span>            :                 }
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span><span class="lineCov">          4 :                 break;</span>
+<span class="lineNum">     131 </span>            :         }
+<span class="lineNum">     132 </span>            : 
+<span class="lineNum">     133 </span><span class="lineCov">          4 :         freeaddrinfo(info);</span>
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span><span class="lineCov">          4 :         if(!addr_it){</span>
+<span class="lineNum">     136 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to create listening socket for %s port %s\n&quot;, bindhost, port);</span>
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">     138 </span>            :         }
+<span class="lineNum">     139 </span>            : 
+<span class="lineNum">     140 </span><span class="lineCov">          4 :         status = listen(fd, LISTEN_QUEUE_LENGTH);</span>
+<span class="lineNum">     141 </span><span class="lineCov">          4 :         if(status &lt; 0){</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to listen on socket: %s&quot;, strerror(errno));</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :                 close(fd);</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">     145 </span>            :         }
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span><span class="lineCov">          4 :         return fd;</span>
+<span class="lineNum">     148 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.11</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

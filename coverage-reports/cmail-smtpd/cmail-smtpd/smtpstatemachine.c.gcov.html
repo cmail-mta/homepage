@@ -1,0 +1,685 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - smtpd.info - cmail-smtpd/smtpstatemachine.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">cmail-smtpd</a> - smtpstatemachine.c<span style="font-size: 80%;"> (source / <a href="smtpstatemachine.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">smtpd.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">261</td>
+            <td class="headerCovTableEntry">339</td>
+            <td class="headerCovTableEntryMed">77.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2015-11-25 19:06:20</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span><span class="lineCov">         21 : int smtpstate_new(LOGGER log, CONNECTION* client, DATABASE* database, PATHPOOL* path_pool){</span></a>
+<span class="lineNum">       2 </span><span class="lineCov">         21 :         CLIENT* client_data=(CLIENT*)client-&gt;aux_data;</span>
+<span class="lineNum">       3 </span><span class="lineCov">         21 :         LISTENER* listener_data=(LISTENER*)client_data-&gt;listener-&gt;aux_data;</span>
+<span class="lineNum">       4 </span>            : 
+<span class="lineNum">       5 </span><span class="lineCov">         21 :         if(!strncasecmp(client_data-&gt;recv_buffer, &quot;ehlo &quot;, 5)){</span>
+<span class="lineNum">       6 </span>            :                 #ifndef CMAIL_NO_TLS
+<span class="lineNum">       7 </span><span class="lineCov">         18 :                 switch(client_data-&gt;listener-&gt;tls_mode){</span>
+<span class="lineNum">       8 </span>            :                         case TLS_ONLY:
+<span class="lineNum">       9 </span><span class="lineCov">          1 :                                 client_data-&gt;current_mail.protocol=(client_data-&gt;sasl_user.authenticated?&quot;sesmtpa&quot;:&quot;sesmtp&quot;);</span>
+<span class="lineNum">      10 </span><span class="lineCov">          1 :                                 break;</span>
+<span class="lineNum">      11 </span>            :                         case TLS_NEGOTIATE:
+<span class="lineNum">      12 </span><span class="lineCov">         17 :                                 if(client-&gt;tls_mode==TLS_ONLY){</span>
+<span class="lineNum">      13 </span><span class="lineCov">          4 :                                         client_data-&gt;current_mail.protocol=(client_data-&gt;sasl_user.authenticated?&quot;esmtpsa&quot;:&quot;esmtps&quot;);</span>
+<span class="lineNum">      14 </span><span class="lineCov">          4 :                                         break;</span>
+<span class="lineNum">      15 </span>            :                                 }
+<span class="lineNum">      16 </span>            :                         case TLS_NONE:
+<span class="lineNum">      17 </span><span class="lineCov">         13 :                                 client_data-&gt;current_mail.protocol=(client_data-&gt;sasl_user.authenticated?&quot;esmtpa&quot;:&quot;esmtp&quot;);</span>
+<span class="lineNum">      18 </span><span class="lineCov">         13 :                                 break;</span>
+<span class="lineNum">      19 </span>            :                 }
+<span class="lineNum">      20 </span>            :                 #else
+<span class="lineNum">      21 </span>            :                 client_data-&gt;current_mail.protocol=(client_data-&gt;sasl_user.authenticated?&quot;esmtpa&quot;:&quot;esmtp&quot;);
+<span class="lineNum">      22 </span>            :                 #endif
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span><span class="lineCov">         18 :                 client_data-&gt;state=STATE_IDLE;</span>
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span><span class="lineCov">         18 :                 client_send(log, client, &quot;250-%s ahoyhoy\r\n&quot;, listener_data-&gt;announce_domain);</span>
+<span class="lineNum">      27 </span>            : 
+<span class="lineNum">      28 </span>            :                 //TODO hook plugins here
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span>            :                 //send hardcoded esmtp options
+<span class="lineNum">      31 </span><span class="lineCov">         18 :                 client_send(log, client, &quot;250-SIZE %d\r\n&quot;, listener_data-&gt;max_size);</span>
+<span class="lineNum">      32 </span><span class="lineCov">         18 :                 client_send(log, client, &quot;250-8BITMIME\r\n&quot;); //FIXME this might imply more processing than planned</span>
+<span class="lineNum">      33 </span><span class="lineCov">         18 :                 client_send(log, client, &quot;250-SMTPUTF8\r\n&quot;); //RFC 6531</span>
+<span class="lineNum">      34 </span><span class="lineCov">         18 :                 switch(listener_data-&gt;auth_offer){</span>
+<span class="lineNum">      35 </span>            :                         case AUTH_NONE:
+<span class="lineNum">      36 </span><span class="lineCov">         10 :                                 break;</span>
+<span class="lineNum">      37 </span>            :                         case AUTH_TLSONLY:
+<span class="lineNum">      38 </span>            :                                 #ifndef CMAIL_NO_TLS
+<span class="lineNum">      39 </span><span class="lineCov">          8 :                                 if(client-&gt;tls_mode!=TLS_ONLY){</span>
+<span class="lineNum">      40 </span><span class="lineCov">          4 :                                         break;</span>
+<span class="lineNum">      41 </span>            :                                 }
+<span class="lineNum">      42 </span>            :                                 #else
+<span class="lineNum">      43 </span>            :                                 break;
+<span class="lineNum">      44 </span>            :                                 #endif
+<span class="lineNum">      45 </span>            :                         case AUTH_ANY:
+<span class="lineNum">      46 </span><span class="lineCov">          4 :                                 client_send(log, client, &quot;250-AUTH PLAIN\r\n&quot;);</span>
+<span class="lineNum">      47 </span><span class="lineCov">          4 :                                 break;</span>
+<span class="lineNum">      48 </span>            :                 }
+<span class="lineNum">      49 </span>            :                 #ifndef CMAIL_NO_TLS
+<span class="lineNum">      50 </span>            :                 //advertise only when possible
+<span class="lineNum">      51 </span><span class="lineCov">         18 :                 if(client_data-&gt;listener-&gt;tls_mode==TLS_NEGOTIATE &amp;&amp; client-&gt;tls_mode==TLS_NONE){</span>
+<span class="lineNum">      52 </span><span class="lineCov">         13 :                         client_send(log, client, &quot;250-STARTTLS\r\n&quot;); //RFC 3207</span>
+<span class="lineNum">      53 </span>            :                 }
+<span class="lineNum">      54 </span>            :                 #endif
+<span class="lineNum">      55 </span><span class="lineCov">         18 :                 client_send(log, client, &quot;250 XYZZY\r\n&quot;); //RFC 5321 2.2.2</span>
+<span class="lineNum">      56 </span><span class="lineCov">         18 :                 return 0;</span>
+<span class="lineNum">      57 </span>            :         }
+<span class="lineNum">      58 </span>            : 
+<span class="lineNum">      59 </span><span class="lineCov">          3 :         if(!strncasecmp(client_data-&gt;recv_buffer, &quot;helo &quot;, 5)){</span>
+<span class="lineNum">      60 </span>            :                 #ifndef CMAIL_NO_TLS
+<span class="lineNum">      61 </span><span class="lineCov">          2 :                 switch(client_data-&gt;listener-&gt;tls_mode){</span>
+<span class="lineNum">      62 </span>            :                         case TLS_ONLY:
+<span class="lineNum">      63 </span><span class="lineNoCov">          0 :                                 client_data-&gt;current_mail.protocol = (client_data-&gt;sasl_user.authenticated ? &quot;ssmtpa&quot;:&quot;ssmtp&quot;);</span>
+<span class="lineNum">      64 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">      65 </span>            :                         case TLS_NEGOTIATE:
+<span class="lineNum">      66 </span><span class="lineCov">          2 :                                 if(client-&gt;tls_mode==TLS_ONLY){</span>
+<span class="lineNum">      67 </span><span class="lineCov">          1 :                                         client_data-&gt;current_mail.protocol = (client_data-&gt;sasl_user.authenticated ? &quot;smtpsa&quot;:&quot;smtps&quot;);</span>
+<span class="lineNum">      68 </span><span class="lineCov">          1 :                                         break;</span>
+<span class="lineNum">      69 </span>            :                                 }
+<span class="lineNum">      70 </span>            :                         case TLS_NONE:
+<span class="lineNum">      71 </span><span class="lineCov">          1 :                                 client_data-&gt;current_mail.protocol = (client_data-&gt;sasl_user.authenticated ? &quot;smtpa&quot;:&quot;smtp&quot;);</span>
+<span class="lineNum">      72 </span><span class="lineCov">          1 :                                 break;</span>
+<span class="lineNum">      73 </span>            :                 }
+<span class="lineNum">      74 </span>            :                 #else
+<span class="lineNum">      75 </span>            :                 client_data-&gt;current_mail.protocol = (client_data-&gt;sasl_user.authenticated ? &quot;smtpa&quot;:&quot;smtp&quot;);
+<span class="lineNum">      76 </span>            :                 #endif
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span><span class="lineCov">          2 :                 client_data-&gt;state=STATE_IDLE;</span>
+<span class="lineNum">      79 </span><span class="lineCov">          2 :                 logprintf(log, LOG_INFO, &quot;Client negotiates smtp\n&quot;);</span>
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span><span class="lineCov">          2 :                 client_send(log, client, &quot;250 %s ahoyhoy\r\n&quot;, listener_data-&gt;announce_domain);</span>
+<span class="lineNum">      82 </span><span class="lineCov">          2 :                 return 0;</span>
+<span class="lineNum">      83 </span>            :         }
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span><span class="lineCov">          1 :         logprintf(log, LOG_INFO, &quot;Command not recognized in state NEW: %s\n&quot;, client_data-&gt;recv_buffer);</span>
+<span class="lineNum">      86 </span><span class="lineCov">          1 :         client_send(log, client, &quot;500 Unknown command\r\n&quot;);</span>
+<span class="lineNum">      87 </span><span class="lineCov">          1 :         return -1;</span>
+<a name="88"><span class="lineNum">      88 </span>            : }</a>
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineCov">         14 : int smtpstate_auth(LOGGER log, CONNECTION* client, DATABASE* database, PATHPOOL* path_pool){</span>
+<span class="lineNum">      91 </span><span class="lineCov">         14 :         CLIENT* client_data = (CLIENT*)client-&gt;aux_data;</span>
+<span class="lineNum">      92 </span><span class="lineCov">         14 :         int status = SASL_ERROR_PROCESSING;</span>
+<span class="lineNum">      93 </span><span class="lineCov">         14 :         char* method = NULL;</span>
+<span class="lineNum">      94 </span><span class="lineCov">         14 :         char* parameter = NULL;</span>
+<span class="lineNum">      95 </span><span class="lineCov">         14 :         char* challenge = NULL;</span>
+<span class="lineNum">      96 </span>            : 
+<span class="lineNum">      97 </span><span class="lineCov">         14 :         if(client_data-&gt;sasl_context.method != SASL_INVALID &amp;&amp; !strcmp(client_data-&gt;recv_buffer, &quot;*&quot;)){</span>
+<span class="lineNum">      98 </span>            :                 //cancel authentication
+<span class="lineNum">      99 </span><span class="lineCov">          1 :                 logprintf(log, LOG_INFO, &quot;Client cancelled authentication\n&quot;);</span>
+<span class="lineNum">     100 </span><span class="lineCov">          1 :                 client_data-&gt;state=STATE_IDLE;</span>
+<span class="lineNum">     101 </span><span class="lineCov">          1 :                 sasl_cancel(&amp;(client_data-&gt;sasl_context));</span>
+<span class="lineNum">     102 </span><span class="lineCov">          1 :                 client_send(log, client, &quot;501 Authentication cancelled\r\n&quot;);</span>
+<span class="lineNum">     103 </span><span class="lineCov">          1 :                 return 0;</span>
+<span class="lineNum">     104 </span>            :         }
+<span class="lineNum">     105 </span><span class="lineCov">         13 :         else if(client_data-&gt;sasl_context.method != SASL_INVALID){</span>
+<span class="lineNum">     106 </span><span class="lineCov">          2 :                 status = sasl_continue(log, &amp;(client_data-&gt;sasl_context), client_data-&gt;recv_buffer, &amp;challenge);</span>
+<span class="lineNum">     107 </span>            :         }
+<span class="lineNum">     108 </span><span class="lineCov">         11 :         else if(!strncasecmp(client_data-&gt;recv_buffer, &quot;auth &quot;, 5)){</span>
+<span class="lineNum">     109 </span>            :                 //tokenize along spaces
+<span class="lineNum">     110 </span><span class="lineCov">         11 :                 method = strtok(client_data-&gt;recv_buffer + 5, &quot; &quot;);</span>
+<span class="lineNum">     111 </span><span class="lineCov">         11 :                 if(method){</span>
+<span class="lineNum">     112 </span><span class="lineCov">         10 :                         parameter = strtok(NULL, &quot; &quot;);</span>
+<span class="lineNum">     113 </span><span class="lineCov">         10 :                         logprintf(log, LOG_DEBUG, &quot;Beginning SASL with method %s parameter %s\n&quot;, method, parameter?parameter:&quot;null&quot;);</span>
+<span class="lineNum">     114 </span><span class="lineCov">         10 :                         status = sasl_begin(log, &amp;(client_data-&gt;sasl_context), &amp;(client_data-&gt;sasl_user), method, parameter, &amp;challenge);</span>
+<span class="lineNum">     115 </span>            :                 }
+<span class="lineNum">     116 </span>            :                 else{
+<span class="lineNum">     117 </span><span class="lineCov">          1 :                         logprintf(log, LOG_WARNING, &quot;Client tried auth without supplying method\n&quot;);</span>
+<span class="lineNum">     118 </span><span class="lineCov">          1 :                         status = SASL_UNKNOWN_METHOD;</span>
+<span class="lineNum">     119 </span>            :                 }
+<span class="lineNum">     120 </span>            :         }
+<span class="lineNum">     121 </span>            :         else{
+<span class="lineNum">     122 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Invalid state (No negotiation but data) reached in AUTH, returning to IDLE\r\n&quot;);</span>
+<span class="lineNum">     123 </span><span class="lineNoCov">          0 :                 client_data-&gt;state=STATE_IDLE;</span>
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :                 client_send(log, client, &quot;500 Invalid state\r\n&quot;);</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">     126 </span>            :         }
+<span class="lineNum">     127 </span>            : 
+<span class="lineNum">     128 </span><span class="lineCov">         13 :         switch(status){</span>
+<span class="lineNum">     129 </span>            :                 case SASL_OK:
+<span class="lineNum">     130 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_ERROR, &quot;Invalid state (SASL_OK) reached in AUTH, returning to IDLE\r\n&quot;);</span>
+<span class="lineNum">     131 </span>            :                         //FIXME might want to reset sasl_user here
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :                         sasl_reset_ctx(&amp;(client_data-&gt;sasl_context), false); //opting for security here, rather than freeing memory we do not own</span>
+<span class="lineNum">     133 </span><span class="lineNoCov">          0 :                         client_data-&gt;state = STATE_IDLE;</span>
+<span class="lineNum">     134 </span><span class="lineNoCov">          0 :                         client_send(log, client, &quot;500 Invalid state\r\n&quot;);</span>
+<span class="lineNum">     135 </span><span class="lineNoCov">          0 :                         return -1;</span>
+<span class="lineNum">     136 </span>            :                 case SASL_ERROR_PROCESSING:
+<span class="lineNum">     137 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_ERROR, &quot;SASL processing error\r\n&quot;);</span>
+<span class="lineNum">     138 </span><span class="lineNoCov">          0 :                         sasl_reset_ctx(&amp;(client_data-&gt;sasl_context), true);</span>
+<span class="lineNum">     139 </span><span class="lineNoCov">          0 :                         client_send(log, client, &quot;454 Internal Error\r\n&quot;);</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :                         client_data-&gt;state = STATE_IDLE;</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :                         return 0;</span>
+<span class="lineNum">     142 </span>            :                 case SASL_ERROR_DATA:
+<span class="lineNum">     143 </span><span class="lineCov">          2 :                         logprintf(log, LOG_ERROR, &quot;SASL failed to parse data\r\n&quot;);</span>
+<span class="lineNum">     144 </span><span class="lineCov">          2 :                         sasl_reset_ctx(&amp;(client_data-&gt;sasl_context), true);</span>
+<span class="lineNum">     145 </span><span class="lineCov">          2 :                         client_send(log, client, &quot;501 Invalid data provided\r\n&quot;);</span>
+<span class="lineNum">     146 </span><span class="lineCov">          2 :                         client_data-&gt;state = STATE_IDLE;</span>
+<span class="lineNum">     147 </span><span class="lineCov">          2 :                         return -1;</span>
+<span class="lineNum">     148 </span>            :                 case SASL_UNKNOWN_METHOD:
+<span class="lineNum">     149 </span><span class="lineCov">          3 :                         logprintf(log, LOG_WARNING, &quot;Client tried unsupported authentication method: %s\n&quot;, client_data-&gt;recv_buffer + 5);</span>
+<span class="lineNum">     150 </span><span class="lineCov">          3 :                         client_data-&gt;state = STATE_IDLE;</span>
+<span class="lineNum">     151 </span><span class="lineCov">          3 :                         sasl_reset_ctx(&amp;(client_data-&gt;sasl_context), false);</span>
+<span class="lineNum">     152 </span><span class="lineCov">          3 :                         client_send(log, client, &quot;504 Unknown mechanism\r\n&quot;);</span>
+<span class="lineNum">     153 </span><span class="lineCov">          3 :                         return -1;</span>
+<span class="lineNum">     154 </span>            :                 case SASL_CONTINUE:
+<span class="lineNum">     155 </span><span class="lineCov">          3 :                         logprintf(log, LOG_INFO, &quot;Asking for SASL continuation\r\n&quot;);</span>
+<span class="lineNum">     156 </span><span class="lineCov">          3 :                         client_send(log, client, &quot;334 %s\r\n&quot;, challenge ? challenge:&quot;&quot;);</span>
+<span class="lineNum">     157 </span><span class="lineCov">          3 :                         return 0;</span>
+<span class="lineNum">     158 </span>            :                 case SASL_DATA_OK:
+<span class="lineNum">     159 </span><span class="lineCov">          5 :                         sasl_reset_ctx(&amp;(client_data-&gt;sasl_context), true);</span>
+<span class="lineNum">     160 </span><span class="lineCov">          5 :                         client_data-&gt;state = STATE_IDLE;</span>
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span>            :                         //check auth data
+<span class="lineNum">     163 </span><span class="lineCov">          5 :                         if(!challenge || auth_validate(log, database, client_data-&gt;sasl_user.authenticated, challenge, &amp;(client_data-&gt;sasl_user.authorized)) &lt; 0){</span>
+<span class="lineNum">     164 </span>            :                                 //login failed
+<span class="lineNum">     165 </span><span class="lineCov">          2 :                                 sasl_reset_user(&amp;(client_data-&gt;sasl_user), true);</span>
+<span class="lineNum">     166 </span><span class="lineCov">          2 :                                 logprintf(log, LOG_INFO, &quot;Client failed to authenticate\n&quot;);</span>
+<span class="lineNum">     167 </span><span class="lineCov">          2 :                                 client_send(log, client, &quot;535 Authentication failed\r\n&quot;);</span>
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :                                 //increase the failscore
+<span class="lineNum">     170 </span><span class="lineCov">          2 :                                 return -1;</span>
+<span class="lineNum">     171 </span>            :                         }
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span><span class="lineCov">          3 :                         if(!client_data-&gt;sasl_user.authorized){</span>
+<span class="lineNum">     174 </span><span class="lineNoCov">          0 :                                 sasl_reset_user(&amp;(client_data-&gt;sasl_user), true);</span>
+<span class="lineNum">     175 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_ERROR, &quot;Failed to allocate memory for authorized user\n&quot;);</span>
+<span class="lineNum">     176 </span><span class="lineNoCov">          0 :                                 client_send(log, client, &quot;454 Internal Error\r\n&quot;);</span>
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :                                 return 0;</span>
+<span class="lineNum">     178 </span>            :                         }
+<span class="lineNum">     179 </span>            : 
+<span class="lineNum">     180 </span><span class="lineCov">          3 :                         client_data-&gt;originating_route = route_query(log, database, client_data-&gt;sasl_user.authorized);</span>
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span><span class="lineCov">          3 :                         logprintf(log, LOG_INFO, &quot;Client authenticated as %s\n&quot;, client_data-&gt;sasl_user.authenticated);</span>
+<span class="lineNum">     183 </span><span class="lineCov">          3 :                         client_send(log, client, &quot;235 Authenticated\r\n&quot;);</span>
+<span class="lineNum">     184 </span>            : 
+<span class="lineNum">     185 </span>            :                         //update the protocol version
+<span class="lineNum">     186 </span>            :                         #ifndef CMAIL_NO_TLS
+<span class="lineNum">     187 </span><span class="lineCov">          3 :                         switch(client_data-&gt;listener-&gt;tls_mode){</span>
+<span class="lineNum">     188 </span>            :                                 case TLS_ONLY:
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :                                         client_data-&gt;current_mail.protocol = &quot;sesmtpa&quot;;</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :                                         break;</span>
+<span class="lineNum">     191 </span>            :                                 case TLS_NEGOTIATE:
+<span class="lineNum">     192 </span><span class="lineCov">          3 :                                         if(client-&gt;tls_mode == TLS_ONLY){</span>
+<span class="lineNum">     193 </span><span class="lineCov">          3 :                                                 client_data-&gt;current_mail.protocol = &quot;esmtpsa&quot;;</span>
+<span class="lineNum">     194 </span><span class="lineCov">          3 :                                                 break;</span>
+<span class="lineNum">     195 </span>            :                                         }
+<span class="lineNum">     196 </span>            :                                 case TLS_NONE:
+<span class="lineNum">     197 </span><span class="lineNoCov">          0 :                                         client_data-&gt;current_mail.protocol = &quot;esmtpa&quot;;</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :                                         break;</span>
+<span class="lineNum">     199 </span>            :                         }
+<span class="lineNum">     200 </span>            :                         #else
+<span class="lineNum">     201 </span>            :                         client_data-&gt;current_mail.protocol = &quot;esmtpa&quot;;
+<span class="lineNum">     202 </span>            :                         #endif
+<span class="lineNum">     203 </span>            : 
+<span class="lineNum">     204 </span>            :                         //decrease the failscore
+<span class="lineNum">     205 </span><span class="lineCov">          3 :                         return 1;</span>
+<span class="lineNum">     206 </span>            :         }
+<span class="lineNum">     207 </span>            : 
+<span class="lineNum">     208 </span><span class="lineNoCov">          0 :         logprintf(log, LOG_ERROR, &quot;Invalid branch reached in AUTH\n&quot;);</span>
+<span class="lineNum">     209 </span><span class="lineNoCov">          0 :         return -1;</span>
+<a name="210"><span class="lineNum">     210 </span>            : }</a>
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span><span class="lineCov">        102 : int smtpstate_idle(LOGGER log, CONNECTION* client, DATABASE* database, PATHPOOL* path_pool){</span>
+<span class="lineNum">     213 </span><span class="lineCov">        102 :         CLIENT* client_data = (CLIENT*)client-&gt;aux_data;</span>
+<span class="lineNum">     214 </span><span class="lineCov">        102 :         LISTENER* listener_data = (LISTENER*)client_data-&gt;listener-&gt;aux_data;</span>
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span><span class="lineCov">        102 :         if(!strncasecmp(client_data-&gt;recv_buffer, &quot;noop&quot;, 4)){</span>
+<span class="lineNum">     217 </span><span class="lineCov">          1 :                 logprintf(log, LOG_INFO, &quot;Client noop\n&quot;);</span>
+<span class="lineNum">     218 </span><span class="lineCov">          1 :                 client_send(log, client, &quot;250 OK\r\n&quot;);</span>
+<span class="lineNum">     219 </span><span class="lineCov">          1 :                 return 0;</span>
+<span class="lineNum">     220 </span>            :         }
+<span class="lineNum">     221 </span>            : 
+<span class="lineNum">     222 </span><span class="lineCov">        101 :         if(!strncasecmp(client_data-&gt;recv_buffer, &quot;rset&quot;, 4)){</span>
+<span class="lineNum">     223 </span><span class="lineCov">         29 :                 logprintf(log, LOG_INFO, &quot;Client reset\n&quot;);</span>
+<span class="lineNum">     224 </span><span class="lineCov">         29 :                 mail_reset(&amp;(client_data-&gt;current_mail));</span>
+<span class="lineNum">     225 </span><span class="lineCov">         29 :                 client_send(log, client, &quot;250 Reset OK\r\n&quot;);</span>
+<span class="lineNum">     226 </span><span class="lineCov">         29 :                 return 0;</span>
+<span class="lineNum">     227 </span>            :         }
+<span class="lineNum">     228 </span>            : 
+<span class="lineNum">     229 </span>            :         #ifndef CMAIL_NO_TLS
+<span class="lineNum">     230 </span>            :         //accept only when offered, reject when already negotiated
+<span class="lineNum">     231 </span><span class="lineCov">         72 :         if(!strncasecmp(client_data-&gt;recv_buffer, &quot;starttls&quot;, 8)){</span>
+<span class="lineNum">     232 </span><span class="lineCov">          6 :                 if(client-&gt;tls_mode!=TLS_NONE){</span>
+<span class="lineNum">     233 </span><span class="lineCov">          1 :                         logprintf(log, LOG_WARNING, &quot;Client with active TLS session tried to negotiate\n&quot;);</span>
+<span class="lineNum">     234 </span><span class="lineCov">          1 :                         client_send(log, client, &quot;503 Already in TLS session\r\n&quot;);</span>
+<span class="lineNum">     235 </span><span class="lineCov">          1 :                         return 0;</span>
+<span class="lineNum">     236 </span>            :                 }
+<span class="lineNum">     237 </span>            : 
+<span class="lineNum">     238 </span><span class="lineCov">          5 :                 if(client_data-&gt;listener-&gt;tls_mode!=TLS_NEGOTIATE){</span>
+<span class="lineNum">     239 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_WARNING, &quot;Client tried to negotiate TLS with non-negotiable listener\n&quot;);</span>
+<span class="lineNum">     240 </span><span class="lineNoCov">          0 :                         client_send(log, client, &quot;503 Not advertised\r\n&quot;);</span>
+<span class="lineNum">     241 </span>            : 
+<span class="lineNum">     242 </span>            :                         //increase the failscore
+<span class="lineNum">     243 </span><span class="lineNoCov">          0 :                         return -1;</span>
+<span class="lineNum">     244 </span>            :                 }
+<span class="lineNum">     245 </span>            : 
+<span class="lineNum">     246 </span><span class="lineCov">          5 :                 logprintf(log, LOG_INFO, &quot;Client wants to negotiate TLS\n&quot;);</span>
+<span class="lineNum">     247 </span><span class="lineCov">          5 :                 mail_reset(&amp;(client_data-&gt;current_mail));</span>
+<span class="lineNum">     248 </span><span class="lineCov">          5 :                 client_data-&gt;state=STATE_NEW;</span>
+<span class="lineNum">     249 </span>            : 
+<span class="lineNum">     250 </span><span class="lineCov">          5 :                 client_send(log, client, &quot;220 Go ahead\r\n&quot;);</span>
+<span class="lineNum">     251 </span>            : 
+<span class="lineNum">     252 </span><span class="lineCov">          5 :                 client-&gt;tls_mode=TLS_NEGOTIATE;</span>
+<span class="lineNum">     253 </span>            : 
+<span class="lineNum">     254 </span>            :                 //this is somewhat dodgy and should probably be replaced by a proper conditional
+<span class="lineNum">     255 </span><span class="lineCov">          5 :                 return tls_init_serverpeer(log, client, listener_data-&gt;tls_priorities, listener_data-&gt;tls_cert);</span>
+<span class="lineNum">     256 </span>            :         }
+<span class="lineNum">     257 </span>            :         #endif
+<span class="lineNum">     258 </span>            : 
+<span class="lineNum">     259 </span><span class="lineCov">         66 :         if(!strncasecmp(client_data-&gt;recv_buffer, &quot;auth &quot;, 5)){</span>
+<span class="lineNum">     260 </span><span class="lineCov">         17 :                 switch(listener_data-&gt;auth_offer){</span>
+<span class="lineNum">     261 </span>            :                         case AUTH_NONE:
+<span class="lineNum">     262 </span><span class="lineCov">          3 :                                 logprintf(log, LOG_WARNING, &quot;Client tried to auth on a non-auth listener\n&quot;);</span>
+<span class="lineNum">     263 </span><span class="lineCov">          3 :                                 client_send(log, client, &quot;503 Not advertised\r\n&quot;);</span>
+<span class="lineNum">     264 </span><span class="lineCov">          3 :                                 return -1;</span>
+<span class="lineNum">     265 </span>            :                         case AUTH_TLSONLY:
+<span class="lineNum">     266 </span>            :                                 #ifndef CMAIL_NO_TLS
+<span class="lineNum">     267 </span><span class="lineCov">         14 :                                 if(client-&gt;tls_mode != TLS_ONLY){</span>
+<span class="lineNum">     268 </span>            :                                 #endif
+<span class="lineNum">     269 </span><span class="lineCov">          2 :                                         logprintf(log, LOG_WARNING, &quot;Non-TLS client tried to auth on auth-tlsonly listener\n&quot;);</span>
+<span class="lineNum">     270 </span><span class="lineCov">          2 :                                         client_send(log, client, &quot;504 Encryption required\r\n&quot;); //FIXME 538 might be better, but is marked obsolete</span>
+<span class="lineNum">     271 </span><span class="lineCov">          2 :                                         return -1;</span>
+<span class="lineNum">     272 </span>            :                                 #ifndef CMAIL_NO_TLS
+<span class="lineNum">     273 </span>            :                                 }
+<span class="lineNum">     274 </span>            :                                 #endif
+<span class="lineNum">     275 </span>            :                         case AUTH_ANY:
+<span class="lineNum">     276 </span><span class="lineCov">         12 :                                 if(client_data-&gt;sasl_user.authenticated){</span>
+<span class="lineNum">     277 </span><span class="lineCov">          1 :                                         logprintf(log, LOG_WARNING, &quot;Authenticated client tried to authenticate again\n&quot;);</span>
+<span class="lineNum">     278 </span><span class="lineCov">          1 :                                         client_send(log, client, &quot;503 Already authenticated\r\n&quot;);</span>
+<span class="lineNum">     279 </span><span class="lineCov">          1 :                                         return -1;</span>
+<span class="lineNum">     280 </span>            :                                 }
+<span class="lineNum">     281 </span>            :                                 //continue
+<span class="lineNum">     282 </span><span class="lineCov">         11 :                                 break;</span>
+<span class="lineNum">     283 </span>            :                 }
+<span class="lineNum">     284 </span>            : 
+<span class="lineNum">     285 </span><span class="lineCov">         11 :                 client_data-&gt;state = STATE_AUTH;</span>
+<span class="lineNum">     286 </span><span class="lineCov">         11 :                 return smtpstate_auth(log, client, database, path_pool);</span>
+<span class="lineNum">     287 </span>            :         }
+<span class="lineNum">     288 </span>            : 
+<span class="lineNum">     289 </span><span class="lineCov">         49 :         if(!strncasecmp(client_data-&gt;recv_buffer, &quot;xyzzy&quot;, 5)){</span>
+<span class="lineNum">     290 </span><span class="lineCov">          1 :                 client_send(log, client, &quot;250 Nothing happens\r\n&quot;);</span>
+<span class="lineNum">     291 </span><span class="lineCov">          1 :                 logprintf(log, LOG_INFO, &quot;Client performs incantation\n&quot;);</span>
+<span class="lineNum">     292 </span>            :                 //Using this command for some debug output...
+<span class="lineNum">     293 </span><span class="lineCov">          1 :                 logprintf(log, LOG_DEBUG, &quot;Client protocol: %s\n&quot;, client_data-&gt;current_mail.protocol);</span>
+<span class="lineNum">     294 </span><span class="lineCov">          1 :                 logprintf(log, LOG_DEBUG, &quot;Peer name %s, mail submitter %s, data_allocated %d\n&quot;, client_data-&gt;peer_name, client_data-&gt;current_mail.submitter, client_data-&gt;current_mail.data_allocated);</span>
+<span class="lineNum">     295 </span><span class="lineCov">          1 :                 logprintf(log, LOG_DEBUG, &quot;AUTH Status %s, Authentication: %s, Authorization: %s\n&quot;, client_data-&gt;sasl_context.method!=SASL_INVALID?&quot;active&quot;:&quot;inactive&quot;, client_data-&gt;sasl_user.authenticated ? client_data-&gt;sasl_user.authenticated:&quot;none&quot;, client_data-&gt;sasl_user.authorized ? client_data-&gt;sasl_user.authorized:&quot;none&quot;);</span>
+<span class="lineNum">     296 </span><span class="lineCov">          1 :                 logprintf(log, LOG_DEBUG, &quot;Originating router: %s (%s)\n&quot;, client_data-&gt;originating_route.router?client_data-&gt;originating_route.router:&quot;none&quot;, client_data-&gt;originating_route.argument?client_data-&gt;originating_route.argument:&quot;none&quot;);</span>
+<span class="lineNum">     297 </span>            :                 #ifndef CMAIL_NO_TLS
+<span class="lineNum">     298 </span><span class="lineCov">          1 :                 logprintf(log, LOG_DEBUG, &quot;TLS State: %s\n&quot;, tls_modestring(client-&gt;tls_mode));</span>
+<span class="lineNum">     299 </span>            :                 #endif
+<span class="lineNum">     300 </span><span class="lineCov">          1 :                 logprintf(log, LOG_DEBUG, &quot;Connection score: %d\n&quot;, client_data-&gt;connection_score);</span>
+<span class="lineNum">     301 </span><span class="lineCov">          1 :                 return 0;</span>
+<span class="lineNum">     302 </span>            :         }
+<span class="lineNum">     303 </span>            : 
+<span class="lineNum">     304 </span><span class="lineCov">         48 :         if(!strncasecmp(client_data-&gt;recv_buffer, &quot;quit&quot;, 4)){</span>
+<span class="lineNum">     305 </span><span class="lineCov">          3 :                 logprintf(log, LOG_INFO, &quot;Client quit\n&quot;);</span>
+<span class="lineNum">     306 </span><span class="lineCov">          3 :                 client_send(log, client, &quot;221 OK Bye\r\n&quot;);</span>
+<span class="lineNum">     307 </span><span class="lineCov">          3 :                 return client_close(client);</span>
+<span class="lineNum">     308 </span>            :         }
+<span class="lineNum">     309 </span>            : 
+<span class="lineNum">     310 </span>            :         //this needs to be implemented as per RFC5321 3.3
+<span class="lineNum">     311 </span><span class="lineCov">         45 :         if(!strncasecmp(client_data-&gt;recv_buffer, &quot;rcpt &quot;, 5)){</span>
+<span class="lineNum">     312 </span><span class="lineCov">          1 :                 logprintf(log, LOG_INFO, &quot;Client tried to use RCPT in IDLE\n&quot;);</span>
+<span class="lineNum">     313 </span><span class="lineCov">          1 :                 client_send(log, client, &quot;503 Bad sequence of commands\r\n&quot;);</span>
+<span class="lineNum">     314 </span><span class="lineCov">          1 :                 return -1;</span>
+<span class="lineNum">     315 </span>            :         }
+<span class="lineNum">     316 </span>            : 
+<span class="lineNum">     317 </span><span class="lineCov">         44 :         if(!strncasecmp(client_data-&gt;recv_buffer, &quot;mail from:&quot;, 10)){</span>
+<span class="lineNum">     318 </span><span class="lineCov">         37 :                 if(listener_data-&gt;auth_require &amp;&amp; !client_data-&gt;sasl_user.authenticated){</span>
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_WARNING, &quot;Client tried mail command without authentication on strict auth listener\n&quot;);</span>
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :                         client_send(log, client, &quot;530 Authentication required\r\n&quot;);</span>
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :                         return -1;</span>
+<span class="lineNum">     322 </span>            :                 }
+<span class="lineNum">     323 </span>            : 
+<span class="lineNum">     324 </span><span class="lineCov">         37 :                 logprintf(log, LOG_INFO, &quot;Client initiates mail transaction\n&quot;);</span>
+<span class="lineNum">     325 </span>            :                 //extract reverse path and store it
+<span class="lineNum">     326 </span><span class="lineCov">         37 :                 if(path_parse(log, client_data-&gt;recv_buffer + 10, &amp;(client_data-&gt;current_mail.reverse_path)) &lt; 0){</span>
+<span class="lineNum">     327 </span><span class="lineNoCov">          0 :                         client_send(log, client, &quot;501 Path rejected\r\n&quot;);</span>
+<span class="lineNum">     328 </span><span class="lineNoCov">          0 :                         return -1;</span>
+<span class="lineNum">     329 </span>            :                 }
+<span class="lineNum">     330 </span>            : 
+<span class="lineNum">     331 </span>            :                 //resolve reverse path
+<span class="lineNum">     332 </span><span class="lineCov">         37 :                 switch(path_resolve(log, &amp;(client_data-&gt;current_mail.reverse_path), database, client_data-&gt;sasl_user.authorized, true)){</span>
+<span class="lineNum">     333 </span>            :                         case 0:
+<span class="lineNum">     334 </span>            :                                 //reverse path contains either store or null router.
+<span class="lineNum">     335 </span>            :                                 //check origination routing data for action to take
+<span class="lineNum">     336 </span><span class="lineCov">         37 :                                 if(client_data-&gt;sasl_user.authenticated &amp;&amp; client_data-&gt;sasl_user.authorized){</span>
+<span class="lineNum">     337 </span><span class="lineCov">         12 :                                         if(!client_data-&gt;originating_route.router || !strcmp(client_data-&gt;originating_route.router, &quot;reject&quot;)){</span>
+<span class="lineNum">     338 </span><span class="lineNoCov">          0 :                                                 client_send(log, client, &quot;551 %s\r\n&quot;, client_data-&gt;originating_route.argument ? client_data-&gt;originating_route.argument:&quot;User not allowed to use this path&quot;);</span>
+<span class="lineNum">     339 </span><span class="lineNoCov">          0 :                                                 path_reset(&amp;(client_data-&gt;current_mail.reverse_path));</span>
+<span class="lineNum">     340 </span><span class="lineNoCov">          0 :                                                 return -1;</span>
+<span class="lineNum">     341 </span>            :                                         }
+<span class="lineNum">     342 </span><span class="lineCov">         12 :                                         else if(!strcmp(client_data-&gt;originating_route.router, &quot;any&quot;)){</span>
+<span class="lineNum">     343 </span>            :                                                 //accept anything
+<span class="lineNum">     344 </span>            :                                         }
+<span class="lineNum">     345 </span><span class="lineNoCov">          0 :                                         else if(!strcmp(client_data-&gt;originating_route.router, &quot;defined&quot;)){</span>
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :                                                 if(!client_data-&gt;current_mail.reverse_path.route.router</span>
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :                                                                 || !client_data-&gt;current_mail.reverse_path.route.argument</span>
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :                                                                 || strcmp(client_data-&gt;current_mail.reverse_path.route.router, &quot;store&quot;)</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :                                                                 || strcmp(client_data-&gt;current_mail.reverse_path.route.argument, client_data-&gt;sasl_user.authorized)){</span>
+<span class="lineNum">     350 </span>            :                                                         //no valid store router pointing back at the user, fail the reverse path
+<span class="lineNum">     351 </span><span class="lineNoCov">          0 :                                                         client_send(log, client, &quot;551 User not allowed to use this path\r\n&quot;);</span>
+<span class="lineNum">     352 </span><span class="lineNoCov">          0 :                                                         path_reset(&amp;(client_data-&gt;current_mail.reverse_path));</span>
+<span class="lineNum">     353 </span><span class="lineNoCov">          0 :                                                         return -1;</span>
+<span class="lineNum">     354 </span>            :                                                 }
+<span class="lineNum">     355 </span>            :                                                 else{
+<span class="lineNum">     356 </span>            :                                                         //the path resolves back to the originating user, accept it
+<span class="lineNum">     357 </span>            :                                                 }
+<span class="lineNum">     358 </span>            :                                         }
+<span class="lineNum">     359 </span>            :                                 }
+<span class="lineNum">     360 </span>            :                                 else{
+<span class="lineNum">     361 </span>            :                                         //filtering of local reverse paths for unauthenticated connections might take place here
+<span class="lineNum">     362 </span>            :                                 }
+<span class="lineNum">     363 </span><span class="lineCov">         37 :                                 break;</span>
+<span class="lineNum">     364 </span>            :                         case 1:
+<span class="lineNum">     365 </span>            :                                 //inbound reject router (should not be able to happen anymore)
+<span class="lineNum">     366 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_ERROR, &quot;Inbound reject router applied to reverse path, please notify the developers!\n&quot;);</span>
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">     368 </span>            :                         default:
+<span class="lineNum">     369 </span>            :                                 //resolution failed
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_INFO, &quot;Failed to resolve reverse path\n&quot;);</span>
+<span class="lineNum">     371 </span><span class="lineNoCov">          0 :                                 path_reset(&amp;(client_data-&gt;current_mail.reverse_path));</span>
+<span class="lineNum">     372 </span><span class="lineNoCov">          0 :                                 client_send(log, client, &quot;451 Path rejected\r\n&quot;);</span>
+<span class="lineNum">     373 </span><span class="lineNoCov">          0 :                                 return 0;</span>
+<span class="lineNum">     374 </span>            :                 }
+<span class="lineNum">     375 </span>            : 
+<span class="lineNum">     376 </span>            :                 //TODO call plugins for spf, etc
+<span class="lineNum">     377 </span>            : 
+<span class="lineNum">     378 </span><span class="lineCov">         37 :                 client_send(log, client, &quot;250 OK\r\n&quot;);</span>
+<span class="lineNum">     379 </span><span class="lineCov">         37 :                 client_data-&gt;state = STATE_RECIPIENTS;</span>
+<span class="lineNum">     380 </span><span class="lineCov">         37 :                 return 0;</span>
+<span class="lineNum">     381 </span>            :         }
+<span class="lineNum">     382 </span>            : 
+<span class="lineNum">     383 </span><span class="lineCov">          7 :         if(!strncasecmp(client_data-&gt;recv_buffer, &quot;vrfy &quot;, 5)</span>
+<span class="lineNum">     384 </span><span class="lineCov">          6 :                         || !strncasecmp(client_data-&gt;recv_buffer, &quot;expn &quot;, 5)){</span>
+<span class="lineNum">     385 </span><span class="lineCov">          2 :                 logprintf(log, LOG_WARNING, &quot;Client tried to verify / expand an address, unsupported\n&quot;);</span>
+<span class="lineNum">     386 </span><span class="lineCov">          2 :                 client_send(log, client, &quot;502 Not implemented\r\n&quot;);</span>
+<span class="lineNum">     387 </span><span class="lineCov">          2 :                 return -1;</span>
+<span class="lineNum">     388 </span>            :         }
+<span class="lineNum">     389 </span>            : 
+<span class="lineNum">     390 </span><span class="lineCov">          5 :         logprintf(log, LOG_INFO, &quot;Command not recognized in state IDLE: %s\n&quot;, client_data-&gt;recv_buffer);</span>
+<span class="lineNum">     391 </span><span class="lineCov">          5 :         client_send(log, client, &quot;500 Unknown command\r\n&quot;);</span>
+<span class="lineNum">     392 </span><span class="lineCov">          5 :         return -1;</span>
+<a name="393"><span class="lineNum">     393 </span>            : }</a>
+<span class="lineNum">     394 </span>            : 
+<span class="lineNum">     395 </span><span class="lineCov">         89 : int smtpstate_recipients(LOGGER log, CONNECTION* client, DATABASE* database, PATHPOOL* path_pool){</span>
+<span class="lineNum">     396 </span><span class="lineCov">         89 :         CLIENT* client_data = (CLIENT*)client-&gt;aux_data;</span>
+<span class="lineNum">     397 </span><span class="lineCov">         89 :         LISTENER* listener_data = (LISTENER*)client_data-&gt;listener-&gt;aux_data;</span>
+<span class="lineNum">     398 </span>            :         unsigned i;
+<span class="lineNum">     399 </span>            :         MAILPATH* current_path;
+<span class="lineNum">     400 </span>            : 
+<span class="lineNum">     401 </span><span class="lineCov">         89 :         if(!strncasecmp(client_data-&gt;recv_buffer, &quot;rcpt to:&quot;, 8)){</span>
+<span class="lineNum">     402 </span>            :                 //get slot in forward_paths
+<span class="lineNum">     403 </span><span class="lineCov">         83 :                 for(i = 0; i &lt; SMTP_MAX_RECIPIENTS; i++){</span>
+<span class="lineNum">     404 </span><span class="lineCov">         83 :                         if(!client_data-&gt;current_mail.forward_paths[i]){</span>
+<span class="lineNum">     405 </span><span class="lineCov">         48 :                                 break;</span>
+<span class="lineNum">     406 </span>            :                         }
+<span class="lineNum">     407 </span>            :                 }
+<span class="lineNum">     408 </span>            : 
+<span class="lineNum">     409 </span><span class="lineCov">         48 :                 if(i == SMTP_MAX_RECIPIENTS){</span>
+<span class="lineNum">     410 </span>            :                         //too many recipients, fail this one
+<span class="lineNum">     411 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_INFO, &quot;Mail exceeded recipient limit\n&quot;);</span>
+<span class="lineNum">     412 </span><span class="lineNoCov">          0 :                         client_send(log, client, &quot;452 Too many recipients\r\n&quot;);</span>
+<span class="lineNum">     413 </span><span class="lineNoCov">          0 :                         return -1;</span>
+<span class="lineNum">     414 </span>            :                 }
+<span class="lineNum">     415 </span>            : 
+<span class="lineNum">     416 </span>            :                 //get path from pool
+<span class="lineNum">     417 </span><span class="lineCov">         48 :                 current_path = pathpool_get(log, path_pool);</span>
+<span class="lineNum">     418 </span><span class="lineCov">         48 :                 if(!current_path){</span>
+<span class="lineNum">     419 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_ERROR, &quot;Failed to get path, failing recipient\n&quot;);</span>
+<span class="lineNum">     420 </span><span class="lineNoCov">          0 :                         client_send(log, client, &quot;452 Recipients pool maxed out\r\n&quot;);</span>
+<span class="lineNum">     421 </span>            :                         //FIXME should state transition back to idle here?
+<span class="lineNum">     422 </span><span class="lineNoCov">          0 :                         return -1;</span>
+<span class="lineNum">     423 </span>            :                 }
+<span class="lineNum">     424 </span>            : 
+<span class="lineNum">     425 </span><span class="lineCov">         48 :                 if(path_parse(log, client_data-&gt;recv_buffer + 8, current_path) &lt; 0){</span>
+<span class="lineNum">     426 </span><span class="lineCov">          3 :                         client_send(log, client, &quot;501 Path rejected\r\n&quot;);</span>
+<span class="lineNum">     427 </span><span class="lineCov">          3 :                         pathpool_return(current_path);</span>
+<span class="lineNum">     428 </span><span class="lineCov">          3 :                         return -1;</span>
+<span class="lineNum">     429 </span>            :                 }
+<span class="lineNum">     430 </span>            : 
+<span class="lineNum">     431 </span>            :                 //the last 2 parameters in this call _must_ be NULL/false to not trigger an invalid branch in this case
+<span class="lineNum">     432 </span><span class="lineCov">         45 :                 switch(path_resolve(log, current_path, database, NULL, false)){</span>
+<span class="lineNum">     433 </span>            :                         case 0:
+<span class="lineNum">     434 </span>            :                                 //continue path handling
+<span class="lineNum">     435 </span><span class="lineCov">         40 :                                 break;</span>
+<span class="lineNum">     436 </span>            :                         case 1:
+<span class="lineNum">     437 </span>            :                                 //reject by router decision
+<span class="lineNum">     438 </span><span class="lineCov">          5 :                                 client_send(log, client, &quot;551 %s\r\n&quot;, current_path-&gt;route.argument ? current_path-&gt;route.argument:&quot;User does not accept mail&quot;);</span>
+<span class="lineNum">     439 </span><span class="lineCov">          5 :                                 pathpool_return(current_path);</span>
+<span class="lineNum">     440 </span><span class="lineCov">          5 :                                 return -1;</span>
+<span class="lineNum">     441 </span>            :                         default:
+<span class="lineNum">     442 </span><span class="lineNoCov">          0 :                                 client_send(log, client, &quot;451 Path rejected\r\n&quot;);</span>
+<span class="lineNum">     443 </span><span class="lineNoCov">          0 :                                 pathpool_return(current_path);</span>
+<span class="lineNum">     444 </span>            :                                 //FIXME should state transition back to idle here?
+<span class="lineNum">     445 </span>            :                                 //client_data-&gt;state=STATE_IDLE;
+<span class="lineNum">     446 </span>            :                                 //mail_reset(&amp;(client_data-&gt;current_mail));
+<span class="lineNum">     447 </span><span class="lineNoCov">          0 :                                 return 0;</span>
+<span class="lineNum">     448 </span>            :                 }
+<span class="lineNum">     449 </span>            : 
+<span class="lineNum">     450 </span><span class="lineCov">         40 :                 if(!current_path-&gt;route.router){</span>
+<span class="lineNum">     451 </span>            :                         //path not local, accept only if authenticated
+<span class="lineNum">     452 </span><span class="lineCov">          1 :                         if(!client_data-&gt;sasl_user.authenticated){</span>
+<span class="lineNum">     453 </span><span class="lineCov">          1 :                                 client_send(log, client, &quot;551 Unknown user\r\n&quot;);</span>
+<span class="lineNum">     454 </span><span class="lineCov">          1 :                                 pathpool_return(current_path);</span>
+<span class="lineNum">     455 </span><span class="lineCov">          1 :                                 return -1;</span>
+<span class="lineNum">     456 </span>            :                         }
+<span class="lineNum">     457 </span>            :                 }
+<span class="lineNum">     458 </span>            : 
+<span class="lineNum">     459 </span>            :                 //FIXME address deduplication?
+<span class="lineNum">     460 </span>            :                 //TODO call plugins
+<span class="lineNum">     461 </span>            : 
+<span class="lineNum">     462 </span><span class="lineCov">         39 :                 client_data-&gt;current_mail.forward_paths[i] = current_path;</span>
+<span class="lineNum">     463 </span><span class="lineCov">         39 :                 client_send(log, client, &quot;250 Accepted\r\n&quot;);</span>
+<span class="lineNum">     464 </span>            : 
+<span class="lineNum">     465 </span>            :                 //decrease the failscore
+<span class="lineNum">     466 </span><span class="lineCov">         39 :                 return 1;</span>
+<span class="lineNum">     467 </span>            :         }
+<span class="lineNum">     468 </span>            : 
+<span class="lineNum">     469 </span><span class="lineCov">         41 :         if(!strncasecmp(client_data-&gt;recv_buffer, &quot;quit&quot;, 4)){</span>
+<span class="lineNum">     470 </span><span class="lineCov">          1 :                 logprintf(log, LOG_INFO, &quot;Client quit\n&quot;);</span>
+<span class="lineNum">     471 </span><span class="lineCov">          1 :                 client_send(log, client, &quot;221 OK Bye\r\n&quot;);</span>
+<span class="lineNum">     472 </span><span class="lineCov">          1 :                 return client_close(client);</span>
+<span class="lineNum">     473 </span>            :         }
+<span class="lineNum">     474 </span>            : 
+<span class="lineNum">     475 </span><span class="lineCov">         40 :         if(!strncasecmp(client_data-&gt;recv_buffer, &quot;noop&quot;, 4)){</span>
+<span class="lineNum">     476 </span><span class="lineCov">          1 :                 logprintf(log, LOG_INFO, &quot;Client noop\n&quot;);</span>
+<span class="lineNum">     477 </span><span class="lineCov">          1 :                 client_send(log, client, &quot;250 OK\r\n&quot;);</span>
+<span class="lineNum">     478 </span><span class="lineCov">          1 :                 return 0;</span>
+<span class="lineNum">     479 </span>            :         }
+<span class="lineNum">     480 </span>            : 
+<span class="lineNum">     481 </span><span class="lineCov">         39 :         if(!strncasecmp(client_data-&gt;recv_buffer, &quot;rset&quot;, 4)){</span>
+<span class="lineNum">     482 </span><span class="lineCov">          4 :                 client_data-&gt;state = STATE_IDLE;</span>
+<span class="lineNum">     483 </span><span class="lineCov">          4 :                 mail_reset(&amp;(client_data-&gt;current_mail));</span>
+<span class="lineNum">     484 </span><span class="lineCov">          4 :                 logprintf(log, LOG_INFO, &quot;Client reset\n&quot;);</span>
+<span class="lineNum">     485 </span><span class="lineCov">          4 :                 client_send(log, client, &quot;250 Reset OK\r\n&quot;);</span>
+<span class="lineNum">     486 </span><span class="lineCov">          4 :                 return 0;</span>
+<span class="lineNum">     487 </span>            :         }
+<span class="lineNum">     488 </span>            : 
+<span class="lineNum">     489 </span><span class="lineCov">         35 :         if(!strncasecmp(client_data-&gt;recv_buffer, &quot;auth&quot;, 4)){</span>
+<span class="lineNum">     490 </span><span class="lineCov">          1 :                 logprintf(log, LOG_INFO, &quot;Client tried to use AUTH in RECIPIENTS\n&quot;);</span>
+<span class="lineNum">     491 </span><span class="lineCov">          1 :                 client_send(log, client, &quot;503 Bad sequence of commands\r\n&quot;);</span>
+<span class="lineNum">     492 </span><span class="lineCov">          1 :                 return -1;</span>
+<span class="lineNum">     493 </span>            :         }
+<span class="lineNum">     494 </span>            : 
+<span class="lineNum">     495 </span><span class="lineCov">         34 :         if(!strncasecmp(client_data-&gt;recv_buffer, &quot;data&quot;, 4)){</span>
+<span class="lineNum">     496 </span>            :                 //reject command if no recipients
+<span class="lineNum">     497 </span><span class="lineCov">         33 :                 if(!client_data-&gt;current_mail.forward_paths[0]){</span>
+<span class="lineNum">     498 </span><span class="lineCov">          2 :                         logprintf(log, LOG_INFO, &quot;Data without recipients\n&quot;);</span>
+<span class="lineNum">     499 </span><span class="lineCov">          2 :                         client_send(log, client, &quot;503 No valid recipients\r\n&quot;);</span>
+<span class="lineNum">     500 </span><span class="lineCov">          2 :                         return -1;</span>
+<span class="lineNum">     501 </span>            :                 }
+<span class="lineNum">     502 </span><span class="lineCov">         31 :                 client_data-&gt;state = STATE_DATA;</span>
+<span class="lineNum">     503 </span>            : 
+<span class="lineNum">     504 </span>            :                 //write received: header
+<span class="lineNum">     505 </span><span class="lineCov">         31 :                 if(mail_recvheader(log, &amp;(client_data-&gt;current_mail), listener_data-&gt;announce_domain, listener_data-&gt;suppress_submitter) &lt; 0){</span>
+<span class="lineNum">     506 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_WARNING, &quot;Failed to write received header\n&quot;);</span>
+<span class="lineNum">     507 </span>            :                 }
+<span class="lineNum">     508 </span>            : 
+<span class="lineNum">     509 </span><span class="lineCov">         31 :                 logprintf(log, LOG_INFO, &quot;Client begins data transmission\n&quot;);</span>
+<span class="lineNum">     510 </span>            : 
+<span class="lineNum">     511 </span><span class="lineCov">         31 :                 client_send(log, client, &quot;354 Go ahead\r\n&quot;);</span>
+<span class="lineNum">     512 </span><span class="lineCov">         31 :                 return 0;</span>
+<span class="lineNum">     513 </span>            :         }
+<span class="lineNum">     514 </span>            : 
+<span class="lineNum">     515 </span><span class="lineCov">          1 :         logprintf(log, LOG_INFO, &quot;Command not recognized in state RECIPIENTS: %s\n&quot;, client_data-&gt;recv_buffer);</span>
+<span class="lineNum">     516 </span><span class="lineCov">          1 :         client_send(log, client, &quot;500 Unknown command\r\n&quot;);</span>
+<span class="lineNum">     517 </span><span class="lineCov">          1 :         return -1;</span>
+<a name="518"><span class="lineNum">     518 </span>            : }</a>
+<span class="lineNum">     519 </span>            : 
+<span class="lineNum">     520 </span><span class="lineCov">        102 : int smtpstate_data(LOGGER log, CONNECTION* client, DATABASE* database, PATHPOOL* path_pool){</span>
+<span class="lineNum">     521 </span><span class="lineCov">        102 :         CLIENT* client_data = (CLIENT*)client-&gt;aux_data;</span>
+<span class="lineNum">     522 </span>            : 
+<span class="lineNum">     523 </span><span class="lineCov">        102 :         if(client_data-&gt;recv_buffer[0] == '.'){</span>
+<span class="lineNum">     524 </span><span class="lineCov">         31 :                 if(client_data-&gt;recv_buffer[1]){</span>
+<span class="lineNum">     525 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_INFO, &quot;Data line with leading dot, fixing\n&quot;);</span>
+<span class="lineNum">     526 </span>            :                         //skip leading dot
+<span class="lineNum">     527 </span>            :                         //FIXME use return value (might indicate message too long)
+<span class="lineNum">     528 </span><span class="lineNoCov">          0 :                         if(mail_line(log, &amp;(client_data-&gt;current_mail), client_data-&gt;recv_buffer + 1) &lt; 0){</span>
+<span class="lineNum">     529 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_WARNING, &quot;Failed to store mail data line\n&quot;);</span>
+<span class="lineNum">     530 </span>            :                         }
+<span class="lineNum">     531 </span><span class="lineNoCov">          0 :                         return 0;</span>
+<span class="lineNum">     532 </span>            :                 }
+<span class="lineNum">     533 </span>            :                 else{
+<span class="lineNum">     534 </span>            :                         //end of mail data signalled
+<span class="lineNum">     535 </span>            :                         //check if mail was too big
+<span class="lineNum">     536 </span><span class="lineCov">         31 :                         if(client_data-&gt;current_mail.data_max &amp;&amp; client_data-&gt;current_mail.data_offset &gt; client_data-&gt;current_mail.data_max){</span>
+<span class="lineNum">     537 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_WARNING, &quot;End of mail, data section exceeded size limitation, rejecting\n&quot;);</span>
+<span class="lineNum">     538 </span><span class="lineNoCov">          0 :                                 client_send(log, client, &quot;552 Size limit exceeded\r\n&quot;);</span>
+<span class="lineNum">     539 </span>            :                         }
+<span class="lineNum">     540 </span>            :                         //check for too many hops
+<span class="lineNum">     541 </span><span class="lineCov">         31 :                         else if(client_data-&gt;current_mail.hop_count &gt; CMAIL_MAX_HOPS){</span>
+<span class="lineNum">     542 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_WARNING, &quot;Mail exceeded maximum hop count of %d&quot;, CMAIL_MAX_HOPS);</span>
+<span class="lineNum">     543 </span><span class="lineNoCov">          0 :                                 client_send(log, client, &quot;554 Too many hops\r\n&quot;);</span>
+<span class="lineNum">     544 </span>            :                         }
+<span class="lineNum">     545 </span>            :                         else{
+<span class="lineNum">     546 </span><span class="lineCov">         31 :                                 logprintf(log, LOG_INFO, &quot;End of mail data, routing\n&quot;);</span>
+<span class="lineNum">     547 </span>            : 
+<span class="lineNum">     548 </span>            :                                 //TODO call plugins here
+<span class="lineNum">     549 </span><span class="lineCov">         31 :                                 if(!client_data-&gt;sasl_user.authenticated){</span>
+<span class="lineNum">     550 </span><span class="lineCov">         21 :                                         switch(mail_route(log, &amp;(client_data-&gt;current_mail), database)){</span>
+<span class="lineNum">     551 </span>            :                                                 case 250:
+<span class="lineNum">     552 </span><span class="lineCov">         18 :                                                         logprintf(log, LOG_INFO, &quot;Incoming mail accepted from %s\n&quot;, client_data-&gt;peer_name);</span>
+<span class="lineNum">     553 </span><span class="lineCov">         18 :                                                         client_send(log, client, &quot;250 OK\r\n&quot;);</span>
+<span class="lineNum">     554 </span><span class="lineCov">         18 :                                                         break;</span>
+<span class="lineNum">     555 </span>            :                                                 case 400:
+<span class="lineNum">     556 </span><span class="lineNoCov">          0 :                                                         logprintf(log, LOG_INFO, &quot;Temporary routing failure, deferring message\n&quot;);</span>
+<span class="lineNum">     557 </span><span class="lineNoCov">          0 :                                                         client_send(log, client, &quot;451 Temporary failure, please try again later. If the error persists, contact the administrator.\r\n&quot;);</span>
+<span class="lineNum">     558 </span><span class="lineNoCov">          0 :                                                         break;</span>
+<span class="lineNum">     559 </span>            :                                                 default:
+<span class="lineNum">     560 </span><span class="lineCov">          3 :                                                         logprintf(log, LOG_WARNING, &quot;Mail not routed, rejecting\n&quot;);</span>
+<span class="lineNum">     561 </span><span class="lineCov">          3 :                                                         client_send(log, client, &quot;554 Rejected\r\n&quot;);</span>
+<span class="lineNum">     562 </span><span class="lineCov">          3 :                                                         break;</span>
+<span class="lineNum">     563 </span>            :                                         }
+<span class="lineNum">     564 </span>            :                                 }
+<span class="lineNum">     565 </span>            :                                 else{
+<span class="lineNum">     566 </span><span class="lineCov">         10 :                                         switch(mail_originate(log, client_data-&gt;sasl_user.authorized, &amp;(client_data-&gt;current_mail), client_data-&gt;originating_route, database)){</span>
+<span class="lineNum">     567 </span>            :                                                 case 250:
+<span class="lineNum">     568 </span><span class="lineCov">          7 :                                                         logprintf(log, LOG_INFO, &quot;Originating mail accepted for user %s (auth %s) from %s\n&quot;, client_data-&gt;sasl_user.authorized, client_data-&gt;sasl_user.authenticated, client_data-&gt;peer_name);</span>
+<span class="lineNum">     569 </span><span class="lineCov">          7 :                                                         client_send(log, client, &quot;250 OK\r\n&quot;);</span>
+<span class="lineNum">     570 </span><span class="lineCov">          7 :                                                         break;</span>
+<span class="lineNum">     571 </span>            :                                                 case 400:
+<span class="lineNum">     572 </span><span class="lineNoCov">          0 :                                                         logprintf(log, LOG_INFO, &quot;Temporary routing failure, deferring message\n&quot;);</span>
+<span class="lineNum">     573 </span><span class="lineNoCov">          0 :                                                         client_send(log, client, &quot;451 Temporary failure, please try again later. If the error persists, contact the administrator.\r\n&quot;);</span>
+<span class="lineNum">     574 </span><span class="lineNoCov">          0 :                                                         break;</span>
+<span class="lineNum">     575 </span>            :                                                 default:
+<span class="lineNum">     576 </span><span class="lineCov">          3 :                                                         logprintf(log, LOG_WARNING, &quot;Originated mail could not be routed, rejecting\n&quot;);</span>
+<span class="lineNum">     577 </span><span class="lineCov">          3 :                                                         client_send(log, client, &quot;554 Rejected\r\n&quot;);</span>
+<span class="lineNum">     578 </span><span class="lineCov">          3 :                                                         break;</span>
+<span class="lineNum">     579 </span>            :                                         }
+<span class="lineNum">     580 </span>            :                                 }
+<span class="lineNum">     581 </span>            :                         }
+<span class="lineNum">     582 </span><span class="lineCov">         31 :                         mail_reset(&amp;(client_data-&gt;current_mail));</span>
+<span class="lineNum">     583 </span><span class="lineCov">         31 :                         client_data-&gt;state=STATE_IDLE;</span>
+<span class="lineNum">     584 </span>            :                 }
+<span class="lineNum">     585 </span>            :         }
+<span class="lineNum">     586 </span>            :         else{
+<span class="lineNum">     587 </span>            :                 //detect end of header &amp; count hops
+<span class="lineNum">     588 </span><span class="lineCov">         71 :                 if(client_data-&gt;current_mail.header_offset == 0){</span>
+<span class="lineNum">     589 </span>            :                         //header end
+<span class="lineNum">     590 </span><span class="lineCov">         43 :                         if(client_data-&gt;recv_buffer[0] == 0){</span>
+<span class="lineNum">     591 </span><span class="lineCov">          4 :                                 client_data-&gt;current_mail.header_offset = client_data-&gt;current_mail.data_offset;</span>
+<span class="lineNum">     592 </span><span class="lineCov">          4 :                                 logprintf(log, LOG_DEBUG, &quot;End of header detected at %d\n&quot;, client_data-&gt;current_mail.header_offset);</span>
+<span class="lineNum">     593 </span>            :                         }
+<span class="lineNum">     594 </span>            :                         //count Received: headers
+<span class="lineNum">     595 </span><span class="lineCov">         39 :                         else if(!strncmp(client_data-&gt;recv_buffer, &quot;Received: &quot;, 10)){</span>
+<span class="lineNum">     596 </span><span class="lineNoCov">          0 :                                 client_data-&gt;current_mail.hop_count++;</span>
+<span class="lineNum">     597 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_DEBUG, &quot;Mail is now at %d hops\n&quot;, client_data-&gt;current_mail.hop_count);</span>
+<span class="lineNum">     598 </span>            :                         }
+<span class="lineNum">     599 </span>            :                 }
+<span class="lineNum">     600 </span>            : 
+<span class="lineNum">     601 </span>            :                 //FIXME use return value (might indicate message too long)
+<span class="lineNum">     602 </span><span class="lineCov">         71 :                 if(mail_line(log, &amp;(client_data-&gt;current_mail), client_data-&gt;recv_buffer) &lt; 0){</span>
+<span class="lineNum">     603 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_WARNING, &quot;Failed to store mail data line\n&quot;);</span>
+<span class="lineNum">     604 </span>            :                 }
+<span class="lineNum">     605 </span><span class="lineCov">         71 :                 return 0;</span>
+<span class="lineNum">     606 </span>            :         }
+<span class="lineNum">     607 </span>            : 
+<span class="lineNum">     608 </span><span class="lineCov">         31 :         return 0;</span>
+<span class="lineNum">     609 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.11</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

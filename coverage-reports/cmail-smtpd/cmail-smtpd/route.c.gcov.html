@@ -1,0 +1,308 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - smtpd.info - cmail-smtpd/route.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">cmail-smtpd</a> - route.c<span style="font-size: 80%;"> (source / <a href="route.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">smtpd.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">81</td>
+            <td class="headerCovTableEntry">112</td>
+            <td class="headerCovTableEntryLo">72.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2015-11-25 19:06:20</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : //this code queries outbound routing information for a user</a>
+<span class="lineNum">       2 </span><span class="lineCov">          3 : MAILROUTE route_query(LOGGER log, DATABASE* database, char* user){</span>
+<span class="lineNum">       3 </span><span class="lineCov">          3 :         MAILROUTE route = {</span>
+<span class="lineNum">       4 </span>            :                 .router = NULL,
+<span class="lineNum">       5 </span>            :                 .argument = NULL
+<span class="lineNum">       6 </span>            :         };
+<span class="lineNum">       7 </span>            :         int status;
+<span class="lineNum">       8 </span>            : 
+<span class="lineNum">       9 </span><span class="lineCov">          3 :         if(!user){</span>
+<span class="lineNum">      10 </span><span class="lineNoCov">          0 :                 return route;</span>
+<span class="lineNum">      11 </span>            :         }
+<span class="lineNum">      12 </span>            : 
+<span class="lineNum">      13 </span><span class="lineCov">          3 :         status = sqlite3_bind_text(database-&gt;query_outbound_router, 1, user, -1, SQLITE_STATIC);</span>
+<span class="lineNum">      14 </span><span class="lineCov">          3 :         if(status != SQLITE_OK){</span>
+<span class="lineNum">      15 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to bind user parameter to routing query: %s\n&quot;, sqlite3_errmsg(database-&gt;conn));</span>
+<span class="lineNum">      16 </span><span class="lineNoCov">          0 :                 sqlite3_reset(database-&gt;query_outbound_router);</span>
+<span class="lineNum">      17 </span><span class="lineNoCov">          0 :                 sqlite3_clear_bindings(database-&gt;query_outbound_router);</span>
+<span class="lineNum">      18 </span><span class="lineNoCov">          0 :                 return route;</span>
+<span class="lineNum">      19 </span>            :         }
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span><span class="lineCov">          3 :         switch(sqlite3_step(database-&gt;query_outbound_router)){</span>
+<span class="lineNum">      22 </span>            :                 case SQLITE_ROW:
+<span class="lineNum">      23 </span>            :                         //copy data
+<span class="lineNum">      24 </span>            :                         //This works because router is NOT NULL in schema
+<span class="lineNum">      25 </span><span class="lineCov">          3 :                         route.router = common_strdup((char*)sqlite3_column_text(database-&gt;query_outbound_router, 0));</span>
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span><span class="lineCov">          3 :                         if(sqlite3_column_text(database-&gt;query_outbound_router, 1)){</span>
+<span class="lineNum">      28 </span><span class="lineNoCov">          0 :                                 route.argument = common_strdup((char*)sqlite3_column_text(database-&gt;query_outbound_router, 1));</span>
+<span class="lineNum">      29 </span>            :                         }
+<span class="lineNum">      30 </span>            : 
+<span class="lineNum">      31 </span><span class="lineCov">          3 :                         if(!route.router){</span>
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_ERROR, &quot;Failed to allocate memory for ROUTE structure\n&quot;);</span>
+<span class="lineNum">      33 </span>            :                         }
+<span class="lineNum">      34 </span><span class="lineCov">          3 :                         break;</span>
+<span class="lineNum">      35 </span>            :                 case SQLITE_DONE:
+<span class="lineNum">      36 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_ERROR, &quot;Database contains no outbound router definition for %s\n&quot;, user);</span>
+<span class="lineNum">      37 </span><span class="lineNoCov">          0 :                         break;</span>
+<span class="lineNum">      38 </span>            :                 default:
+<span class="lineNum">      39 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_WARNING, &quot;Unhandled query return value: %s\n&quot;, sqlite3_errmsg(database-&gt;conn));</span>
+<span class="lineNum">      40 </span><span class="lineNoCov">          0 :                         break;</span>
+<span class="lineNum">      41 </span>            :         }
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span><span class="lineCov">          3 :         sqlite3_reset(database-&gt;query_outbound_router);</span>
+<span class="lineNum">      44 </span><span class="lineCov">          3 :         sqlite3_clear_bindings(database-&gt;query_outbound_router);</span>
+<span class="lineNum">      45 </span>            : 
+<span class="lineNum">      46 </span><span class="lineCov">          3 :         return route;</span>
+<a name="47"><span class="lineNum">      47 </span>            : }</a>
+<span class="lineNum">      48 </span>            : 
+<span class="lineNum">      49 </span><span class="lineCov">        163 : void route_free(MAILROUTE* route){</span>
+<span class="lineNum">      50 </span><span class="lineCov">        163 :         if(route){</span>
+<span class="lineNum">      51 </span><span class="lineCov">        163 :                 if(route-&gt;router){</span>
+<span class="lineNum">      52 </span><span class="lineCov">         48 :                         free(route-&gt;router);</span>
+<span class="lineNum">      53 </span><span class="lineCov">         48 :                         route-&gt;router = NULL;</span>
+<span class="lineNum">      54 </span>            :                 }
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span><span class="lineCov">        163 :                 if(route-&gt;argument){</span>
+<span class="lineNum">      57 </span><span class="lineCov">         22 :                         free(route-&gt;argument);</span>
+<span class="lineNum">      58 </span><span class="lineCov">         22 :                         route-&gt;argument = NULL;</span>
+<span class="lineNum">      59 </span>            :                 }
+<span class="lineNum">      60 </span>            :         }
+<a name="61"><span class="lineNum">      61 </span><span class="lineCov">        163 : }</span></a>
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span><span class="lineCov">         33 : int route_local_path(LOGGER log, DATABASE* database, MAIL* mail, MAILPATH* current_path){</span>
+<span class="lineNum">      64 </span><span class="lineCov">         33 :         int rv = 0;</span>
+<span class="lineNum">      65 </span>            :         USER_DATABASE* user_db;
+<span class="lineNum">      66 </span>            :         char path_replacement[SMTP_MAX_PATH_LENGTH];
+<span class="lineNum">      67 </span>            :         char forward_path[SMTP_MAX_PATH_LENGTH];
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span>            :         //reject the path if the path does not have a router table entry
+<span class="lineNum">      70 </span>            :         //this check should be redundant, as paths without routers are non-local
+<span class="lineNum">      71 </span><span class="lineCov">         33 :         if(!current_path-&gt;route.router){</span>
+<span class="lineNum">      72 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">      73 </span>            :         }
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span><span class="lineCov">         33 :         logprintf(log, LOG_DEBUG, &quot;Inbound router %s (%s) for %s\n&quot;, current_path-&gt;route.router, current_path-&gt;route.argument ? current_path-&gt;route.argument:&quot;none&quot;, current_path-&gt;path);</span>
+<span class="lineNum">      76 </span>            : 
+<span class="lineNum">      77 </span><span class="lineCov">         33 :         if(!strcmp(current_path-&gt;route.router, &quot;store&quot;)){</span>
+<span class="lineNum">      78 </span><span class="lineCov">         11 :                 if(!(current_path-&gt;route.argument)){</span>
+<span class="lineNum">      79 </span><span class="lineCov">          2 :                         logprintf(log, LOG_ERROR, &quot;Path is assigned store router without argument, rejecting transaction\n&quot;);</span>
+<span class="lineNum">      80 </span>            :                         //Fail the transaction permanently
+<span class="lineNum">      81 </span><span class="lineCov">          2 :                         rv = -1;</span>
+<span class="lineNum">      82 </span>            :                 }
+<span class="lineNum">      83 </span>            :                 else{
+<span class="lineNum">      84 </span>            :                         //preemptively fail the transaction...
+<span class="lineNum">      85 </span><span class="lineCov">          9 :                         rv = -1;</span>
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            :                         //check for user existence (as well as a user database path)
+<span class="lineNum">      88 </span><span class="lineCov">          9 :                         if(sqlite3_bind_text(database-&gt;query_authdata, 1, current_path-&gt;route.argument, -1, SQLITE_STATIC) == SQLITE_OK){</span>
+<span class="lineNum">      89 </span><span class="lineCov">          9 :                                 switch(sqlite3_step(database-&gt;query_authdata)){</span>
+<span class="lineNum">      90 </span>            :                                         case SQLITE_ROW:
+<span class="lineNum">      91 </span>            :                                                 //check for a user database
+<span class="lineNum">      92 </span><span class="lineCov">          9 :                                                 if(sqlite3_column_text(database-&gt;query_authdata, 2)){</span>
+<span class="lineNum">      93 </span><span class="lineCov">          4 :                                                         logprintf(log, LOG_DEBUG, &quot;Fetching user database for user %s (%s)\n&quot;, current_path-&gt;route.argument, (char*)sqlite3_column_text(database-&gt;query_authdata, 2));  </span>
+<span class="lineNum">      94 </span><span class="lineCov">          4 :                                                         user_db = database_userdb(log, database, (char*)sqlite3_column_text(database-&gt;query_authdata, 2));</span>
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span><span class="lineCov">          4 :                                                         if(!user_db){</span>
+<span class="lineNum">      97 </span>            :                                                                 //try to refresh the user database set
+<span class="lineNum">      98 </span><span class="lineCov">          3 :                                                                 database_refresh(log, database);</span>
+<span class="lineNum">      99 </span><span class="lineCov">          3 :                                                                 user_db = database_userdb(log, database, (char*)sqlite3_column_text(database-&gt;query_authdata, 2));</span>
+<span class="lineNum">     100 </span>            : 
+<span class="lineNum">     101 </span><span class="lineCov">          3 :                                                                 if(!user_db){</span>
+<span class="lineNum">     102 </span>            :                                                                         //as last resort, store to master db
+<span class="lineNum">     103 </span><span class="lineCov">          1 :                                                                         logprintf(log, LOG_WARNING, &quot;Stored mail for user %s to master instead of defined database\n&quot;, current_path-&gt;route.argument);</span>
+<span class="lineNum">     104 </span><span class="lineCov">          1 :                                                                         rv = mail_store_inbox(log, database-&gt;mail_storage.mailbox_master, mail, current_path);</span>
+<span class="lineNum">     105 </span>            :                                                                 }
+<span class="lineNum">     106 </span>            :                                                                 else{
+<span class="lineNum">     107 </span><span class="lineCov">          2 :                                                                         logprintf(log, LOG_DEBUG, &quot;Storing mail for %s to user database %s after database refresh\n&quot;, current_path-&gt;route.argument, user_db-&gt;file_name);</span>
+<span class="lineNum">     108 </span><span class="lineCov">          2 :                                                                         rv = mail_store_inbox(log, user_db-&gt;mailbox, mail, current_path);</span>
+<span class="lineNum">     109 </span>            :                                                                 }
+<span class="lineNum">     110 </span>            :                                                         }
+<span class="lineNum">     111 </span>            :                                                         else{
+<span class="lineNum">     112 </span><span class="lineCov">          1 :                                                                 logprintf(log, LOG_DEBUG, &quot;Storing mail for %s to user database %s\n&quot;, current_path-&gt;route.argument, user_db-&gt;file_name);</span>
+<span class="lineNum">     113 </span><span class="lineCov">          1 :                                                                 rv = mail_store_inbox(log, user_db-&gt;mailbox, mail, current_path);</span>
+<span class="lineNum">     114 </span>            :                                                         }
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span>            :                                                 }
+<span class="lineNum">     117 </span>            :                                                 else{
+<span class="lineNum">     118 </span>            :                                                         //simply store to master
+<span class="lineNum">     119 </span><span class="lineCov">          5 :                                                         logprintf(log, LOG_DEBUG, &quot;Storing mail for %s to master database\n&quot;, current_path-&gt;route.argument);</span>
+<span class="lineNum">     120 </span><span class="lineCov">          5 :                                                         rv = mail_store_inbox(log, database-&gt;mail_storage.mailbox_master, mail, current_path);</span>
+<span class="lineNum">     121 </span>            :                                                 }
+<span class="lineNum">     122 </span><span class="lineCov">          9 :                                                 break;</span>
+<span class="lineNum">     123 </span>            :                                         case SQLITE_DONE:
+<span class="lineNum">     124 </span><span class="lineNoCov">          0 :                                                 logprintf(log, LOG_ERROR, &quot;Failed to resolve router argument %s to a user, failing transaction\n&quot;, current_path-&gt;route.argument);</span>
+<span class="lineNum">     125 </span><span class="lineNoCov">          0 :                                                 break;</span>
+<span class="lineNum">     126 </span>            :                                         default:
+<span class="lineNum">     127 </span><span class="lineNoCov">          0 :                                                 logprintf(log, LOG_ERROR, &quot;Failed to execute user info query: %s\n&quot;, sqlite3_errmsg(database-&gt;conn));</span>
+<span class="lineNum">     128 </span><span class="lineNoCov">          0 :                                                 break;</span>
+<span class="lineNum">     129 </span>            :                                 }
+<span class="lineNum">     130 </span>            :                         }
+<span class="lineNum">     131 </span>            :                         else{
+<span class="lineNum">     132 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_ERROR, &quot;Failed to bind user to user info query\n&quot;);</span>
+<span class="lineNum">     133 </span>            :                         }
+<span class="lineNum">     134 </span>            : 
+<span class="lineNum">     135 </span><span class="lineCov">          9 :                         sqlite3_reset(database-&gt;query_authdata);</span>
+<span class="lineNum">     136 </span><span class="lineCov">          9 :                         sqlite3_clear_bindings(database-&gt;query_authdata);</span>
+<span class="lineNum">     137 </span>            : 
+<span class="lineNum">     138 </span>            :                         //if we could not store mail, retry with master
+<span class="lineNum">     139 </span><span class="lineCov">          9 :                         if(rv){</span>
+<span class="lineNum">     140 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_ERROR, &quot;Failed to store mail for %s (%d: %s), retrying one last time with master db\n&quot;, current_path-&gt;route.argument, rv, sqlite3_errmsg(database-&gt;conn));</span>
+<span class="lineNum">     141 </span><span class="lineNoCov">          0 :                                 rv = mail_store_inbox(log, database-&gt;mail_storage.mailbox_master, mail, current_path);</span>
+<span class="lineNum">     142 </span><span class="lineNoCov">          0 :                                 if(rv){</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :                                         logprintf(log, LOG_ERROR, &quot;Failed to store mail: %s\n&quot;, sqlite3_errmsg(database-&gt;conn));</span>
+<span class="lineNum">     144 </span>            :                                 }
+<span class="lineNum">     145 </span>            :                         }
+<span class="lineNum">     146 </span>            :                 }
+<span class="lineNum">     147 </span>            :         }
+<span class="lineNum">     148 </span><span class="lineCov">         22 :         else if(!strcmp(current_path-&gt;route.router, &quot;redirect&quot;)){</span>
+<span class="lineNum">     149 </span><span class="lineCov">         10 :                 if(current_path-&gt;route.argument){</span>
+<span class="lineNum">     150 </span>            :                         //FIXME this should be ensured to be properly terminated
+<span class="lineNum">     151 </span><span class="lineCov">          8 :                         strncpy(forward_path, current_path-&gt;route.argument, sizeof(forward_path) - 1);</span>
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span>            :                         //mangle the envelope recipient according to the route
+<span class="lineNum">     154 </span>            :                         //we're able to do this and not worry about exploitation from unsanitized input
+<span class="lineNum">     155 </span>            :                         //because the path parser removes all comments from user-supplied paths
+<span class="lineNum">     156 </span><span class="lineCov">          8 :                         strncpy(path_replacement, current_path-&gt;path, current_path-&gt;delimiter_position);</span>
+<span class="lineNum">     157 </span><span class="lineCov">          8 :                         path_replacement[current_path-&gt;delimiter_position] = 0;</span>
+<span class="lineNum">     158 </span><span class="lineCov">          8 :                         if(common_strrepl(forward_path, sizeof(forward_path), &quot;(to-local)&quot;, path_replacement) &lt; 0){</span>
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_ERROR, &quot;Failed to replace to-local variable in redirect router\n&quot;);</span>
+<span class="lineNum">     160 </span>            :                                 //fail the transaction
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :                                 rv = -1;</span>
+<span class="lineNum">     162 </span>            :                         }
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span><span class="lineCov">         16 :                         if(!rv &amp;&amp;</span>
+<span class="lineNum">     165 </span><span class="lineCov">          8 :                                 common_strrepl(forward_path, sizeof(forward_path), &quot;(to-domain)&quot;,</span>
+<span class="lineNum">     166 </span>            :                                 //this ensures that the variable always gets replaced, with an empty string if need be
+<span class="lineNum">     167 </span><span class="lineCov">          8 :                                 current_path-&gt;path + current_path-&gt;delimiter_position + (current_path-&gt;path[current_path-&gt;delimiter_position] ? 1:0) ) &lt; 0){</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_ERROR, &quot;Failed to replace to-domain variable in redirect router\n&quot;);</span>
+<span class="lineNum">     169 </span>            :                                 //fail the transaction
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :                                 rv = -1;</span>
+<span class="lineNum">     171 </span>            :                         }
+<span class="lineNum">     172 </span>            : 
+<span class="lineNum">     173 </span><span class="lineCov">          8 :                         if(!rv){</span>
+<span class="lineNum">     174 </span><span class="lineCov">          8 :                                 strncpy(path_replacement, mail-&gt;reverse_path.path, mail-&gt;reverse_path.delimiter_position);</span>
+<span class="lineNum">     175 </span><span class="lineCov">          8 :                                 path_replacement[mail-&gt;reverse_path.delimiter_position] = 0;</span>
+<span class="lineNum">     176 </span><span class="lineCov">          8 :                                 if(common_strrepl(forward_path, sizeof(forward_path), &quot;(from-local)&quot;, path_replacement) &lt; 0){</span>
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :                                         logprintf(log, LOG_ERROR, &quot;Failed to replace from-local variable in redirect router\n&quot;);</span>
+<span class="lineNum">     178 </span>            :                                         //fail the transaction
+<span class="lineNum">     179 </span><span class="lineNoCov">          0 :                                         rv = -1;</span>
+<span class="lineNum">     180 </span>            :                                 }
+<span class="lineNum">     181 </span>            :                         }
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span><span class="lineCov">         16 :                         if(!rv &amp;&amp;</span>
+<span class="lineNum">     184 </span><span class="lineCov">          8 :                                 common_strrepl(forward_path, sizeof(forward_path), &quot;(from-domain)&quot;,</span>
+<span class="lineNum">     185 </span><span class="lineCov">          8 :                                 mail-&gt;reverse_path.path + mail-&gt;reverse_path.delimiter_position + (current_path-&gt;path[current_path-&gt;delimiter_position] ? 1:0)) &lt; 0){</span>
+<span class="lineNum">     186 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_ERROR, &quot;Failed to replace from-domain variable in redirect router\n&quot;);</span>
+<span class="lineNum">     187 </span>            :                                 //fail the transaction
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :                                 rv = -1;</span>
+<span class="lineNum">     189 </span>            :                         }
+<span class="lineNum">     190 </span>            : 
+<span class="lineNum">     191 </span>            :                         //insert into outbound table
+<span class="lineNum">     192 </span><span class="lineCov">          8 :                         if(!rv){</span>
+<span class="lineNum">     193 </span><span class="lineCov">          8 :                                 rv = mail_store_outbox(log, database-&gt;mail_storage.outbox_master, NULL, forward_path, mail);</span>
+<span class="lineNum">     194 </span>            :                         }
+<span class="lineNum">     195 </span>            :                 }
+<span class="lineNum">     196 </span>            :                 else{
+<span class="lineNum">     197 </span><span class="lineCov">          2 :                         logprintf(log, LOG_ERROR, &quot;Redirect router without argument, failing transaction\n&quot;);</span>
+<span class="lineNum">     198 </span>            :                         //fail the transaction permanently
+<span class="lineNum">     199 </span><span class="lineCov">          2 :                         rv = -1;</span>
+<span class="lineNum">     200 </span>            :                 }
+<span class="lineNum">     201 </span>            :         }
+<span class="lineNum">     202 </span><span class="lineCov">         12 :         else if(!strcmp(current_path-&gt;route.router, &quot;handoff&quot;)){</span>
+<span class="lineNum">     203 </span><span class="lineCov">          4 :                 if(current_path-&gt;route.argument){</span>
+<span class="lineNum">     204 </span>            :                         //insert into outbound table
+<span class="lineNum">     205 </span><span class="lineCov">          2 :                         rv = mail_store_outbox(log, database-&gt;mail_storage.outbox_master, current_path-&gt;route.argument, current_path-&gt;path, mail);</span>
+<span class="lineNum">     206 </span>            :                 }
+<span class="lineNum">     207 </span>            :                 else{
+<span class="lineNum">     208 </span><span class="lineCov">          2 :                         logprintf(log, LOG_ERROR, &quot;Handoff router without argument, failing transaction\n&quot;);</span>
+<span class="lineNum">     209 </span><span class="lineCov">          2 :                         rv = -1;</span>
+<span class="lineNum">     210 </span>            :                 }
+<span class="lineNum">     211 </span>            :         }
+<span class="lineNum">     212 </span><span class="lineCov">          8 :         else if(!strcmp(current_path-&gt;route.router, &quot;reject&quot;)){</span>
+<span class="lineNum">     213 </span>            :                 //this should probably never be reached as the path
+<span class="lineNum">     214 </span>            :                 //of the user should already have been rejected.
+<span class="lineNum">     215 </span>            :                 //otherwise, a mail with multiple recipients including
+<span class="lineNum">     216 </span>            :                 //this one might get bounced on the basis of one
+<span class="lineNum">     217 </span>            :                 //rejecting recipient
+<span class="lineNum">     218 </span><span class="lineNoCov">          0 :                 rv = -1;</span>
+<span class="lineNum">     219 </span>            :         }
+<span class="lineNum">     220 </span><span class="lineCov">          8 :         else if(!strcmp(current_path-&gt;route.router, &quot;drop&quot;)){</span>
+<span class="lineNum">     221 </span>            :                 //this one is easy.
+<span class="lineNum">     222 </span>            :         }
+<span class="lineNum">     223 </span>            :         else{
+<span class="lineNum">     224 </span>            :                 //TODO call plugins for other routers
+<span class="lineNum">     225 </span>            :         }
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span><span class="lineCov">         33 :         if(rv&gt;0){</span>
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_INFO, &quot;Additional information: %s\n&quot;, sqlite3_errmsg(database-&gt;conn));</span>
+<span class="lineNum">     229 </span>            :         }
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span><span class="lineCov">         33 :         return rv;</span>
+<span class="lineNum">     232 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.11</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

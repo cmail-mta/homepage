@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - smtpd.info - lib/sasl.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">lib</a> - sasl.c<span style="font-size: 80%;"> (source / <a href="sasl.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">smtpd.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">55</td>
+            <td class="headerCovTableEntry">70</td>
+            <td class="headerCovTableEntryMed">78.6 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2015-11-25 19:06:20</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntry">7</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /* This file is part of the cmail project (http://cmail.rocks/)</a>
+<span class="lineNum">       2 </span>            :  * (c) 2015 Fabian &quot;cbdev&quot; Stumpf
+<span class="lineNum">       3 </span>            :  * License: Simplified BSD (2-Clause)
+<span class="lineNum">       4 </span>            :  * For further information, consult LICENSE.txt
+<a name="5"><span class="lineNum">       5 </span>            :  */</a>
+<span class="lineNum">       6 </span>            : 
+<span class="lineNum">       7 </span><span class="lineCov">         21 : void sasl_reset_ctx(SASL_CONTEXT* ctx, bool data_valid){</span>
+<span class="lineNum">       8 </span><span class="lineCov">         21 :         SASL_CONTEXT empty = {</span>
+<span class="lineNum">       9 </span>            :                 .method = SASL_INVALID,
+<span class="lineNum">      10 </span>            :                 .method_data = NULL,
+<span class="lineNum">      11 </span>            :                 .user = NULL
+<span class="lineNum">      12 </span>            :         };
+<span class="lineNum">      13 </span>            : 
+<span class="lineNum">      14 </span><span class="lineCov">         21 :         if(data_valid){</span>
+<span class="lineNum">      15 </span><span class="lineCov">          8 :                 if(ctx-&gt;method_data){</span>
+<span class="lineNum">      16 </span>            :                         //FIXME arbitrate this by method
+<span class="lineNum">      17 </span><span class="lineNoCov">          0 :                         free(ctx-&gt;method_data);</span>
+<span class="lineNum">      18 </span>            :                 }
+<span class="lineNum">      19 </span>            :         }
+<span class="lineNum">      20 </span>            : 
+<span class="lineNum">      21 </span><span class="lineCov">         21 :         *ctx = empty;</span>
+<a name="22"><span class="lineNum">      22 </span><span class="lineCov">         21 : }</span></a>
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span><span class="lineCov">         27 : void sasl_reset_user(SASL_USER* user, bool data_valid){</span>
+<span class="lineNum">      25 </span><span class="lineCov">         27 :         SASL_USER empty = {</span>
+<span class="lineNum">      26 </span>            :                 .authorized = NULL,
+<span class="lineNum">      27 </span>            :                 .authenticated = NULL
+<span class="lineNum">      28 </span>            :         };
+<span class="lineNum">      29 </span>            : 
+<span class="lineNum">      30 </span><span class="lineCov">         27 :         if(data_valid){</span>
+<span class="lineNum">      31 </span><span class="lineCov">         17 :                 if(user-&gt;authorized){</span>
+<span class="lineNum">      32 </span><span class="lineCov">          3 :                         free(user-&gt;authorized);</span>
+<span class="lineNum">      33 </span>            :                 }
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span><span class="lineCov">         17 :                 if(user-&gt;authenticated){</span>
+<span class="lineNum">      36 </span><span class="lineCov">          5 :                         free(user-&gt;authenticated);</span>
+<span class="lineNum">      37 </span>            :                 }
+<span class="lineNum">      38 </span>            :         }
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span><span class="lineCov">         27 :         *user = empty;</span>
+<a name="41"><span class="lineNum">      41 </span><span class="lineCov">         27 : }</span></a>
+<span class="lineNum">      42 </span>            : 
+<span class="lineNum">      43 </span><span class="lineCov">         10 : SASL_METHOD sasl_scan_method(char* method){</span>
+<span class="lineNum">      44 </span><span class="lineCov">         10 :         if(!strncasecmp(method, &quot;plain&quot;, 5)){</span>
+<span class="lineNum">      45 </span><span class="lineCov">          8 :                 return SASL_PLAIN;</span>
+<span class="lineNum">      46 </span>            :         }
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span><span class="lineCov">          2 :         return SASL_INVALID;</span>
+<a name="49"><span class="lineNum">      49 </span>            : }</a>
+<span class="lineNum">      50 </span>            : 
+<span class="lineNum">      51 </span><span class="lineCov">          3 : int sasl_challenge(LOGGER log, SASL_CONTEXT* ctx, char** response){</span>
+<span class="lineNum">      52 </span><span class="lineCov">          3 :         switch(ctx-&gt;method){</span>
+<span class="lineNum">      53 </span>            :                 case SASL_PLAIN:
+<span class="lineNum">      54 </span><span class="lineCov">          3 :                         *response = NULL;</span>
+<span class="lineNum">      55 </span><span class="lineCov">          3 :                         return SASL_CONTINUE;</span>
+<span class="lineNum">      56 </span>            :                 default:
+<span class="lineNum">      57 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_ERROR, &quot;No challenge handler defined for SASL method\n&quot;);</span>
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :                         return SASL_ERROR_PROCESSING;</span>
+<span class="lineNum">      59 </span>            :         }
+<span class="lineNum">      60 </span>            : 
+<span class="lineNum">      61 </span>            :         return SASL_ERROR_PROCESSING;
+<a name="62"><span class="lineNum">      62 </span>            : }</a>
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span><span class="lineCov">          7 : int sasl_continue(LOGGER log, SASL_CONTEXT* ctx, char* data, char** response){</span>
+<span class="lineNum">      65 </span><span class="lineCov">          7 :         int length, off_user = 0, off_pass = 0;</span>
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span><span class="lineCov">          7 :         if(!response){</span>
+<span class="lineNum">      68 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;NULL response pointer in sasl_continue\n&quot;);</span>
+<span class="lineNum">      69 </span><span class="lineNoCov">          0 :                 return SASL_ERROR_PROCESSING;</span>
+<span class="lineNum">      70 </span>            :         }
+<span class="lineNum">      71 </span>            : 
+<span class="lineNum">      72 </span><span class="lineCov">          7 :         switch(ctx-&gt;method){</span>
+<span class="lineNum">      73 </span>            :                 case SASL_PLAIN:
+<span class="lineNum">      74 </span><span class="lineCov">          7 :                         if(!data){</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :                                 return SASL_ERROR_DATA;</span>
+<span class="lineNum">      76 </span>            :                         }
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span><span class="lineCov">          7 :                         length = auth_base64decode(log, data);</span>
+<span class="lineNum">      79 </span>            : 
+<span class="lineNum">      80 </span><span class="lineCov">          7 :                         if(length &lt; 4){ //2x NUL, 2x min 1 byte</span>
+<span class="lineNum">      81 </span><span class="lineCov">          2 :                                 logprintf(log, LOG_ERROR, &quot;Failed to decode PLAIN authentication parameter\n&quot;);</span>
+<span class="lineNum">      82 </span><span class="lineCov">          2 :                                 return SASL_ERROR_DATA;</span>
+<span class="lineNum">      83 </span>            :                         }
+<span class="lineNum">      84 </span>            : 
+<span class="lineNum">      85 </span>            :                         //RFC 4616 message = [authzid] UTF8NUL authcid UTF8NUL passwd
+<span class="lineNum">      86 </span>            :                         //TODO test this thoroughly
+<span class="lineNum">      87 </span><span class="lineCov">          5 :                         off_user = strlen(data) + 1;</span>
+<span class="lineNum">      88 </span><span class="lineCov">          5 :                         if(off_user &gt;= length || strlen(data + off_user) &lt; 1 || off_user + strlen(data + off_user) &gt;= length){</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_ERROR, &quot;SASL PLAIN user read out of bounds\n&quot;);</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :                                 return SASL_ERROR_DATA;</span>
+<span class="lineNum">      91 </span>            :                         }
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span><span class="lineCov">          5 :                         off_pass = off_user + strlen(data + off_user) + 1;</span>
+<span class="lineNum">      94 </span><span class="lineCov">          5 :                         if(off_pass &gt;= length || off_pass + strlen(data + off_pass) &gt;= length){</span>
+<span class="lineNum">      95 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_ERROR, &quot;SASL PLAIN pass read out of bounds\n&quot;);</span>
+<span class="lineNum">      96 </span><span class="lineNoCov">          0 :                                 return SASL_ERROR_DATA;</span>
+<span class="lineNum">      97 </span>            :                         }
+<span class="lineNum">      98 </span>            : 
+<span class="lineNum">      99 </span>            :                         //FIXME do not print passwords
+<span class="lineNum">     100 </span><span class="lineCov">          5 :                         logprintf(log, LOG_DEBUG, &quot;SASL PLAIN user %s pass %s\n&quot;, data + off_user, data + off_pass);</span>
+<span class="lineNum">     101 </span><span class="lineCov">          5 :                         ctx-&gt;user-&gt;authenticated = common_strdup(data + off_user);</span>
+<span class="lineNum">     102 </span><span class="lineCov">          5 :                         if(!(ctx-&gt;user-&gt;authenticated)){</span>
+<span class="lineNum">     103 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_ERROR, &quot;Failed to allocate memory for authenticated user\n&quot;);</span>
+<span class="lineNum">     104 </span><span class="lineNoCov">          0 :                                 return SASL_ERROR_PROCESSING;</span>
+<span class="lineNum">     105 </span>            :                         }
+<span class="lineNum">     106 </span>            : 
+<span class="lineNum">     107 </span><span class="lineCov">          5 :                         *response = data + off_pass;</span>
+<span class="lineNum">     108 </span><span class="lineCov">          5 :                         return SASL_DATA_OK;</span>
+<span class="lineNum">     109 </span>            :                 default:
+<span class="lineNum">     110 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_ERROR, &quot;No continuation handler defined for SASL method\n&quot;);</span>
+<span class="lineNum">     111 </span><span class="lineNoCov">          0 :                         return SASL_ERROR_PROCESSING;</span>
+<span class="lineNum">     112 </span>            :         }
+<span class="lineNum">     113 </span>            : 
+<span class="lineNum">     114 </span>            :         return SASL_ERROR_PROCESSING;
+<a name="115"><span class="lineNum">     115 </span>            : }</a>
+<span class="lineNum">     116 </span>            : 
+<span class="lineNum">     117 </span><span class="lineCov">         10 : int sasl_begin(LOGGER log, SASL_CONTEXT* ctx, SASL_USER* user, char* method, char* data, char** response){</span>
+<span class="lineNum">     118 </span>            :         //sanity check
+<span class="lineNum">     119 </span><span class="lineCov">         10 :         if(!ctx || !user || !method || !response){</span>
+<span class="lineNum">     120 </span><span class="lineNoCov">          0 :                 return SASL_ERROR_PROCESSING;</span>
+<span class="lineNum">     121 </span>            :         }
+<span class="lineNum">     122 </span>            : 
+<span class="lineNum">     123 </span><span class="lineCov">         10 :         sasl_reset_ctx(ctx, false);</span>
+<span class="lineNum">     124 </span><span class="lineCov">         10 :         sasl_reset_user(user, false);</span>
+<span class="lineNum">     125 </span><span class="lineCov">         10 :         ctx-&gt;user = user;</span>
+<span class="lineNum">     126 </span>            : 
+<span class="lineNum">     127 </span>            :         //scan method
+<span class="lineNum">     128 </span><span class="lineCov">         10 :         ctx-&gt;method = sasl_scan_method(method);</span>
+<span class="lineNum">     129 </span>            : 
+<span class="lineNum">     130 </span><span class="lineCov">         10 :         if(ctx-&gt;method == SASL_INVALID){</span>
+<span class="lineNum">     131 </span><span class="lineCov">          2 :                 return SASL_UNKNOWN_METHOD;</span>
+<span class="lineNum">     132 </span>            :         }
+<span class="lineNum">     133 </span>            : 
+<span class="lineNum">     134 </span>            :         //if initial supplied, handle
+<span class="lineNum">     135 </span><span class="lineCov">          8 :         if(data){</span>
+<span class="lineNum">     136 </span><span class="lineCov">          5 :                 return sasl_continue(log, ctx, data, response);</span>
+<span class="lineNum">     137 </span>            :         }
+<span class="lineNum">     138 </span>            : 
+<span class="lineNum">     139 </span><span class="lineCov">          3 :         return sasl_challenge(log, ctx, response);</span>
+<a name="140"><span class="lineNum">     140 </span>            : }</a>
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span><span class="lineCov">          1 : int sasl_cancel(SASL_CONTEXT* ctx){</span>
+<span class="lineNum">     143 </span><span class="lineCov">          1 :         sasl_reset_ctx(ctx, true);</span>
+<span class="lineNum">     144 </span><span class="lineCov">          1 :         return 0;</span>
+<span class="lineNum">     145 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.11</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

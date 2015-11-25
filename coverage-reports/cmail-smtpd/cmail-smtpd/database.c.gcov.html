@@ -1,0 +1,311 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - smtpd.info - cmail-smtpd/database.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">cmail-smtpd</a> - database.c<span style="font-size: 80%;"> (source / <a href="database.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">smtpd.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">97</td>
+            <td class="headerCovTableEntry">127</td>
+            <td class="headerCovTableEntryMed">76.4 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2015-11-25 19:06:20</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span><span class="lineCov">          3 : int database_attach(LOGGER log, DATABASE* database, char* dbfile){</span></a>
+<span class="lineNum">       2 </span><span class="lineCov">          3 :         char* INSERT_USER_MAILBOX = &quot;INSERT INTO mailbox (mail_user, mail_ident, mail_envelopeto, mail_envelopefrom, mail_submitter, mail_proto, mail_data) VALUES (?, ?, ?, ?, ?, ?, ?);&quot;;</span>
+<span class="lineNum">       3 </span>            :         unsigned slot;
+<span class="lineNum">       4 </span>            :         USER_DATABASE* entry;
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            :         //initialize user storage structure
+<span class="lineNum">       7 </span><span class="lineCov">          3 :         if(!database-&gt;mail_storage.users){</span>
+<span class="lineNum">       8 </span><span class="lineCov">          1 :                 database-&gt;mail_storage.users = calloc(1, sizeof(USER_DATABASE*));</span>
+<span class="lineNum">       9 </span><span class="lineCov">          1 :                 if(!database-&gt;mail_storage.users){</span>
+<span class="lineNum">      10 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_ERROR, &quot;Failed to allocate memory for user storage database structure\n&quot;);</span>
+<span class="lineNum">      11 </span><span class="lineNoCov">          0 :                         return -1;</span>
+<span class="lineNum">      12 </span>            :                 }
+<span class="lineNum">      13 </span>            :         }
+<span class="lineNum">      14 </span>            : 
+<span class="lineNum">      15 </span>            :         //create/reuse entry in user storage structure
+<span class="lineNum">      16 </span><span class="lineCov">          4 :         for(slot = 0; database-&gt;mail_storage.users[slot]; slot++){</span>
+<span class="lineNum">      17 </span><span class="lineCov">          2 :                 if(!database-&gt;mail_storage.users[slot]-&gt;conn){</span>
+<span class="lineNum">      18 </span><span class="lineCov">          1 :                         break;</span>
+<span class="lineNum">      19 </span>            :                 }
+<span class="lineNum">      20 </span>            :         }
+<span class="lineNum">      21 </span>            : 
+<span class="lineNum">      22 </span>            :         //if no usable slot, reallocate
+<span class="lineNum">      23 </span><span class="lineCov">          3 :         if(!database-&gt;mail_storage.users[slot]){</span>
+<span class="lineNum">      24 </span><span class="lineCov">          2 :                 database-&gt;mail_storage.users = realloc(database-&gt;mail_storage.users, (slot + 2) * sizeof(USER_DATABASE*));</span>
+<span class="lineNum">      25 </span><span class="lineCov">          2 :                 if(!database-&gt;mail_storage.users){</span>
+<span class="lineNum">      26 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_ERROR, &quot;Failed to reallocate user storage database structure\n&quot;);</span>
+<span class="lineNum">      27 </span><span class="lineNoCov">          0 :                         return -1;</span>
+<span class="lineNum">      28 </span>            :                 }
+<span class="lineNum">      29 </span><span class="lineCov">          2 :                 database-&gt;mail_storage.users[slot + 1] = NULL;</span>
+<span class="lineNum">      30 </span><span class="lineCov">          2 :                 database-&gt;mail_storage.users[slot] = calloc(1, sizeof(USER_DATABASE));</span>
+<span class="lineNum">      31 </span><span class="lineCov">          2 :                 if(!database-&gt;mail_storage.users[slot]){</span>
+<span class="lineNum">      32 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_ERROR, &quot;Failed to allocate user storage database structure\n&quot;);</span>
+<span class="lineNum">      33 </span><span class="lineNoCov">          0 :                         return -1;</span>
+<span class="lineNum">      34 </span>            :                 }
+<span class="lineNum">      35 </span>            :         }
+<span class="lineNum">      36 </span>            : 
+<span class="lineNum">      37 </span><span class="lineCov">          3 :         entry = database-&gt;mail_storage.users[slot];</span>
+<span class="lineNum">      38 </span><span class="lineCov">          3 :         entry-&gt;conn = database_open(log, dbfile, SQLITE_OPEN_READWRITE);</span>
+<span class="lineNum">      39 </span><span class="lineCov">          3 :         if(!entry-&gt;conn){</span>
+<span class="lineNum">      40 </span>            :                 //this automatically makes the slot reusable (conn = NULL)
+<span class="lineNum">      41 </span><span class="lineCov">          1 :                 logprintf(log, LOG_WARNING, &quot;Failed to connect to user database file %s\n&quot;, dbfile);</span>
+<span class="lineNum">      42 </span><span class="lineCov">          1 :                 return -1;</span>
+<span class="lineNum">      43 </span>            :         }
+<span class="lineNum">      44 </span>            : 
+<span class="lineNum">      45 </span><span class="lineCov">          2 :         entry-&gt;mailbox = database_prepare(log, entry-&gt;conn, INSERT_USER_MAILBOX);</span>
+<span class="lineNum">      46 </span><span class="lineCov">          2 :         if(!entry-&gt;mailbox){</span>
+<span class="lineNum">      47 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to create user mailbox insert query\n&quot;);</span>
+<span class="lineNum">      48 </span>            :                 //close the database connection and return the slot
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :                 sqlite3_close(entry-&gt;conn);</span>
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :                 entry-&gt;conn = NULL;</span>
+<span class="lineNum">      51 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">      52 </span>            :         }
+<span class="lineNum">      53 </span>            : 
+<span class="lineNum">      54 </span><span class="lineCov">          2 :         entry-&gt;file_name = common_strdup(dbfile);</span>
+<span class="lineNum">      55 </span><span class="lineCov">          2 :         if(!entry-&gt;file_name){</span>
+<span class="lineNum">      56 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to copy user storage file name\n&quot;);</span>
+<span class="lineNum">      57 </span>            :                 //close the database connection and return the slot
+<span class="lineNum">      58 </span><span class="lineNoCov">          0 :                 sqlite3_finalize(entry-&gt;mailbox);</span>
+<span class="lineNum">      59 </span><span class="lineNoCov">          0 :                 sqlite3_close(entry-&gt;conn);</span>
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :                 entry-&gt;conn = NULL;</span>
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">      62 </span>            :         }
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span><span class="lineCov">          2 :         return 0;</span>
+<a name="65"><span class="lineNum">      65 </span>            : }</a>
+<span class="lineNum">      66 </span>            : 
+<span class="lineNum">      67 </span><span class="lineCov">          5 : int database_detach(LOGGER log, USER_DATABASE* db){</span>
+<span class="lineNum">      68 </span><span class="lineCov">          5 :         USER_DATABASE empty_db = {</span>
+<span class="lineNum">      69 </span>            :                 .conn = NULL,
+<span class="lineNum">      70 </span>            :                 .active = false,
+<span class="lineNum">      71 </span>            :                 .mailbox = NULL,
+<span class="lineNum">      72 </span>            :                 .file_name = NULL
+<span class="lineNum">      73 </span>            :         };
+<span class="lineNum">      74 </span>            : 
+<span class="lineNum">      75 </span><span class="lineCov">          5 :         if(db-&gt;conn){</span>
+<span class="lineNum">      76 </span>            :                 //TODO error check these
+<span class="lineNum">      77 </span><span class="lineCov">          2 :                 sqlite3_finalize(db-&gt;mailbox);</span>
+<span class="lineNum">      78 </span><span class="lineCov">          2 :                 sqlite3_close(db-&gt;conn);</span>
+<span class="lineNum">      79 </span><span class="lineCov">          2 :                 free(db-&gt;file_name);</span>
+<span class="lineNum">      80 </span>            :         }
+<span class="lineNum">      81 </span>            : 
+<span class="lineNum">      82 </span><span class="lineCov">          5 :         *db = empty_db;</span>
+<span class="lineNum">      83 </span>            : 
+<span class="lineNum">      84 </span><span class="lineCov">          5 :         return 0;</span>
+<a name="85"><span class="lineNum">      85 </span>            : }</a>
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span><span class="lineCov">         12 : USER_DATABASE* database_userdb(LOGGER log, DATABASE* database, char* filename){</span>
+<span class="lineNum">      88 </span>            :         unsigned i;
+<span class="lineNum">      89 </span>            : 
+<span class="lineNum">      90 </span><span class="lineCov">         12 :         if(!database-&gt;mail_storage.users){</span>
+<span class="lineNum">      91 </span><span class="lineCov">          2 :                 return NULL;</span>
+<span class="lineNum">      92 </span>            :         }
+<span class="lineNum">      93 </span>            : 
+<span class="lineNum">      94 </span><span class="lineCov">         18 :         for(i = 0; database-&gt;mail_storage.users[i]; i++){</span>
+<span class="lineNum">      95 </span><span class="lineCov">         13 :                 if(database-&gt;mail_storage.users[i]-&gt;file_name &amp;&amp; !strcmp(database-&gt;mail_storage.users[i]-&gt;file_name, filename)){</span>
+<span class="lineNum">      96 </span><span class="lineCov">          5 :                         return database-&gt;mail_storage.users[i];</span>
+<span class="lineNum">      97 </span>            :                 }
+<span class="lineNum">      98 </span>            :         }
+<span class="lineNum">      99 </span>            : 
+<span class="lineNum">     100 </span><span class="lineCov">          5 :         logprintf(log, LOG_INFO, &quot;User storage queried for unknown database %s\n&quot;, filename);</span>
+<span class="lineNum">     101 </span><span class="lineCov">          5 :         return NULL;</span>
+<a name="102"><span class="lineNum">     102 </span>            : }</a>
+<span class="lineNum">     103 </span>            : 
+<span class="lineNum">     104 </span><span class="lineCov">          4 : int database_refresh(LOGGER log, DATABASE* database){</span>
+<span class="lineNum">     105 </span><span class="lineCov">          4 :         int status, rv = 0;</span>
+<span class="lineNum">     106 </span>            :         unsigned i;
+<span class="lineNum">     107 </span>            : 
+<span class="lineNum">     108 </span><span class="lineCov">          4 :         char* QUERY_USER_DATABASES = &quot;SELECT user_database FROM main.users WHERE user_database NOT NULL GROUP BY user_database;&quot;;</span>
+<span class="lineNum">     109 </span>            : 
+<span class="lineNum">     110 </span><span class="lineCov">          4 :         sqlite3_stmt* select_dbs = database_prepare(log, database-&gt;conn, QUERY_USER_DATABASES);</span>
+<span class="lineNum">     111 </span><span class="lineCov">          4 :         if(!select_dbs){</span>
+<span class="lineNum">     112 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to prepare user storage management statement\n&quot;);</span>
+<span class="lineNum">     113 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">     114 </span>            :         }
+<span class="lineNum">     115 </span>            : 
+<span class="lineNum">     116 </span><span class="lineCov">          4 :         if(database-&gt;mail_storage.users){</span>
+<span class="lineNum">     117 </span><span class="lineCov">          5 :                 for(i = 0; database-&gt;mail_storage.users[i]; i++){</span>
+<span class="lineNum">     118 </span><span class="lineCov">          3 :                         database-&gt;mail_storage.users[i]-&gt;active = false;</span>
+<span class="lineNum">     119 </span>            :                 }
+<span class="lineNum">     120 </span>            :         }
+<span class="lineNum">     121 </span>            : 
+<span class="lineNum">     122 </span>            :         do{
+<span class="lineNum">     123 </span>            :                 //fetch user database
+<span class="lineNum">     124 </span><span class="lineCov">          6 :                 status = sqlite3_step(select_dbs);</span>
+<span class="lineNum">     125 </span><span class="lineCov">          6 :                 switch(status){</span>
+<span class="lineNum">     126 </span>            :                         case SQLITE_ROW:
+<span class="lineNum">     127 </span>            :                                 //if not attached, attach
+<span class="lineNum">     128 </span><span class="lineCov">          3 :                                 if(!database_userdb(log, database, (char*)sqlite3_column_text(select_dbs, 0))){</span>
+<span class="lineNum">     129 </span>            :                                         //attach
+<span class="lineNum">     130 </span><span class="lineCov">          3 :                                         if(database_attach(log, database, (char*)sqlite3_column_text(select_dbs, 0)) &lt; 0){</span>
+<span class="lineNum">     131 </span><span class="lineCov">          1 :                                                 logprintf(log, LOG_ERROR, &quot;Failed to attach database: %s\n&quot;, sqlite3_errmsg(database-&gt;conn));</span>
+<span class="lineNum">     132 </span><span class="lineCov">          1 :                                                 status = SQLITE_ERROR;</span>
+<span class="lineNum">     133 </span><span class="lineCov">          1 :                                                 rv = -1;</span>
+<span class="lineNum">     134 </span>            :                                         }
+<span class="lineNum">     135 </span>            :                                         else{
+<span class="lineNum">     136 </span>            :                                                 //database seems to have been attached ok, mark it active
+<span class="lineNum">     137 </span><span class="lineCov">          2 :                                                 database_userdb(log, database, (char*)sqlite3_column_text(select_dbs, 0))-&gt;active = true;</span>
+<span class="lineNum">     138 </span>            :                                         }
+<span class="lineNum">     139 </span>            :                                 }
+<span class="lineNum">     140 </span><span class="lineCov">          3 :                                 break;</span>
+<span class="lineNum">     141 </span>            :                         case SQLITE_DONE:
+<span class="lineNum">     142 </span>            :                                 //traversed all databases
+<span class="lineNum">     143 </span><span class="lineCov">          3 :                                 break;</span>
+<span class="lineNum">     144 </span>            :                         default:
+<span class="lineNum">     145 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_ERROR, &quot;User storage database initialization failed: %s\n&quot;, sqlite3_errmsg(database-&gt;conn));</span>
+<span class="lineNum">     146 </span><span class="lineNoCov">          0 :                                 rv = -1;</span>
+<span class="lineNum">     147 </span><span class="lineNoCov">          0 :                                 break;</span>
+<span class="lineNum">     148 </span>            :                 }
+<span class="lineNum">     149 </span>            :         }
+<span class="lineNum">     150 </span><span class="lineCov">          6 :         while(status == SQLITE_ROW);</span>
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span>            :         //detach inactive databases
+<span class="lineNum">     153 </span><span class="lineCov">          4 :         if(database-&gt;mail_storage.users){</span>
+<span class="lineNum">     154 </span><span class="lineCov">          8 :                 for(i = 0; database-&gt;mail_storage.users[i]; i++){</span>
+<span class="lineNum">     155 </span><span class="lineCov">          5 :                         if(!database-&gt;mail_storage.users[i]-&gt;active){</span>
+<span class="lineNum">     156 </span>            :                                 //FIXME check this for return value
+<span class="lineNum">     157 </span><span class="lineCov">          3 :                                 database_detach(log, database-&gt;mail_storage.users[i]);</span>
+<span class="lineNum">     158 </span>            :                         }
+<span class="lineNum">     159 </span>            :                 }
+<span class="lineNum">     160 </span>            :         }
+<span class="lineNum">     161 </span>            : 
+<span class="lineNum">     162 </span><span class="lineCov">          4 :         sqlite3_finalize(select_dbs);</span>
+<span class="lineNum">     163 </span><span class="lineCov">          4 :         return rv;</span>
+<a name="164"><span class="lineNum">     164 </span>            : }</a>
+<span class="lineNum">     165 </span>            : 
+<span class="lineNum">     166 </span><span class="lineCov">          1 : int database_initialize(LOGGER log, DATABASE* database){</span>
+<span class="lineNum">     167 </span><span class="lineCov">          1 :         char* QUERY_ADDRESS_INFO = &quot;SELECT address_router, address_route FROM main.addresses WHERE ? LIKE address_expression ORDER BY address_order DESC;&quot;;</span>
+<span class="lineNum">     168 </span><span class="lineCov">          1 :         char* INSERT_MASTER_MAILBOX = &quot;INSERT INTO main.mailbox (mail_user, mail_ident, mail_envelopeto, mail_envelopefrom, mail_submitter, mail_proto, mail_data) VALUES (?, ?, ?, ?, ?, ?, ?);&quot;;</span>
+<span class="lineNum">     169 </span><span class="lineCov">          1 :         char* INSERT_MASTER_OUTBOX = &quot;INSERT INTO main.outbox (mail_remote, mail_envelopefrom, mail_envelopeto, mail_submitter, mail_data) VALUES (?, ?, ?, ?, ?);&quot;;</span>
+<span class="lineNum">     170 </span><span class="lineCov">          1 :         char* QUERY_ORIGINATING_ROUTER = &quot;SELECT smtpd_router, smtpd_route FROM main.smtpd WHERE smtpd_user = ?;&quot;;</span>
+<span class="lineNum">     171 </span>            : 
+<span class="lineNum">     172 </span>            :         //this query has to conform to the auth_validate contract (the first 2 columns are fixed)
+<span class="lineNum">     173 </span><span class="lineCov">          1 :         char* QUERY_AUTHENTICATION_DATA = &quot;SELECT user_authdata, user_alias, user_database FROM main.users WHERE user_name = ?;&quot;;</span>
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            :         //check the database schema version
+<span class="lineNum">     176 </span><span class="lineCov">          1 :         if(database_schema_version(log, database-&gt;conn)!=CMAIL_CURRENT_SCHEMA_VERSION){</span>
+<span class="lineNum">     177 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;The database schema is at another version than required for this build\n&quot;);</span>
+<span class="lineNum">     178 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">     179 </span>            :         }
+<span class="lineNum">     180 </span>            : 
+<span class="lineNum">     181 </span><span class="lineCov">          1 :         database-&gt;query_authdata = database_prepare(log, database-&gt;conn, QUERY_AUTHENTICATION_DATA);</span>
+<span class="lineNum">     182 </span><span class="lineCov">          1 :         database-&gt;query_address = database_prepare(log, database-&gt;conn, QUERY_ADDRESS_INFO);</span>
+<span class="lineNum">     183 </span><span class="lineCov">          1 :         database-&gt;query_outbound_router = database_prepare(log, database-&gt;conn, QUERY_ORIGINATING_ROUTER);</span>
+<span class="lineNum">     184 </span><span class="lineCov">          1 :         database-&gt;mail_storage.mailbox_master = database_prepare(log, database-&gt;conn, INSERT_MASTER_MAILBOX);</span>
+<span class="lineNum">     185 </span><span class="lineCov">          1 :         database-&gt;mail_storage.outbox_master = database_prepare(log, database-&gt;conn, INSERT_MASTER_OUTBOX);</span>
+<span class="lineNum">     186 </span>            : 
+<span class="lineNum">     187 </span><span class="lineCov">          1 :         if(!database-&gt;query_authdata){</span>
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to prepare authentication data query\n&quot;);</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">     190 </span>            :         }
+<span class="lineNum">     191 </span>            : 
+<span class="lineNum">     192 </span><span class="lineCov">          1 :         if(!database-&gt;query_address){</span>
+<span class="lineNum">     193 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to prepare address query statement\n&quot;);</span>
+<span class="lineNum">     194 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">     195 </span>            :         }
+<span class="lineNum">     196 </span>            : 
+<span class="lineNum">     197 </span><span class="lineCov">          1 :         if(!database-&gt;query_outbound_router){</span>
+<span class="lineNum">     198 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to prepare outbound router query statement\n&quot;);</span>
+<span class="lineNum">     199 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">     200 </span>            :         }
+<span class="lineNum">     201 </span>            : 
+<span class="lineNum">     202 </span><span class="lineCov">          1 :         if(!database-&gt;mail_storage.mailbox_master || !database-&gt;mail_storage.outbox_master){</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to prepare mail storage statement\n&quot;);</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">     205 </span>            :         }
+<span class="lineNum">     206 </span>            : 
+<span class="lineNum">     207 </span><span class="lineCov">          1 :         return database_refresh(log, database);</span>
+<a name="208"><span class="lineNum">     208 </span>            : }</a>
+<span class="lineNum">     209 </span>            : 
+<span class="lineNum">     210 </span><span class="lineCov">          2 : void database_free(LOGGER log, DATABASE* database){</span>
+<span class="lineNum">     211 </span>            :         unsigned i;
+<span class="lineNum">     212 </span>            : 
+<span class="lineNum">     213 </span>            :         //FIXME check for SQLITE_BUSY here
+<span class="lineNum">     214 </span><span class="lineCov">          2 :         if(database-&gt;conn){</span>
+<span class="lineNum">     215 </span><span class="lineCov">          2 :                 sqlite3_finalize(database-&gt;query_authdata);</span>
+<span class="lineNum">     216 </span><span class="lineCov">          2 :                 sqlite3_finalize(database-&gt;query_address);</span>
+<span class="lineNum">     217 </span><span class="lineCov">          2 :                 sqlite3_finalize(database-&gt;query_outbound_router);</span>
+<span class="lineNum">     218 </span><span class="lineCov">          2 :                 sqlite3_finalize(database-&gt;mail_storage.mailbox_master);</span>
+<span class="lineNum">     219 </span><span class="lineCov">          2 :                 sqlite3_finalize(database-&gt;mail_storage.outbox_master);</span>
+<span class="lineNum">     220 </span>            : 
+<span class="lineNum">     221 </span>            :                 //finalize user storage
+<span class="lineNum">     222 </span><span class="lineCov">          2 :                 if(database-&gt;mail_storage.users){</span>
+<span class="lineNum">     223 </span><span class="lineCov">          3 :                         for(i = 0; database-&gt;mail_storage.users[i]; i++){</span>
+<span class="lineNum">     224 </span>            :                                 //FIXME user return value
+<span class="lineNum">     225 </span><span class="lineCov">          2 :                                 database_detach(log, database-&gt;mail_storage.users[i]);</span>
+<span class="lineNum">     226 </span>            : 
+<span class="lineNum">     227 </span><span class="lineCov">          2 :                                 free(database-&gt;mail_storage.users[i]);</span>
+<span class="lineNum">     228 </span>            :                         }
+<span class="lineNum">     229 </span><span class="lineCov">          1 :                         free(database-&gt;mail_storage.users);</span>
+<span class="lineNum">     230 </span>            :                 }
+<span class="lineNum">     231 </span>            : 
+<span class="lineNum">     232 </span><span class="lineCov">          2 :                 sqlite3_close(database-&gt;conn);</span>
+<span class="lineNum">     233 </span><span class="lineCov">          2 :                 database-&gt;conn = NULL;</span>
+<span class="lineNum">     234 </span>            :         }
+<span class="lineNum">     235 </span><span class="lineCov">          2 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.11</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

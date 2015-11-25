@@ -1,0 +1,438 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - smtpd.info - cmail-smtpd/client.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">cmail-smtpd</a> - client.c<span style="font-size: 80%;"> (source / <a href="client.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">smtpd.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">113</td>
+            <td class="headerCovTableEntry">155</td>
+            <td class="headerCovTableEntryLo">72.9 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2015-11-25 19:06:20</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span><span class="lineCov">        317 : int client_line(LOGGER log, CONNECTION* client, DATABASE* database, PATHPOOL* path_pool){</span></a>
+<span class="lineNum">       2 </span><span class="lineCov">        317 :         CLIENT* client_data = (CLIENT*)client-&gt;aux_data;</span>
+<span class="lineNum">       3 </span>            : 
+<span class="lineNum">       4 </span><span class="lineCov">        317 :         logprintf(log, LOG_ALL_IO, &quot;&gt;&gt; %s\n&quot;, client_data-&gt;recv_buffer);</span>
+<span class="lineNum">       5 </span><span class="lineCov">        317 :         switch(client_data-&gt;state){</span>
+<span class="lineNum">       6 </span>            :                 case STATE_NEW:
+<span class="lineNum">       7 </span><span class="lineCov">         21 :                         return smtpstate_new(log, client, database, path_pool);</span>
+<span class="lineNum">       8 </span>            :                 case STATE_IDLE:
+<span class="lineNum">       9 </span><span class="lineCov">        102 :                         return smtpstate_idle(log, client, database, path_pool);</span>
+<span class="lineNum">      10 </span>            :                 case STATE_AUTH:
+<span class="lineNum">      11 </span><span class="lineCov">          3 :                         return smtpstate_auth(log, client, database, path_pool);</span>
+<span class="lineNum">      12 </span>            :                 case STATE_RECIPIENTS:
+<span class="lineNum">      13 </span><span class="lineCov">         89 :                         return smtpstate_recipients(log, client, database, path_pool);</span>
+<span class="lineNum">      14 </span>            :                 case STATE_DATA:
+<span class="lineNum">      15 </span><span class="lineCov">        102 :                         return smtpstate_data(log, client, database, path_pool);</span>
+<span class="lineNum">      16 </span>            :                 default:
+<span class="lineNum">      17 </span>            :                         //TODO resolve to plugin handler
+<span class="lineNum">      18 </span><span class="lineNoCov">          0 :                         break;</span>
+<span class="lineNum">      19 </span>            :         }
+<span class="lineNum">      20 </span><span class="lineNoCov">          0 :         return 0;</span>
+<a name="21"><span class="lineNum">      21 </span>            : }</a>
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span><span class="lineCov">          2 : int client_free(LOGGER log, CONNECTION* client){</span>
+<span class="lineNum">      24 </span><span class="lineCov">          2 :         CLIENT* client_data = (CLIENT*)client-&gt;aux_data;</span>
+<span class="lineNum">      25 </span>            : 
+<span class="lineNum">      26 </span><span class="lineCov">          2 :         logprintf(log, LOG_DEBUG, &quot;Freeing client data\n&quot;);</span>
+<span class="lineNum">      27 </span><span class="lineCov">          2 :         mail_reset(&amp;(client_data-&gt;current_mail));</span>
+<span class="lineNum">      28 </span><span class="lineCov">          2 :         if(client_data-&gt;current_mail.data){</span>
+<span class="lineNum">      29 </span><span class="lineCov">          2 :                 free(client_data-&gt;current_mail.data);</span>
+<span class="lineNum">      30 </span><span class="lineCov">          2 :                 client_data-&gt;current_mail.data = NULL;</span>
+<span class="lineNum">      31 </span><span class="lineCov">          2 :                 client_data-&gt;current_mail.data_allocated = 0;</span>
+<span class="lineNum">      32 </span>            :         }
+<span class="lineNum">      33 </span><span class="lineCov">          2 :         return 0;</span>
+<a name="34"><span class="lineNum">      34 </span>            : }</a>
+<span class="lineNum">      35 </span>            : 
+<span class="lineNum">      36 </span><span class="lineCov">        106 : int client_memtimeout(LOGGER log, CONNECTION* client){</span>
+<span class="lineNum">      37 </span><span class="lineCov">        106 :         CLIENT* client_data = (CLIENT*)client-&gt;aux_data;</span>
+<span class="lineNum">      38 </span><span class="lineCov">        106 :         int delta = time(NULL) - client_data-&gt;last_action;</span>
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span><span class="lineCov">        106 :         if(client_data-&gt;current_mail.data &amp;&amp; delta &gt; CMAIL_MEMORY_TIMEOUT){</span>
+<span class="lineNum">      41 </span><span class="lineNoCov">          0 :                 client_free(log, client);</span>
+<span class="lineNum">      42 </span>            :         }
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span><span class="lineCov">        106 :         return 0;</span>
+<a name="45"><span class="lineNum">      45 </span>            : }</a>
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span><span class="lineCov">         15 : int client_resolve(LOGGER log, CONNECTION* client){</span>
+<span class="lineNum">      48 </span>            :         struct sockaddr_storage data;
+<span class="lineNum">      49 </span><span class="lineCov">         15 :         socklen_t len = sizeof(struct sockaddr_storage);</span>
+<span class="lineNum">      50 </span><span class="lineCov">         15 :         CLIENT* client_data = (CLIENT*)client-&gt;aux_data;</span>
+<span class="lineNum">      51 </span>            :         int status;
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineCov">         15 :         if(getpeername(client-&gt;fd, (struct sockaddr*)&amp;data, &amp;len) &lt; 0){</span>
+<span class="lineNum">      54 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to get peer name: %s\n&quot;, strerror(errno));</span>
+<span class="lineNum">      55 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">      56 </span>            :         }
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span><span class="lineCov">         15 :         status=getnameinfo((struct sockaddr*)&amp;data, len, client_data-&gt;peer_name, MAX_FQDN_LENGTH - 1, NULL, 0, 0);</span>
+<span class="lineNum">      59 </span><span class="lineCov">         15 :         if(status){</span>
+<span class="lineNum">      60 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_WARNING, &quot;Failed to resolve peer: %s\n&quot;, gai_strerror(status));</span>
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">      62 </span>            :         }
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span><span class="lineCov">         15 :         logprintf(log, LOG_INFO, &quot;Connection from %s\n&quot;, client_data-&gt;peer_name);</span>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span><span class="lineCov">         15 :         return 0;</span>
+<a name="67"><span class="lineNum">      67 </span>            : }</a>
+<span class="lineNum">      68 </span>            : 
+<span class="lineNum">      69 </span><span class="lineCov">         84 : bool client_timeout(LOGGER log, CONNECTION* client){</span>
+<span class="lineNum">      70 </span><span class="lineCov">         84 :         CLIENT* client_data = (CLIENT*)client-&gt;aux_data;</span>
+<span class="lineNum">      71 </span><span class="lineCov">         84 :         int delta = time(NULL) - client_data-&gt;last_action;</span>
+<span class="lineNum">      72 </span>            : 
+<span class="lineNum">      73 </span><span class="lineCov">         84 :         if(delta &lt; 0){</span>
+<span class="lineNum">      74 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Time reported an error or skipped ahead: %s\n&quot;, strerror(errno));</span>
+<span class="lineNum">      75 </span><span class="lineNoCov">          0 :                 return false;</span>
+<span class="lineNum">      76 </span>            :         }
+<span class="lineNum">      77 </span>            : 
+<span class="lineNum">      78 </span><span class="lineCov">         84 :         logprintf(log, LOG_DEBUG, &quot;Client has activity delta %d seconds\n&quot;, delta);</span>
+<span class="lineNum">      79 </span>            :         /*
+<span class="lineNum">      80 </span>            :         switch(client_data-&gt;state){
+<span class="lineNum">      81 </span>            :                 case STATE_NEW:
+<span class="lineNum">      82 </span>            :                 case STATE_IDLE:
+<span class="lineNum">      83 </span>            :                 case STATE_AUTH:
+<span class="lineNum">      84 </span>            :                 case STATE_RECIPIENTS:
+<span class="lineNum">      85 </span>            :                 case STATE_DATA:
+<span class="lineNum">      86 </span>            :         }
+<span class="lineNum">      87 </span>            :         */
+<span class="lineNum">      88 </span>            : 
+<span class="lineNum">      89 </span>            :         //According to RFC 5321 4.5.3.2.7, the server timeout is always 5 minutes and does not depend on client state
+<span class="lineNum">      90 </span><span class="lineCov">         84 :         return delta &gt; SMTP_SERVER_TIMEOUT;</span>
+<a name="91"><span class="lineNum">      91 </span>            : }</a>
+<span class="lineNum">      92 </span>            : 
+<span class="lineNum">      93 </span><span class="lineCov">         15 : int client_accept(LOGGER log, DATABASE* database, CONNECTION* listener, CONNPOOL* clients){</span>
+<span class="lineNum">      94 </span><span class="lineCov">         15 :         int client_slot = -1, flags, status;</span>
+<span class="lineNum">      95 </span><span class="lineCov">         15 :         LISTENER* listener_data = (LISTENER*)listener-&gt;aux_data;</span>
+<span class="lineNum">      96 </span><span class="lineCov">         45 :         CLIENT empty_data = {</span>
+<span class="lineNum">      97 </span>            :                 .listener = listener,
+<span class="lineNum">      98 </span>            :                 .state = STATE_NEW,
+<span class="lineNum">      99 </span>            :                 .recv_offset = 0,
+<span class="lineNum">     100 </span><span class="lineCov">         15 :                 .last_action = time(NULL),</span>
+<span class="lineNum">     101 </span>            :                 .connection_score = 0,
+<span class="lineNum">     102 </span>            :                 .peer_name = &quot;&quot;,
+<span class="lineNum">     103 </span>            :                 .current_mail = {
+<span class="lineNum">     104 </span>            :                         .submitter = NULL,
+<span class="lineNum">     105 </span>            :                         .reverse_path = {
+<span class="lineNum">     106 </span>            :                                 .delimiter_position = 0,
+<span class="lineNum">     107 </span>            :                                 .in_transaction = false,
+<span class="lineNum">     108 </span>            :                                 .path = &quot;&quot;,
+<span class="lineNum">     109 </span>            :                                 .route = {
+<span class="lineNum">     110 </span>            :                                         .router = NULL,
+<span class="lineNum">     111 </span>            :                                         .argument = NULL
+<span class="lineNum">     112 </span>            :                                 }
+<span class="lineNum">     113 </span>            :                         },
+<span class="lineNum">     114 </span>            :                         .forward_paths = {
+<span class="lineNum">     115 </span>            :                                 NULL
+<span class="lineNum">     116 </span>            :                         },
+<span class="lineNum">     117 </span>            :                         .message_id = &quot;&quot;,
+<span class="lineNum">     118 </span>            :                         .protocol = &quot;unknown&quot;,
+<span class="lineNum">     119 </span>            :                         //these need to persist between clients
+<span class="lineNum">     120 </span>            :                         .data_offset = 0,
+<span class="lineNum">     121 </span>            :                         .data_allocated = 0,
+<span class="lineNum">     122 </span><span class="lineCov">         15 :                         .data_max = listener_data-&gt;max_size,</span>
+<span class="lineNum">     123 </span>            :                         .hop_count = 0,
+<span class="lineNum">     124 </span>            :                         .header_offset = 0,
+<span class="lineNum">     125 </span>            :                         .data = NULL
+<span class="lineNum">     126 </span>            :                 },
+<span class="lineNum">     127 </span>            :                 .originating_route = {
+<span class="lineNum">     128 </span>            :                         .router = NULL,
+<span class="lineNum">     129 </span>            :                         .argument = NULL
+<span class="lineNum">     130 </span>            :                 },
+<span class="lineNum">     131 </span>            :                 .sasl_user = {
+<span class="lineNum">     132 </span>            :                         .authorized = NULL,
+<span class="lineNum">     133 </span>            :                         .authenticated = NULL
+<span class="lineNum">     134 </span>            :                 },
+<span class="lineNum">     135 </span>            :                 .sasl_context = {
+<span class="lineNum">     136 </span>            :                         .method = SASL_INVALID
+<span class="lineNum">     137 </span>            :                         //rest is automatically reset by sasl_begin
+<span class="lineNum">     138 </span>            :                 }
+<span class="lineNum">     139 </span>            :         };
+<span class="lineNum">     140 </span>            :         CLIENT* actual_data;
+<span class="lineNum">     141 </span>            : 
+<span class="lineNum">     142 </span><span class="lineCov">         15 :         if(connpool_active(*clients) &gt;= CMAIL_MAX_CONCURRENT_CLIENTS){</span>
+<span class="lineNum">     143 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_INFO, &quot;Not accepting new client, limit reached\n&quot;);</span>
+<span class="lineNum">     144 </span><span class="lineNoCov">          0 :                 return 1;</span>
+<span class="lineNum">     145 </span>            :         }
+<span class="lineNum">     146 </span>            : 
+<span class="lineNum">     147 </span><span class="lineCov">         15 :         client_slot = connpool_add(clients, accept(listener-&gt;fd, NULL, NULL));</span>
+<span class="lineNum">     148 </span>            : 
+<span class="lineNum">     149 </span><span class="lineCov">         15 :         if(client_slot &lt; 0){</span>
+<span class="lineNum">     150 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to pool client socket\n&quot;);</span>
+<span class="lineNum">     151 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">     152 </span>            :         }
+<span class="lineNum">     153 </span>            : 
+<span class="lineNum">     154 </span>            :         //set socket nonblocking
+<span class="lineNum">     155 </span><span class="lineCov">         15 :         flags = fcntl(clients-&gt;conns[client_slot].fd, F_GETFL, 0);</span>
+<span class="lineNum">     156 </span><span class="lineCov">         15 :         if(flags &lt; 0){</span>
+<span class="lineNum">     157 </span><span class="lineNoCov">          0 :                 flags = 0;</span>
+<span class="lineNum">     158 </span>            :         }
+<span class="lineNum">     159 </span><span class="lineCov">         15 :         status = fcntl(clients-&gt;conns[client_slot].fd, F_SETFL, flags | O_NONBLOCK);</span>
+<span class="lineNum">     160 </span><span class="lineCov">         15 :         if(status &lt; 0){</span>
+<span class="lineNum">     161 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_ERROR, &quot;Failed to make client socket nonblocking: %s\n&quot;, strerror(errno));</span>
+<span class="lineNum">     162 </span>            :         }
+<span class="lineNum">     163 </span>            : 
+<span class="lineNum">     164 </span><span class="lineCov">         15 :         if(!(clients-&gt;conns[client_slot].aux_data)){</span>
+<span class="lineNum">     165 </span><span class="lineCov">          2 :                 clients-&gt;conns[client_slot].aux_data = malloc(sizeof(CLIENT));</span>
+<span class="lineNum">     166 </span><span class="lineCov">          2 :                 if(!clients-&gt;conns[client_slot].aux_data){</span>
+<span class="lineNum">     167 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_ERROR, &quot;Failed to allocate client data set\n&quot;);</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :                         return -1;</span>
+<span class="lineNum">     169 </span>            :                 }
+<span class="lineNum">     170 </span>            :         }
+<span class="lineNum">     171 </span>            :         else{
+<span class="lineNum">     172 </span>            :                 //preserve old data
+<span class="lineNum">     173 </span><span class="lineCov">         13 :                 actual_data = (CLIENT*)clients-&gt;conns[client_slot].aux_data;</span>
+<span class="lineNum">     174 </span><span class="lineCov">         13 :                 empty_data.current_mail.data_allocated = actual_data-&gt;current_mail.data_allocated;</span>
+<span class="lineNum">     175 </span><span class="lineCov">         13 :                 empty_data.current_mail.data = actual_data-&gt;current_mail.data;</span>
+<span class="lineNum">     176 </span>            :         }
+<span class="lineNum">     177 </span>            : 
+<span class="lineNum">     178 </span>            :         //initialise / reset client data structure
+<span class="lineNum">     179 </span><span class="lineCov">         15 :         actual_data = (CLIENT*)clients-&gt;conns[client_slot].aux_data;</span>
+<span class="lineNum">     180 </span><span class="lineCov">         15 :         *actual_data = empty_data;</span>
+<span class="lineNum">     181 </span>            : 
+<span class="lineNum">     182 </span><span class="lineCov">         15 :         if(client_resolve(log, &amp;(clients-&gt;conns[client_slot])) &lt; 0){</span>
+<span class="lineNum">     183 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_WARNING, &quot;Peer resolution failed\n&quot;);</span>
+<span class="lineNum">     184 </span>            :                 //FIXME this might be bigger than we think
+<span class="lineNum">     185 </span>            :         }
+<span class="lineNum">     186 </span>            : 
+<span class="lineNum">     187 </span><span class="lineCov">         15 :         if(listener_data-&gt;fixed_user){</span>
+<span class="lineNum">     188 </span><span class="lineNoCov">          0 :                 actual_data-&gt;sasl_user.authenticated = common_strdup(listener_data-&gt;fixed_user);</span>
+<span class="lineNum">     189 </span><span class="lineNoCov">          0 :                 actual_data-&gt;sasl_user.authorized = common_strdup(listener_data-&gt;fixed_user);</span>
+<span class="lineNum">     190 </span><span class="lineNoCov">          0 :                 if(!actual_data-&gt;sasl_user.authenticated || !actual_data-&gt;sasl_user.authorized){</span>
+<span class="lineNum">     191 </span><span class="lineNoCov">          0 :                         logprintf(log, LOG_ERROR, &quot;Failed to allocate memory for fixed user authentication data\n&quot;);</span>
+<span class="lineNum">     192 </span>            :                         //TODO fail this connection
+<span class="lineNum">     193 </span>            :                 }
+<span class="lineNum">     194 </span>            :                 else{
+<span class="lineNum">     195 </span>            :                         //query routing data
+<span class="lineNum">     196 </span><span class="lineNoCov">          0 :                         actual_data-&gt;originating_route = route_query(log, database, actual_data-&gt;sasl_user.authorized);</span>
+<span class="lineNum">     197 </span>            :                 }
+<span class="lineNum">     198 </span>            :         }
+<span class="lineNum">     199 </span>            : 
+<span class="lineNum">     200 </span><span class="lineCov">         15 :         actual_data-&gt;current_mail.submitter = actual_data-&gt;peer_name;</span>
+<span class="lineNum">     201 </span><span class="lineCov">         15 :         logprintf(log, LOG_DEBUG, &quot;Initialized client data to peername %s, submitter %s\n&quot;, actual_data-&gt;peer_name, actual_data-&gt;current_mail.submitter);</span>
+<span class="lineNum">     202 </span>            : 
+<span class="lineNum">     203 </span>            :         #ifndef CMAIL_NO_TLS
+<span class="lineNum">     204 </span>            :         //if on tlsonly port, immediately wait for negotiation
+<span class="lineNum">     205 </span><span class="lineCov">         15 :         if(listener-&gt;tls_mode == TLS_ONLY){</span>
+<span class="lineNum">     206 </span><span class="lineCov">          1 :                 logprintf(log, LOG_INFO, &quot;Listen socket is TLSONLY, waiting for negotiation...\n&quot;);</span>
+<span class="lineNum">     207 </span><span class="lineCov">          1 :                 clients-&gt;conns[client_slot].tls_mode = TLS_NEGOTIATE;</span>
+<span class="lineNum">     208 </span><span class="lineCov">          1 :                 return tls_init_serverpeer(log, &amp;(clients-&gt;conns[client_slot]), listener_data-&gt;tls_priorities, listener_data-&gt;tls_cert);</span>
+<span class="lineNum">     209 </span>            :         }
+<span class="lineNum">     210 </span>            :         #endif
+<span class="lineNum">     211 </span>            : 
+<span class="lineNum">     212 </span><span class="lineCov">         14 :         client_send(log, &amp;(clients-&gt;conns[client_slot]), &quot;220 %s ESMTP service ready\r\n&quot;, listener_data-&gt;announce_domain);</span>
+<span class="lineNum">     213 </span><span class="lineCov">         14 :         return 0;</span>
+<a name="214"><span class="lineNum">     214 </span>            : }</a>
+<span class="lineNum">     215 </span>            : 
+<span class="lineNum">     216 </span><span class="lineCov">         15 : int client_close(CONNECTION* client){</span>
+<span class="lineNum">     217 </span><span class="lineCov">         15 :         CLIENT* client_data = (CLIENT*)client-&gt;aux_data;</span>
+<span class="lineNum">     218 </span>            : 
+<span class="lineNum">     219 </span>            :         #ifndef CMAIL_NO_TLS
+<span class="lineNum">     220 </span>            :         //shut down the tls session
+<span class="lineNum">     221 </span><span class="lineCov">         15 :         if(client-&gt;tls_mode != TLS_NONE){</span>
+<span class="lineNum">     222 </span><span class="lineCov">          6 :                 gnutls_bye(client-&gt;tls_session, GNUTLS_SHUT_RDWR);</span>
+<span class="lineNum">     223 </span><span class="lineCov">          6 :                 gnutls_deinit(client-&gt;tls_session);</span>
+<span class="lineNum">     224 </span><span class="lineCov">          6 :                 client-&gt;tls_mode = TLS_NONE;</span>
+<span class="lineNum">     225 </span>            :         }
+<span class="lineNum">     226 </span>            :         #endif
+<span class="lineNum">     227 </span>            : 
+<span class="lineNum">     228 </span>            :         //close the socket
+<span class="lineNum">     229 </span><span class="lineCov">         15 :         close(client-&gt;fd);</span>
+<span class="lineNum">     230 </span>            : 
+<span class="lineNum">     231 </span>            :         //reset mail buffer contents
+<span class="lineNum">     232 </span><span class="lineCov">         15 :         mail_reset(&amp;(client_data-&gt;current_mail));</span>
+<span class="lineNum">     233 </span>            : 
+<span class="lineNum">     234 </span>            :         //reset authentication
+<span class="lineNum">     235 </span><span class="lineCov">         15 :         sasl_reset_user(&amp;(client_data-&gt;sasl_user), true);</span>
+<span class="lineNum">     236 </span>            : 
+<span class="lineNum">     237 </span>            :         //reset originating route
+<span class="lineNum">     238 </span><span class="lineCov">         15 :         route_free(&amp;(client_data-&gt;originating_route));</span>
+<span class="lineNum">     239 </span>            : 
+<span class="lineNum">     240 </span>            :         //return the connpool slot
+<span class="lineNum">     241 </span><span class="lineCov">         15 :         client-&gt;fd = -1;</span>
+<span class="lineNum">     242 </span>            : 
+<span class="lineNum">     243 </span><span class="lineCov">         15 :         return 0;</span>
+<a name="244"><span class="lineNum">     244 </span>            : }</a>
+<span class="lineNum">     245 </span>            : 
+<span class="lineNum">     246 </span><span class="lineCov">        293 : int client_process(LOGGER log, CONNECTION* client, DATABASE* database, PATHPOOL* path_pool){</span>
+<span class="lineNum">     247 </span><span class="lineCov">        293 :         CLIENT* client_data = (CLIENT*)client-&gt;aux_data;</span>
+<span class="lineNum">     248 </span><span class="lineCov">        293 :         LISTENER* listener_data = (LISTENER*)client_data-&gt;listener-&gt;aux_data;</span>
+<span class="lineNum">     249 </span>            :         ssize_t left, bytes, line_length;
+<span class="lineNum">     250 </span>            : 
+<span class="lineNum">     251 </span>            :         #ifndef CMAIL_NO_TLS
+<span class="lineNum">     252 </span>            :         do{
+<span class="lineNum">     253 </span>            :         #endif
+<span class="lineNum">     254 </span><span class="lineCov">        293 :         left = sizeof(client_data-&gt;recv_buffer) - client_data-&gt;recv_offset;</span>
+<span class="lineNum">     255 </span>            : 
+<span class="lineNum">     256 </span><span class="lineCov">        293 :         if(left &lt; 2){</span>
+<span class="lineNum">     257 </span>            :                 //unterminated line
+<span class="lineNum">     258 </span>            :                 //FIXME this might be kind of a harsh response
+<span class="lineNum">     259 </span><span class="lineNoCov">          0 :                 logprintf(log, LOG_WARNING, &quot;Line too long, closing client connection\n&quot;);</span>
+<span class="lineNum">     260 </span><span class="lineNoCov">          0 :                 client_send(log, client, &quot;500 Line too long\r\n&quot;);</span>
+<span class="lineNum">     261 </span><span class="lineNoCov">          0 :                 client_close(client);</span>
+<span class="lineNum">     262 </span><span class="lineNoCov">          0 :                 return 0;</span>
+<span class="lineNum">     263 </span>            :         }
+<span class="lineNum">     264 </span>            : 
+<span class="lineNum">     265 </span><span class="lineCov">        293 :         bytes = network_read(log, client, client_data-&gt;recv_buffer+client_data-&gt;recv_offset, left);</span>
+<span class="lineNum">     266 </span>            : 
+<span class="lineNum">     267 </span>            :         //failed to read from socket
+<span class="lineNum">     268 </span><span class="lineCov">        293 :         if(bytes &lt; 0){</span>
+<span class="lineNum">     269 </span>            :                 #ifndef CMAIL_NO_TLS
+<span class="lineNum">     270 </span><span class="lineCov">          9 :                 switch(client-&gt;tls_mode){</span>
+<span class="lineNum">     271 </span>            :                         case TLS_NONE:
+<span class="lineNum">     272 </span>            :                 #endif
+<span class="lineNum">     273 </span><span class="lineNoCov">          0 :                 switch(errno){</span>
+<span class="lineNum">     274 </span>            :                         case EAGAIN:
+<span class="lineNum">     275 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_WARNING, &quot;Read signaled, but blocked\n&quot;);</span>
+<span class="lineNum">     276 </span><span class="lineNoCov">          0 :                                 return 0;</span>
+<span class="lineNum">     277 </span>            :                         default:
+<span class="lineNum">     278 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_ERROR, &quot;Failed to read from client: %s\n&quot;, strerror(errno));</span>
+<span class="lineNum">     279 </span><span class="lineNoCov">          0 :                                 client_close(client);</span>
+<span class="lineNum">     280 </span><span class="lineNoCov">          0 :                                 return -1;</span>
+<span class="lineNum">     281 </span>            :                 }
+<span class="lineNum">     282 </span>            :                 #ifndef CMAIL_NO_TLS
+<span class="lineNum">     283 </span>            :                         break;
+<span class="lineNum">     284 </span>            :                         case TLS_NEGOTIATE:
+<span class="lineNum">     285 </span>            :                                 //errors during TLS negotiation
+<span class="lineNum">     286 </span><span class="lineCov">          6 :                                 if(bytes == -2){</span>
+<span class="lineNum">     287 </span><span class="lineNoCov">          0 :                                         client_close(client);</span>
+<span class="lineNum">     288 </span>            :                                 }
+<span class="lineNum">     289 </span><span class="lineCov">          6 :                                 return 0;</span>
+<span class="lineNum">     290 </span>            :                         case TLS_ONLY:
+<span class="lineNum">     291 </span><span class="lineCov">          3 :                                 switch(bytes){</span>
+<span class="lineNum">     292 </span>            :                                         case GNUTLS_E_INTERRUPTED:
+<span class="lineNum">     293 </span>            :                                         case GNUTLS_E_AGAIN:
+<span class="lineNum">     294 </span><span class="lineNoCov">          0 :                                                 logprintf(log, LOG_WARNING, &quot;TLS read signaled, but blocked\n&quot;);</span>
+<span class="lineNum">     295 </span><span class="lineNoCov">          0 :                                                 return 0;</span>
+<span class="lineNum">     296 </span>            :                                         default:
+<span class="lineNum">     297 </span><span class="lineCov">          3 :                                                 logprintf(log, LOG_ERROR, &quot;GnuTLS reported an error while reading: %s\n&quot;, gnutls_strerror(bytes));</span>
+<span class="lineNum">     298 </span><span class="lineCov">          3 :                                                 client_close(client);</span>
+<span class="lineNum">     299 </span><span class="lineCov">          3 :                                                 return -1;</span>
+<span class="lineNum">     300 </span>            :                                 }
+<span class="lineNum">     301 </span>            :                 }
+<span class="lineNum">     302 </span>            :                 #endif
+<span class="lineNum">     303 </span>            :         }
+<span class="lineNum">     304 </span>            : 
+<span class="lineNum">     305 </span>            :         //client disconnect / handshake success
+<span class="lineNum">     306 </span><span class="lineCov">        284 :         else if(bytes == 0){</span>
+<span class="lineNum">     307 </span>            :                 #ifndef CMAIL_NO_TLS
+<span class="lineNum">     308 </span><span class="lineCov">         14 :                 switch(client-&gt;tls_mode){</span>
+<span class="lineNum">     309 </span>            :                         case TLS_NEGOTIATE:
+<span class="lineNum">     310 </span>            :                                 //tls handshake ok
+<span class="lineNum">     311 </span><span class="lineCov">          6 :                                 client-&gt;tls_mode = TLS_ONLY;</span>
+<span class="lineNum">     312 </span><span class="lineCov">          6 :                                 if(client_data-&gt;listener-&gt;tls_mode == TLS_ONLY){</span>
+<span class="lineNum">     313 </span>            :                                         //send greeting if listener is tlsonly
+<span class="lineNum">     314 </span><span class="lineCov">          1 :                                         client_send(log, client, &quot;220 %s ESMTPS service ready\r\n&quot;, listener_data-&gt;announce_domain);</span>
+<span class="lineNum">     315 </span>            :                                 }
+<span class="lineNum">     316 </span><span class="lineCov">          6 :                                 break;</span>
+<span class="lineNum">     317 </span>            :                         default:
+<span class="lineNum">     318 </span>            :                 #endif
+<span class="lineNum">     319 </span><span class="lineCov">          8 :                 logprintf(log, LOG_INFO, &quot;Client has disconnected\n&quot;);</span>
+<span class="lineNum">     320 </span><span class="lineCov">          8 :                 client_close(client);</span>
+<span class="lineNum">     321 </span>            :                 #ifndef CMAIL_NO_TLS
+<span class="lineNum">     322 </span>            :                 }
+<span class="lineNum">     323 </span>            :                 #endif
+<span class="lineNum">     324 </span><span class="lineCov">         14 :                 return 0;</span>
+<span class="lineNum">     325 </span>            :         }
+<span class="lineNum">     326 </span>            : 
+<span class="lineNum">     327 </span><span class="lineCov">        270 :         logprintf(log, LOG_DEBUG, &quot;Received %d bytes of data, recv_offset is %d\n&quot;, bytes, client_data-&gt;recv_offset);</span>
+<span class="lineNum">     328 </span>            : 
+<span class="lineNum">     329 </span>            :         do{
+<span class="lineNum">     330 </span><span class="lineCov">        587 :                 line_length = common_next_line(log, client_data-&gt;recv_buffer, &amp;(client_data-&gt;recv_offset), &amp;bytes);</span>
+<span class="lineNum">     331 </span><span class="lineCov">        587 :                 if(line_length &gt;= 0){</span>
+<span class="lineNum">     332 </span><span class="lineCov">        317 :                         if(line_length &gt;= SMTP_MAX_LINE_LENGTH - 2){</span>
+<span class="lineNum">     333 </span><span class="lineNoCov">          0 :                                 logprintf(log, LOG_WARNING, &quot;Line too long, ignoring\n&quot;);</span>
+<span class="lineNum">     334 </span><span class="lineNoCov">          0 :                                 client_send(log, client, &quot;500 Line too long\r\n&quot;);</span>
+<span class="lineNum">     335 </span>            :                                 //client_line(log, client, database, path_pool);
+<span class="lineNum">     336 </span>            :                                 //FIXME might handle this more sensibly
+<span class="lineNum">     337 </span>            :                         }
+<span class="lineNum">     338 </span>            :                         else{
+<span class="lineNum">     339 </span>            :                                 //update last_action only upon complete lines to kill slowloris style attacks
+<span class="lineNum">     340 </span><span class="lineCov">        317 :                                 client_data-&gt;last_action = time(NULL);</span>
+<span class="lineNum">     341 </span>            : 
+<span class="lineNum">     342 </span><span class="lineCov">        317 :                                 client_data-&gt;connection_score += client_line(log, client, database, path_pool);</span>
+<span class="lineNum">     343 </span>            : 
+<span class="lineNum">     344 </span>            :                                 //disconnect the client after too many failed commands
+<span class="lineNum">     345 </span><span class="lineCov">        317 :                                 if(client_data-&gt;connection_score &lt; CMAIL_FAILSCORE_LIMIT){</span>
+<span class="lineNum">     346 </span><span class="lineNoCov">          0 :                                         logprintf(log, LOG_WARNING, &quot;Disconnecting client because of bad connection score\n&quot;);</span>
+<span class="lineNum">     347 </span><span class="lineNoCov">          0 :                                         client_send(log, client, &quot;500 Too many failed commands\r\n&quot;);</span>
+<span class="lineNum">     348 </span><span class="lineNoCov">          0 :                                         client_close(client);</span>
+<span class="lineNum">     349 </span><span class="lineNoCov">          0 :                                         return 0;</span>
+<span class="lineNum">     350 </span>            :                                 }
+<span class="lineNum">     351 </span>            :                         }
+<span class="lineNum">     352 </span>            :                 }
+<span class="lineNum">     353 </span>            :         }
+<span class="lineNum">     354 </span><span class="lineCov">        587 :         while(line_length &gt;= 0);</span>
+<span class="lineNum">     355 </span>            : 
+<span class="lineNum">     356 </span>            :         #ifndef CMAIL_NO_TLS
+<span class="lineNum">     357 </span>            :         }
+<span class="lineNum">     358 </span><span class="lineCov">        270 :         while(client-&gt;tls_mode == TLS_ONLY &amp;&amp; gnutls_record_check_pending(client-&gt;tls_session));</span>
+<span class="lineNum">     359 </span>            :         #endif
+<span class="lineNum">     360 </span>            : 
+<span class="lineNum">     361 </span><span class="lineCov">        270 :         return 0;</span>
+<span class="lineNum">     362 </span>            : }
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.11</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
