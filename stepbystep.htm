@@ -58,13 +58,14 @@
 			<p>
 			In the cloned directory, run <code>make</code> to build all modules, followed
 			by <code>make install</code> to copy the binaries to a system path (by default
-			<code>/usr/local/sbin/</code>, this may be changed by supplying the environment variable
+			<code>/usr/sbin/</code>, this may be changed by supplying the environment variable
 			<code>PREFIX</code>). Running <code>make init</code> after this step will create a
 			new user for cmail (in order to minimize attack surface, cmail is not usually run as root
 			and instead drops its privileges after initialization), copy over default configuration files,
 			correctly set privileges and generally set up the basic structure needed for operation. 
 			Alternatively, the <code>make tls-init</code> command does all that and also generates a temporary TLS
-			certificate and key for initial usage and testing (openssl required).
+			certificate and key for initial usage and testing (openssl required). Please remember to replace the
+			generated key and certificate with secure ones when using this option.
 			</p>
 			<p>
 			<code style="display:block;">
@@ -73,6 +74,11 @@
 				~/cmail# make install<br/>
 				~/cmail# make tls-init
 			</code>
+			</p>
+			<p>
+			After these steps, the core cmail binaries as well as the administration tool suite will have
+			been installed. Should you prefer using the web administration interface to the command line tools,
+			the HTTP API and web panel need to be installed additionally.
 			</p>
 		</div>
 
@@ -84,9 +90,20 @@
 		</div>
 
 		<div class="section">
+			<h2>3 Install service startup files</h2>
+			In order to have cmail start up at boot time, specific services files need to be installed,
+			depending on your init system. Example files are provided for systemd and sysvinit.
+		</div>
+
+		<div class="section">
 			<h2>3 Setting up the master database</h2>
 			cmail uses <a href="https://sqlite.org/">SQLite</a>, a file-based database to store
-			most of its running configuration and data.
+			most of its running configuration and data. Administration of a running cmail server
+			can either be performed by using the cmail-admin suite of command line tools or by using
+			the HTTP API and web panel.
+			<p>
+			
+			</p>
 		</div>
 
 		<div class="section">
