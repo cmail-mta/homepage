@@ -1,0 +1,139 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>cmail-admin-user: Manage cmail users and per-user settings</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link rel="icon" href="../static/cmail_logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../static/cmail_logo.png" type="image/x-icon" />
+		<link rel="stylesheet" type="text/css" href="../static/cmail.css" />
+		<meta name="description" content="cmail - Internet mail processing suite with SQLite backend" />
+		<meta name="keywords" content="cmail, smtp, email, pop, webmail, messaging, administration" />
+		<meta name="robots" content="index,follow" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+	</head>
+	<body>
+		<div>
+			<a href="../index.htm">Back</a> to the main page
+		</div>
+
+		<div>
+			<h1>cmail-admin-user</h1>
+			<h3>Manage cmail users and per-user settings</h3>
+			This administration utility is used for creating and modifying users and their attributes for a
+			cmail server system.
+		</div>
+
+		<div class="section">
+			<h2>Building &amp; Prerequisites</h2>
+			The following packages are required for building this utility (Debian packages are listed)
+			<ul>
+				<li>libnettle-dev <i>(Cryptographic functions for password hashing)</i></li>
+				<li>libsqlite3-dev <i>(Database interface)</i></li>
+			</ul>
+
+			A build of only this specific binary can be initiated by running <code>make</code> from within 
+			<code>cmail-admin/user</code> in the main repository. A build of all administration utilities may be
+			initiated by running <code>make</code> from within <code>cmail-admin/</code>.
+		</div>
+
+		<div class="section">
+			<h2>Setup information</h2>
+			The utility is automatically installed to a location accessible by the administrator with the
+			<code>make install</code> step of the installation (<code>/usr/sbin/</code> by default).
+		</div>
+
+		<div class="section">
+			<h2>Invocation</h2>
+			This utility needs read and write access to the master database AS WELL AS the folder containing it.
+			The location of the master database file is assumed to be <code>/etc/cmail/databases/master.db3</code>
+			by default and can be overridden by specifying either the <strong>--dbpath</strong> command line option
+			or the <strong>CMAIL_MASTER_DB</strong> environment variable when running this utility.
+
+			<p>
+			Specifying the <strong>--help</strong> argument to an invocation prints additional information about the
+			utility.
+			</p>
+
+			<p>
+			The cmail-admin utilities operate in one of several modes, as specified in the table below. Modes may optionally
+			accept mode-specific arguments.
+			</p>
+		</div>
+
+		<div class="section">
+			<h2>Modes of operation</h2>
+			<table border="1">
+				<tr>
+					<th>Mode</th>
+					<th>
+						Arguments
+						<div style="font-weight:normal;font-size:80%;font-decoration:none;">
+							<i>variable</i> [<i>optional</i>] <code>verbatim</code>
+						</div>
+					</th>
+					<th>Description</th>
+					<th>Example</th>
+				</tr>
+				<tr>
+					<td><code>list</code></td>
+					<td>[<i>expression</i>]</td>
+					<td>List all users currently known to the system. Optionally, filter the list for entries matching <i>expression</i>.</td>
+					<td><code>cmail-admin-user list %mpease%</code></td>
+				</tr>
+				<tr>
+					<td><code>add</code></td>
+					<td><i>username</i> [<i>password</i>]</td>
+					<td>Create a new user and update the login credentials if supplied. User names must be unique.</td>
+					<td><code>cmail-admin-user add mpease donotusethisasyourpassword</code></td>
+				</tr>
+				<tr>
+					<td><code>revoke</code></td>
+					<td><i>user</i></td>
+					<td>
+						Reset the password for the specified user. This causes all login attempts for the user to be rejected. 
+						Note that the system will still accept mail on the users behalf, as <code>revoke</code> only invalidates the 
+						login credentials, not the account.
+					</td>
+					<td><code>cmail-admin-user revoke cbdev</code></td>
+				</tr>
+				<tr>
+					<td><code>password</code></td>
+					<td><i>user</i> [<i>password</i>]</td>
+					<td>
+						Update the password for the specified <i>user</i> to a new one. If none is supplied, the password is queried interactively.
+					</td>
+					<td><code>cmail-admin-user password mpease dontusethispassword</code></td>
+				</tr>
+				<tr>
+					<td><code>alias</code></td>
+					<td><i>user</i> [<i>alias</i>]</td>
+					<td>
+						Mark <i>user</i> as an alias for <i>alias</i>. This functionality enables <i>alias</i> to have multiple virtual passwords, 
+						thus allowing safe sharing of a mailbox. Take note that <i>user</i> will only be able to access mail stored to <i>alias</i>. 
+						This operation can be undone by not specifying the <i>alias</i> parameter.
+					</td>
+					<td><code>cmail-admin-user alias cbdev cdbev</code></td>
+				</tr>
+				<tr>
+					<td><code>userdb</code></td>
+					<td><i>user</i> [<i>path</i>]</td>
+					<td>
+						Have all mail stored for <i>user</i> be physically located in an SQLite database at path. The user database must conform to 
+						the schema outlined in the cmail developer documentation, such as databases created with <a href="database.htm">cmail-admin-database</a>.
+						<i>path</i> should always be an absolute path, as the working directory of processes accessing the user databases is subject to change.
+						User databases and the directory containing them must be read- and writable by the user running the cmail daemons. This change can be undone 
+						by not specifying <i>path</i>. Note that mail stored in a user database that is no longer known to the system can not be retrieved via the cmail
+						suite.
+					</td>
+					<td><code>cmail-admin-user userdb cbdev /home/cbdev/mail.db3</code></td>
+				</tr>
+				<tr>
+					<td><code>delete</code></td>
+					<td><i>user</i></td>
+					<td>Delete <i>user</i> from the system. Take note that all mail belonging to this user will be lost.</td>
+					<td><code>cmail-admin-user delete cbdev</code></td>
+				</tr>
+			</table>
+		</div>
+	</body>
+</html>

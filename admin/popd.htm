@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>cmail-admin-popd: Manage POP3 access to cmail mailboxes</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link rel="icon" href="../static/cmail_logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../static/cmail_logo.png" type="image/x-icon" />
+		<link rel="stylesheet" type="text/css" href="../static/cmail.css" />
+		<meta name="description" content="cmail - Internet mail processing suite with SQLite backend" />
+		<meta name="keywords" content="cmail, smtp, email, pop, webmail, messaging, administration" />
+		<meta name="robots" content="index,follow" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+	</head>
+	<body>
+		<div>
+			<a href="../index.htm">Back</a> to the main page
+		</div>
+
+		<div>
+			<h1>cmail-admin-popd</h1>
+			<h3>Manage POP3 access to cmail mailboxes</h3>
+			Configures access to cmail mailboxes via the POP3 daemon. In order to be able to access mail via POP3, <a href="../modules/popd.htm">cmail-popd</a>
+			must be running, the accessing user must have the use of POP enabled by this tool and present valid credentials, which may be configured 
+			with <a href="user.htm">cmail-admin-user</a>.
+		</div>
+
+		<div class="section">
+			<h2>Building &amp; Prerequisites</h2>
+			The following packages are required for building this utility (Debian packages are listed)
+			<ul>
+				<li>libnettle-dev <i>(Cryptographic functions for password hashing)</i></li>
+				<li>libsqlite3-dev <i>(Database interface)</i></li>
+			</ul>
+
+			A build of only this specific binary can be initiated by running <code>make</code> from within 
+			<code>cmail-admin/popd</code> in the main repository. A build of all administration utilities may be
+			initiated by running <code>make</code> from within <code>cmail-admin/</code>.
+		</div>
+
+		<div class="section">
+			<h2>Setup information</h2>
+			The utility is automatically installed to a location accessible by the administrator with the
+			<code>make install</code> step of the installation (<code>/usr/sbin/</code> by default).
+		</div>
+
+		<div class="section">
+			<h2>Invocation</h2>
+			This utility needs read and write access to the master database AS WELL AS the folder containing it.
+			The location of the master database file is assumed to be <code>/etc/cmail/databases/master.db3</code>
+			by default and can be overridden by specifying either the <strong>--dbpath</strong> command line option
+			or the <strong>CMAIL_MASTER_DB</strong> environment variable when running this utility.
+
+			<p>
+			Specifying the <strong>--help</strong> argument to an invocation prints additional information about the
+			utility.
+			</p>
+
+			<p>
+			The cmail-admin utilities operate in one of several modes, as specified in the table below. Modes may optionally
+			accept mode-specific arguments.
+			</p>
+		</div>
+
+		<div class="section">
+			<h2>Modes of operation</h2>
+			<table border="1">
+				<tr>
+					<th>Mode</th>
+					<th>
+						Arguments
+						<div style="font-weight:normal;font-size:80%;font-decoration:none;">
+							<i>variable</i> [<i>optional</i>] <code>verbatim</code>
+						</div>
+					</th>
+					<th>Description</th>
+					<th>Example</th>
+				</tr>
+				<tr>
+					<td><code>list</code></td>
+					<td>[<i>expression</i>]</td>
+					<td>
+						List all users currently able to access their mail via POP, as well as their current lock state.
+						Optionally, filter the list for entries matching <i>expression</i>.
+					</td>
+					<td><code>cmail-admin-popd list mpease%</code></td>
+				</tr>
+				<tr>
+					<td><code>enable</code></td>
+					<td><i>user</i></td>
+					<td>
+						Enable POP access for <i>user</i>.
+					</td>
+					<td><code>cmail-admin-popd enable cbdev</code></td>
+				</tr>
+				<tr>
+					<td><code>unlock</code></td>
+					<td><i>user</i></td>
+					<td>
+						Unlock the maildrop for <i>user</i>. This is an emergency option and should only be used after making
+						sure there are no more active connections to the mailbox.
+					</td>
+					<td><code>cmail-admin-popd unlock mpease</code></td>
+				</tr>
+				<tr>
+					<td><code>disable</code></td>
+					<td><i>user</i></td>
+					<td>
+						Disable POP access for a user.
+					</td>
+					<td><code>cmail-admin-popd disable cbdev</code></td>
+				</tr>
+			</table>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,164 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>cmail-admin-smtpd: Configure outbound authentication and mail handling</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link rel="icon" href="../static/cmail_logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../static/cmail_logo.png" type="image/x-icon" />
+		<link rel="stylesheet" type="text/css" href="../static/cmail.css" />
+		<meta name="description" content="cmail - Internet mail processing suite with SQLite backend" />
+		<meta name="keywords" content="cmail, smtp, email, pop, webmail, messaging, administration" />
+		<meta name="robots" content="index,follow" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+	</head>
+	<body>
+		<div>
+			<a href="../index.htm">Back</a> to the main page
+		</div>
+
+		<div>
+			<h1>cmail-admin-smtpd</h1>
+			<h3>Configure SMTP daemon authentication and outbound mail handling</h3>
+			Manage user authentication against the SMTP daemon and configure how originated mail 
+			(mail that is being sent by a local, authenticated user) is handled.
+		</div>
+
+		<div class="section">
+			<h2>Building &amp; Prerequisites</h2>
+			The following packages are required for building this utility (Debian packages are listed)
+			<ul>
+				<li>libnettle-dev <i>(Cryptographic functions for password hashing)</i></li>
+				<li>libsqlite3-dev <i>(Database interface)</i></li>
+			</ul>
+
+			A build of only this specific binary can be initiated by running <code>make</code> from within 
+			<code>cmail-admin/smtpd</code> in the main repository. A build of all administration utilities may be
+			initiated by running <code>make</code> from within <code>cmail-admin/</code>.
+		</div>
+
+		<div class="section">
+			<h2>Setup information</h2>
+			The utility is automatically installed to a location accessible by the administrator with the
+			<code>make install</code> step of the installation (<code>/usr/sbin/</code> by default).
+		</div>
+
+		<div class="section">
+			<h2>Invocation</h2>
+			This utility needs read and write access to the master database AS WELL AS the folder containing it.
+			The location of the master database file is assumed to be <code>/etc/cmail/databases/master.db3</code>
+			by default and can be overridden by specifying either the <strong>--dbpath</strong> command line option
+			or the <strong>CMAIL_MASTER_DB</strong> environment variable when running this utility.
+
+			<p>
+			Specifying the <strong>--help</strong> argument to an invocation prints additional information about the
+			utility.
+			</p>
+
+			<p>
+			The cmail-admin utilities operate in one of several modes, as specified in the table below. Modes may optionally
+			accept mode-specific arguments.
+			</p>
+		</div>
+
+		<div class="section">
+			<h2>Modes of operation</h2>
+			<table border="1">
+				<tr>
+					<th>Mode</th>
+					<th>
+						Arguments
+						<div style="font-weight:normal;font-size:80%;font-decoration:none;">
+							<i>variable</i> [<i>optional</i>] <code>verbatim</code>
+						</div>
+					</th>
+					<th>Description</th>
+					<th>Example</th>
+				</tr>
+				<tr>
+					<td><code>list</code></td>
+					<td>[<i>expression</i>]</td>
+					<td>List all users currently able to authenticate with the SMTP daemon. Optionally, filter the list for entries matching <i>expression</i>.</td>
+					<td><code>cmail-admin-smtpd list mpease%</code></td>
+				</tr>
+				<tr>
+					<td><code>enable</code></td>
+					<td><i>username</i> [<i>router</i> [<i>router-argument</i>]]</td>
+					<td>
+						Allow <i>username</i> to authenticate with the SMTP daemon. Users must exist and have valid login credentials to successfully authenticate.
+						User management tasks may for example be performed with <a href="user.htm">cmail-admin-user</a>. See below for a table of valid <i>router</i>
+						values.
+					</td>
+					<td><code>cmail-admin-smtpd enable cbdev any</code></td>
+				</tr>
+				<tr>
+					<td><code>update</code></td>
+					<td><i>user</i> <i>router</i> [<i>router-argument</i>]</td>
+					<td>
+						 Update an existing entry in the access control list with new routing data.
+					</td>
+					<td><code>cmail-admin-smtpd update cbdev reject "No more mail, please"</code></td>
+				</tr>
+				<tr>
+					<td><code>disable</code></td>
+					<td><i>user</i></td>
+					<td>
+						Remove a user from the ACL. Note that this does not prevent the user from receiving mail, only from authenticating 
+						with the SMTP daemon and originating it.
+					</td>
+					<td><code>cmail-admin-smtpd disable cbdev</code></td>
+				</tr>
+			</table>
+		</div>
+
+		<div class="section">
+			<h2>Outbound routers</h2>
+			Outbound routers are filters limiting the paths which a user may use as reverse paths in originated mails (that is, they limit the addresses a user may send from).
+			<table border="1">
+				<tr>
+					<th>Router</th>
+					<th>Arguments</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td><code>any</code></td>
+					<td></td>
+					<td>
+						Accept any reverse path.
+					</td>
+				</tr>
+				<tr>
+					<td><code>defined</code></td>
+					<td></td>
+					<td>
+						Accept only reverse paths that have a store router pointing back to the authorized user. Note that while there needs to be a store router 
+						set to the user, it need not be the one actually taken when the path is routed inbound (that is, an outbound path may be allowed to multiple users,
+						while the inbound mail for that path can only go to one).
+					</td>
+				</tr>
+				<tr>
+					<td><code>handoff</code></td>
+					<td><i>remote-spec</i></td>
+					<td>
+						Have originated mail by this user handled by another SMTP server (smarthost).  This effectively relays the entire envelope section verbatim 
+						to the remote server.  If the <i>remote-spec</i> is not set, this router behaves the same way as the <code>drop</code> router. If the 
+						<i>remote-spec</i> is invalid,  the outbound SMTP client will generate a bounce notification message after a configured amount of retries.
+					</td>
+				</tr>
+				<tr>
+					<td><code>reject</code></td>
+					<td>[<i>reason</i>]</td>
+					<td>
+						Reject any reverse path (SMTP 551), optionally presenting <i>reason</i> as failure reason.
+					</td>
+				</tr>
+				<tr>
+					<td><code>drop</code></td>
+					<td></td>
+					<td>
+						Accept any reverse path, but quietly drop all originated mail for this user.
+					</td>
+				</tr>
+			</table>
+		</div>
+	</body>
+</html>

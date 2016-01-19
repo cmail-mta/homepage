@@ -1,0 +1,176 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>cmail-admin-address: Manage inbound mail path expressions for cmail</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link rel="icon" href="../static/cmail_logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="../static/cmail_logo.png" type="image/x-icon" />
+		<link rel="stylesheet" type="text/css" href="../static/cmail.css" />
+		<meta name="description" content="cmail - Internet mail processing suite with SQLite backend" />
+		<meta name="keywords" content="cmail, smtp, email, pop, webmail, messaging, administration" />
+		<meta name="robots" content="index,follow" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+	</head>
+	<body>
+		<div>
+			<a href="../index.htm">Back</a> to the main page
+		</div>
+
+		<div>
+			<h1>cmail-admin-address</h1>
+			<h3>Configure inbound path expressions for cmail</h3>
+			cmail-admin-address allows the administrator of a cmail server system to create, modify and delete address 
+			entries, which are tuples of an address expression, an address order and routing information describing how mail 
+			adressed to the path is to be handled. Inbound paths are matched against the set of all configured entries, ordered 
+			totally by the address order, with the highest order value being matched first. Expressions may contain arbitrary-length 
+			wildcards (<strong>%</strong>) and single-character wildcards (<strong>_</strong>). Further information about the exact 
+			matching semantics may be found by referring to the <a href="https://www.sqlite.org/lang_expr.html#like">SQLite documentation</a>.
+		</div>
+
+		<div class="section">
+			<h2>Building &amp; Prerequisites</h2>
+			The following packages are required for building this utility (Debian packages are listed)
+			<ul>
+				<li>libnettle-dev <i>(Cryptographic functions for password hashing)</i></li>
+				<li>libsqlite3-dev <i>(Database interface)</i></li>
+			</ul>
+
+			A build of only this specific binary can be initiated by running <code>make</code> from within 
+			<code>cmail-admin/address</code> in the main repository. A build of all administration utilities may be
+			initiated by running <code>make</code> from within <code>cmail-admin/</code>.
+		</div>
+
+		<div class="section">
+			<h2>Setup information</h2>
+			The utility is automatically installed to a location accessible by the administrator with the
+			<code>make install</code> step of the installation (<code>/usr/sbin/</code> by default).
+		</div>
+
+		<div class="section">
+			<h2>Invocation</h2>
+			This utility needs read and write access to the master database AS WELL AS the folder containing it.
+			The location of the master database file is assumed to be <code>/etc/cmail/databases/master.db3</code>
+			by default and can be overridden by specifying either the <strong>--dbpath</strong> command line option
+			or the <strong>CMAIL_MASTER_DB</strong> environment variable when running this utility.
+
+			<p>
+			Specifying the <strong>--help</strong> argument to an invocation prints additional information about the
+			utility.
+			</p>
+
+			<p>
+			The cmail-admin utilities operate in one of several modes, as specified in the table below. Modes may optionally
+			accept mode-specific arguments.
+			</p>
+		</div>
+
+		<div class="section">
+			<h2>Modes of operation</h2>
+			<table border="1">
+				<tr>
+					<th>Mode</th>
+					<th>
+						Arguments
+						<div style="font-weight:normal;font-size:80%;font-decoration:none;">
+							<i>variable</i> [<i>optional</i>] <code>verbatim</code>
+						</div>
+					</th>
+					<th>Description</th>
+					<th>Example</th>
+				</tr>
+				<tr>
+					<td><code>list</code></td>
+					<td>[<i>expression</i>]</td>
+					<td>List all address entries currently known to the system. Optionally, filter the list for entries matching <i>expression</i>.</td>
+					<td><code>cmail-admin-address list mpease%</code></td>
+				</tr>
+				<tr>
+					<td><code>add</code></td>
+					<td><i>expression</i> <i>router</i> [<i>router-argument</i> [<i>order</i>]]</td>
+					<td>
+						Add an inbound path entry for the provided <i>expression</i>, to be handled by the specified <i>router</i>. 
+						Some routers may require a <i>router-argument</i>.  Optionally, an order value may be provided, which will be assigned to the path
+						unless there is already an active entry using that <i>order</i>. See below for a table of valid <i>router</i> values.
+					</td>
+					<td><code>cmail-admin-address add "%@cbcdn.com" store cbdev</code></td>
+				</tr>
+				<tr>
+					<td><code>swap</code></td>
+					<td><i>first</i> <i>second</i></td>
+					<td>
+						Swap the <i>order</i> values of the two entries indicated by the given order values <i>first</i> and <i>second</i>.
+					</td>
+					<td><code>cmail-admin-address swap 9001 9002</code></td>
+				</tr>
+				<tr>
+					<td><code>delete</code></td>
+					<td><i>order</i></td>
+					<td>
+						Delete the expression entry assigned the given <i>order</i>.
+					</td>
+					<td><code>cmail-admin-address delete 9001</code></td>
+				</tr>
+			</table>
+		</div>
+
+		<div class="section">
+			<h2>Inbound path routers</h2>
+			Inbound routers are processing functions applied to incoming mail for each path in the recipients list, some of wich take an additional argument.
+			<table border="1">
+				<tr>
+					<th>Router</th>
+					<th>Arguments</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td><code>store</code></td>
+					<td><i>user</i></td>
+					<td>
+						Store the received mail to the inbox of <i>user</i>. Note that this does not resolve aliases. If <i>user</i> is not set or not a valid user, 
+						this router behaves the same way as the <code>reject</code> router.
+					</td>
+				</tr>
+				<tr>
+					<td><code>handoff</code></td>
+					<td><i>remote-spec</i></td>
+					<td>
+						Have incoming mail for this path be handled by a remote mail server (smart host) by simply reusing the original envelope with the new remote.
+						If <i>remote-spec</i> is not set, this router behaves the same way as the <code>reject</code> router. If the <i>remote-spec</i> is invalid, 
+						the outbound SMTP client will generate a bounce notification message after a configured amount of retries.
+					</td>
+				</tr>
+				<tr>
+					<td><code>redirect</code></td>
+					<td><i>new-recipient</i></td>
+					<td>
+						Rewrite the envelope recipient of the mail according to <i>new-recipient</i>, which may optionally contain any of the following variables:
+						<ul>
+							<li><code>(to-local)</code> - will be replaced with the local part of the recipient path</li>
+							<li><code>(from-local)</code> - will be replaced with the local part of the reverse path</li>
+							<li><code>(to-domain)</code> - will be replaced with the domain part of the recipient path</li>
+							<li><code>(from-domain)</code> - will be replaced with the domain part of the reverse path</li>
+						</ul>
+						If <i>new-recipient</i> is not set, this router will behave the same way as the <code>reject</code> router. 
+						If <i>new-recipient</i> is an invalid path, the outbound SMTP client will generate a bounce notification message after a configured
+						amount of retries. Note that no router rewrites the header or body section of a mail. Therefore, the original recipient may still 
+						appear in the relevant headers.
+					</td>
+				</tr>
+				<tr>
+					<td><code>reject</code></td>
+					<td>[<i>reason</i>]</td>
+					<td>
+						Reject the recipient path (SMTP 551), optionally presenting <i>reason</i> as failure reason.
+					</td>
+				</tr>
+				<tr>
+					<td><code>drop</code></td>
+					<td></td>
+					<td>
+						Accept but quietly drop incoming mail for this recipient path.
+					</td>
+				</tr>
+			</table>
+		</div>
+	</body>
+</html>

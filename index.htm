@@ -26,15 +26,24 @@
 		<div style="clear:both;">
 			Architecturally, cmail is split into several modules which interface through
 			a central SQLite database (the <a href="database.htm">master database</a>).
-			<ul>
-				<li><a href="modules/api.htm">cmail-api</a>			<i>HTTP API to the master database</i></li>
-				<li><a href="modules/smtpd.htm">cmail-smtpd</a>			<i>SMTP server (Accept incoming / originated mails)</i></li>
-				<li><a href="modules/popd.htm">cmail-popd</a>			<i>POP server (Access mailboxes via POP)</i></li>
-				<li><a href="modules/imapd.htm">cmail-imapd</a>			<i>IMAP server (Access mailboxes via IMAP)</i></li>
-				<li><a href="modules/dispatchd.htm">cmail-dispatchd</a>		<i>SMTP client (Deliver outgoing mails to remote servers)</i></li>
-				<li><a href="modules/webadmin.htm">cmail-webadmin</a>		<i>HTTP Administration interface</i></li>
-				<li><a href="modules/webmailer.htm">cmail-webmailer</a>		<i>Web mailer interface</i></li>
-			</ul>
+			For most modules, a command-line administration tool is provided.
+			<div>
+				<ul style="display:inline-block;vertical-align:top;">
+					<li><a href="modules/api.htm">cmail-api</a>			<i>HTTP API to the master database</i></li>
+					<li><a href="modules/smtpd.htm">cmail-smtpd</a>			<i>SMTP server (Accept incoming / originated mails)</i></li>
+					<li><a href="modules/popd.htm">cmail-popd</a>			<i>POP server (Access mailboxes via POP)</i></li>
+					<li><a href="modules/imapd.htm">cmail-imapd</a>			<i>IMAP server (Access mailboxes via IMAP)</i></li>
+					<li><a href="modules/dispatchd.htm">cmail-dispatchd</a>		<i>SMTP client (Deliver outgoing mails to remote servers)</i></li>
+					<li><a href="modules/webadmin.htm">cmail-webadmin</a>		<i>HTTP Administration interface</i></li>
+					<li><a href="modules/webmailer.htm">cmail-webmailer</a>		<i>Web mailer interface</i></li>
+				</ul>
+				<ul style="display:inline-block;vertical-align:top;">
+					<li><a href="admin/user.htm">cmail-admin-user</a>		<i>Manage cmail users</i></li>
+					<li><a href="admin/address.htm">cmail-admin-address</a>		<i>Administration of inbound mail paths</i></li>
+					<li><a href="admin/smtpd.htm">cmail-admin-smtpd</a>		<i>Administration of outbound mail handling</i></li>
+					<li><a href="admin/popd.htm">cmail-admin-popd</a>		<i>Control access to the POP3 interface</i></li>
+				</ul>
+			</div>
 			Read more about the system architecture in the <a href="architecture.htm">architecture &amp; development information section</a>.
 		</div>
 

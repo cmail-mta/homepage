@@ -1,13 +1,13 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>cmail-smtpd: Accept incoming/originating mails</title>
+		<title>cmail-admin-user: Manage cmail users and per-user settings</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<link rel="icon" href="../static/cmail_logo.png" type="image/x-icon" />
 		<link rel="shortcut icon" href="../static/cmail_logo.png" type="image/x-icon" />
 		<link rel="stylesheet" type="text/css" href="../static/cmail.css" />
 		<meta name="description" content="cmail - Internet mail processing suite with SQLite backend" />
-		<meta name="keywords" content="cmail, smtp, email, pop, webmail, messaging" />
+		<meta name="keywords" content="cmail, smtp, email, pop, webmail, messaging, administration" />
 		<meta name="robots" content="index,follow" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 	</head>
@@ -17,8 +17,8 @@
 		</div>
 
 		<div>
-			<h1>cmail-smtpd</h1>
-			<h3>Accept incoming/originated mails via SMTP</h3>
+			<h1>cmail-admin-user</h1>
+			<h3></h3>
 			This component provides the services that most accurately matches the
 			common perception of a mail server. It accepts incoming mail via SMTP
 			(usually on port 25) and allows new mail to be submitted for delivery 
@@ -196,7 +196,6 @@
 
 		<div class="section">
 			<h2>Database configuration</h2>
-
 		</div>
 
 		<div class="section">
