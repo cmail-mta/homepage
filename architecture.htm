@@ -38,6 +38,37 @@
 		</div>
 
 		<div class="section">
+			<h2>Starting to contribute</h2>
+			Looking for a place to start? Here are some pointers: 
+			<ul>
+				<li>
+					There are some <a href="https://github.com/cmail-mta/cmail/issues?q=is%3Aissue+is%3Aopen+label%3Anewcomer-friendly">issues 
+					marked <code>newcomer-friendly</code></a> on the issue tracking system
+				</li>
+				<li>
+					Find the documentation somewhat lacking? Consider extending and
+					updating the <a href="https://github.com/cmail-mta/homepage">homepage</a>
+				</li>
+				<li>
+					If you're interested in learning about the protocols involved in mail processing,
+					consider writing <a href="https://github.com/cmail-mta/cmail/tree/master/tests/expect">protocol level tests</a> 
+					against the cmail implementations - edge cases are particularly welcome!
+				</li>
+				<li>
+					Grep your clone of the source repository for occurences of <strong>FIXME</strong> or <strong>TODO</strong>
+					and see if there's something simple to do
+				</li>
+				<li>
+					Created a great connector or helper program? Consider adding it to the 
+					<a href="https://github.com/cmail-mta/contrib">contrib repository</a>
+				</li>
+				<li>
+					Opening well researched issues on Github (e.g. against the <a href="https://github.com/cmail-mta/homepage/issues">homepage</a> 
+					or <a href="https://github.com/cmail-mta/cmail/issues">main</a> repositories) is also a great way to help
+				</li>
+		</div>
+
+		<div class="section">
 			<h2>Development tooling</h2>
 			cmail uses a variety of tools to help maintain code quality,
 			automate tasks and aid development.
@@ -145,7 +176,7 @@
 			<code class="block">rtl2dot.py smtpd.c.170r.expand | dot -Tsvg &gt; smtpd.svg</code>
 			</p>
 			<p>
-			The previous steps generate a full callgraph, containing all functions called via any one possible path from main.
+			The previous steps generate a full callgraph, containing all functions called via any one possible path from <code>main</code>.
 			This includes common functions such as <code>logprintf</code>, which are called from almost every function, eg. to print 
 			messages to the log files, as well as library functions which are not directly part of the project.
 			<p>
