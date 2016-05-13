@@ -109,7 +109,16 @@
 			<h2>2a Test the configuration</h2>
 			This step might not be needed when installing from source, but it is nevertheless useful for learning
 			how to debug your mail server.
+			
 			<p>
+				To do this, run the daemons one by one without having them detach from the console, so you can
+				see their debug information printed.
+
+				<code style="display:block;">
+					~# cmail-smtpd nodetach /etc/cmail/smtpd.conf<br/>
+					~# cmail-popd nodetach /etc/cmail/popd.conf<br/>
+					~# cmail-dispatchd nodetach /etc/cmail/dispatchd.conf<br/>
+				</code>
 			</p>
 		</div>
 
