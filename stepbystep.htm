@@ -120,6 +120,23 @@
 					~# cmail-dispatchd nodetach /etc/cmail/dispatchd.conf<br/>
 				</code>
 			</p>
+			<p>
+				<h3>Common problems</h3>
+				<ul>
+					<li>
+						<strong>"Could not bind to port 25"</strong><br/>
+						There might already be an MTA installed on your system (such as exim or
+						OpenSMTPd). List all currently bound listening sockets with
+						<code style="display:block;">
+							~# ss -lt
+						</code>
+						To find out what program is using the port, run
+						<code style="display:block;">
+							~# lsof | grep TCP
+						</code>
+					</li>
+				</ul>
+			</p>
 		</div>
 
 		<div class="section">
