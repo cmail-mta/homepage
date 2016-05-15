@@ -123,7 +123,8 @@
 			
 			<p>
 				To do this, run the daemons one by one without having them detach from the console, so you can
-				see their debug information printed.
+				see their debug information printed. After verifying that the configuration works, exit the daemons
+				again by pressing <code>Ctrl-C</code>.
 
 				<p>
 				<code style="display:block;">
@@ -158,6 +159,11 @@
 							~# apt-get uninstall exim4*
 						</code>
 						</p>
+					</li>
+					<li>
+						<strong>No connection to the services from remote hosts</strong><br />
+						Be sure to configure your firewall (and in some cases, your provider's firewall)
+						to allow connections on the cmail service ports.
 					</li>
 				</ul>
 			</p>
