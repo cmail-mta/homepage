@@ -18,15 +18,19 @@
 
 		<div>
 			<h1>Step by step setup</h1>
+			<p>
 			This page details the process of installing and configuring
 			a functional cmail server.
+			</p>
 		</div>
 
 		<div class="section">
 			<h2>1a Setup from packages</h2>
+			<p>
 			Install the package with your package manager of choice (eg. dpkg, pacman).
 			Depending on the package maintainer, this process may already run a dialog
 			of some sorts querying basic configuration information.
+			</p>
 		</div>
 
 		<div class="section">
@@ -208,7 +212,7 @@
 						to allow connections on the cmail service ports. Try running the command
 						<p>
 						<code>
-							tcptraceroute <em>your-server</em> 25
+							~# tcptraceroute <em>your-server</em> 25
 						</code>
 						</p>
 						from another computer and find out where the trace stops.
