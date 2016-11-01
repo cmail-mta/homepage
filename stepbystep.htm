@@ -205,7 +205,13 @@
 					<li>
 						<strong>No connection to the services from remote hosts</strong><br />
 						Be sure to configure your firewall (and in some cases, your provider's firewall)
-						to allow connections on the cmail service ports.
+						to allow connections on the cmail service ports. Try running the command
+						<p>
+						<code>
+							tcptraceroute <em>your-server</em> 25
+						</code>
+						from another computer and find out where the trace stops.
+						</p>
 					</li>
 				</ul>
 			</p>
