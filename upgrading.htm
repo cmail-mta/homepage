@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>cmail: Upgrade instructions</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link rel="icon" href="static/cmail_logo.png" type="image/x-icon" />
+		<link rel="shortcut icon" href="static/cmail_logo.png" type="image/x-icon" />
+		<link rel="stylesheet" type="text/css" href="static/cmail.css" />
+		<meta name="description" content="cmail - Internet mail processing suite with SQLite backend" />
+		<meta name="keywords" content="cmail, smtp, email, pop, webmail, messaging, upgrade installation, upgrade procedure, step by step" />
+		<meta name="robots" content="index,follow" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+	</head>
+	<body>
+		<div>
+			<a href="index.htm">Back</a> to the main page
+		</div>
+		<div>
+			<h1>Upgrading a cmail installation</h1>
+			This page describes to process of upgrading a cmail installation.
+		</div>
+
+		<div class="section">
+			<h2>Installation method</h2>
+			<p>
+			If you installed cmail from the source distribution as described in the <a href="stepbystep.htm">step-by-step installation guide</a>, 
+			the following sections will explain how to upgrade that installation to the newest version.
+			</p>
+			<p>
+			If you installed cmail via another method (e.g. a package manager), please refer to your specific methods
+			instructions for upgrading.
+			</p>
+		</div>
+
+		<div class="section">
+			<h2>1 Updating the local repository clone</h2>
+			<p>
+			Enter the directory you originally cloned the cmail repository into. Run
+			</p>
+			<p>
+			<code>
+				~# git pull origin master
+			</code>
+			</p>
+			to update your local copy.
+		</div>
+
+		<div class="section">
+			<h2>2 Building and installing the new binaries</h2>
+			In the cmail directory, run
+			<p>
+			<code>
+				~# make<br/>
+				~# make install
+			</code>
+			</p>
+			to build updated binaries from the source and install them
+			over the old binaries.
+		</div>
+		
+		<div class="section">
+			<h2>3 Restart the daemons</h2>
+			In order to activate the updated binaries, restart each service by executing
+			<p>
+			<code>
+				~# service cmail-smtpd restart<br/>
+				~# service cmail-popd restart<br/>
+				~# service cmail-dispatchd restart
+			</code>
+			</p>
+			Check the log files for any errors that may occur.
+		</div>
+
+		<div class="section">
+			<h2>4 Upgrading the database</h2>
+			If in the previous step you have encountered the error message
+			<p style="padding-left:2em;">
+			<strong>The database schema is at another version than required for this build</strong>
+			</p>
+			you will need to upgrade your databases.
+			To do so, for each database, open the database file with the <code>sqlite3</code> utility and determine
+			the schema version by running
+
+			<p>
+			<code>
+				SELECT value FROM meta WHERE key='schema_version';
+			</code>
+			</p>
+
+			and find a file named <code>update-<em>oldversion</em>to<em>newversion</em>.sql</code> in the
+			<code>sql-update/</code> folder of the source directory. To apply this update, run
+
+			<p>
+			<code>
+				.read <em>/path/to/sql-update/update-xtoy.sql</em>
+			</code>
+			</p>
+
+			within the sqlite3 shell and watch the output.
+		</div>
+		
+		<div class="section">
+			<h2>4a Restarting the daemons</h2>
+			As in step 3, restart the daemons and watch the logs for proper operation.
+		</div>
+	</body>
+</html>
