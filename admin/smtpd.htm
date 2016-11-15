@@ -142,6 +142,14 @@
 						Have originated mail by this user handled by another SMTP server (smarthost).  This effectively relays the entire envelope section verbatim 
 						to the remote server.  If the <i>remote-spec</i> is not set, this router behaves the same way as the <code>drop</code> router. If the 
 						<i>remote-spec</i> is invalid,  the outbound SMTP client will generate a bounce notification message after a configured amount of retries.
+						<p>
+						A <i>remote-spec</i> must consist of a host name, optionally prefixed by authentication information in the form <em>user:password@hostname</em>
+						and optionally trailed by a non-default port and TLS mode specification of the form <em>hostname:port/tlsmode</em>.
+						<em>tlsmode</em> must be one of <strong>none</strong> (default), <strong>starttls</strong> or <strong>tlsonly</strong>.
+						When a remote port is specified, only that port is connected to and any additional ports configured in the <a href="../modules/dispatchd.htm">
+						cmail-dispatchd</a> configuration are ignored for that remote.
+						</p>
+						The optional parts of a <em>remote-spec</em> may be combined, for example to form <em>cbdev:insecurepassword@foo.example.org:2525/starttls</em>.
 					</td>
 				</tr>
 				<tr>
