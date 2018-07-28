@@ -23,9 +23,17 @@
 			&quot;mail server&quot;.
 		</div>
 
-		<div style="clear:both;">
-			Architecturally, cmail is split into several modules which interface through
-			a central SQLite database (the <a href="database.htm">master database</a>).
+		<div style="clear:both;" id="menu">
+			<ul>
+				<li><a href="#about">About</a></li>
+				<li><a href="#install">Installation</a></li>
+				<li><a href="#admin">Administration</a></li>
+				<li><a href="#contribute">Contributing</a></li>
+			</ul>
+		</div>
+
+		<div class="section">
+			Architecturally, cmail is split into several modules which interface through a central SQLite database (the <a href="database.htm">master database</a>).
 			For most modules, a command-line administration tool is provided.
 			<div>
 				<ul style="display:inline-block;vertical-align:top;">
@@ -75,19 +83,25 @@
 			Most of it can probably be enabled or emulated with sufficient thought, though.
 			</p>
 			<p>
-			Should that not be enough, cmail provides a (planned) internal API for modifying its behaviour with 
-			runtime-loaded shared libraries (plugins).
+			Should that not be enough, you can extend cmail either by modyfing the purposely slim codebase or
+			by interfacing with a (not yet implemented, but planned) internal API for modifying its behaviour
+			with runtime-loaded shared libraries (plugins).
 			</p>
 			If cmail still does not meet your expectations after that, you might be better off using another
 			MTA :)
 		</div>
 
 		<div class="section">
-			<h2>Coarse roadmap</h2>
+			<h2>Current state &amp; coarse roadmap</h2>
+			As the main developers have transitioned from university into full-time jobs, development has slowed
+			somewhat. However, multiple cmail systems are in full productive use and the architecture has proven to be
+			very stable. The primary criticism so far is missing support for IMAP, which is in slow progress,
+			both due to the aforementioned lack of time as well as the pecularities of the IMAP protocol.
+			<p>
+			The following coarse roadmap illustrates the progress we currently aim for
 			<ol>
-				<li><i>cmail-smtpd</i> Plugin API specification (2015)</li>
-				<li><i>cmail</i> Initial packaging &amp; setup scripts (2015)</li>
-				<li><i>cmail-imapd</i> Basic implementation (2015/2016)</li>
+				<li><i>cmail-imapd</i> Basic implementation (2019)</li>
+				<li>Initial public packaged release (2019)</li>
 			</ol>
 			This listing should not be taken at face value. Development pace is not easy to estimate,
 			and features may be postponed because of lack of interest or more pressing issues.
@@ -161,10 +175,10 @@
 
 		<div class="section">
 			<h2>Contributing &amp; Contact</h2>
-			Our main development languages are C (daemons), PHP (API backend) and
-			JavaScript/HTML (web panels). To get acquainted with the tools we use,
-			our methodology, architecture and codebase, we have aggregated some
-			resources on our <a href="architecture.htm">architecture &amp; development information</a> page
+			Our main development languages are C (daemons), PHP (API backend) and JavaScript/HTML (web interface).
+			To get acquainted with the tools we use, our methodology, architecture and codebase, we have aggregated some
+			resources on our <a href="architecture.htm">architecture &amp; development information</a> page on this
+			web site as well as <a href="https://github.com/cmail-mta/cmail/blob/master/DEVELOPMENT.txt">within the repository</a>.
 
 			<p>
 			cmail is distributed under the <a href="http://opensource.org/licenses/BSD-2-Clause">BSD 2-Clause license</a>. 
