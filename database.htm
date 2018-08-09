@@ -26,18 +26,91 @@
 
 		<div class="section">
 			<h2>Why SQLite</h2>
+			<p>
+			SQLite has a long track record as a stable file format (which qualifies it over
+			most other binary (and especially homebrew) storage formats. It also presents a
+			nice C API (which sets it apart from most other Mail storage formats), the database
+			is present as a single file on the disk (which may become rather large, but makes
+			it easy to switch between databases) and using a database leaves open the option
+			of implementing other database backends later, which (potentially) allows for great
+			scalability.
+			</p>
+			<p>
+			Using a database also allows us to maintain a single storage backend both for
+			configuration and mail storage, though whether that is a good thing is of course
+			a matter of opinion.
+			</p>
 		</div>
 
 		<div class="section">
 			<h2>Creating an empty database</h2>
+			To create an empty database, the cmail repository provides a schema file, consisting
+			of all SQL statements necessary to create an empty master database.
+			<p>
+			To interact with SQLite databases, you can either install the <code>sqlite3</code> command-line
+			interface or use a database management tool of your choice which supports it.
+			</p>
+			To create a new, empty master database in your current working directory, run
+			<p>
+			<code>
+				~# sqlite3 empty.db &quot;.read <em>/path/to/cmail-repo/</em>sql-update/install_master.sql&quot;
+			</code>
+			</p>
+			or load the respective file into your database editor and run the commands in <code>sql-update/install_master.sql</code>.
+			<p>
+			Note that for a master database to be used by cmail, the file must be passed as the <code>database</code> parameter
+			in the daemon configuration, and the file itself as well as the directory containing it must be read- and writable by
+			the user running the cmail daemons.
+			</p>
+		</div>
+
+		<div class="section">
+			<h2>User databases</h2>
+			Since SQLite databases are file-based and cmail needs to access the same file from multiple daemons, locking
+			may become a problem on high-volume installations. cmail counters this by allowing users to have their own
+			<em>user databases</em>, which will only contain mail stored to their accounts. User databases do not contain
+			system configuration data as the master database does. User databases can also be used to allow users direct SQL
+			access to their mail. Note that, should a user database become unwritable for cmail, incoming mail will be stored
+			to the master database even if a user database is configured. This helps prevent lost mail.
+			<p>
+			To create a user database, follow the steps above, substituting <code>sql-update/install_master.sql</code> with
+			<code>sql-update/install_user.sql</code>.
+			</p>
+			<p>
+			Note that some daemons and protocols (namely, the IMAP implementations), may have notes and restrictions on the use
+			of user databases, at least as far as inter-system portability of database files goes.
+			</p>
+			To activate a user database, pass the path to the newly installed user database to <code><a href="admin/user.htm">cmail-admin-user</a>
+			userdb</code> and take care that the file itself as well as the directory containing it must be read- and writable
+			by the user running the cmail daemons.
 		</div>
 
 		<div class="section">
 			<h2>Populating the database</h2>
+			To interact with a master database, for example to configure users and mail addresses, use the cmail-admin set
+			of tools: <a href="admin/user.htm">cmail-admin-user</a>,  <a href="admin/address.htm">cmail-admin-address</a>,
+			<a href="admin/smtpd.htm">cmail-admin-smtpd</a> and <a href="admin/popd.htm">cmail-admin-popd</a>
+			or, if you prefer, install and use the web interface.
+			<p>
+			To learn more about the internal structure of the master database, skip to the "Schema reference" section of this
+			document or refer to the comments in <code>sql-update/install_master.sql</code>.
+			</p>
 		</div>
 
 		<div class="section">
-			<h2>Schema reference</h2>
+			<h2>Upgrading the database</h2>
+			As development progresses, the internal structure of master and user databases evolves. To prevent problems when using
+			incompatible code and database versions, all databases track their "schema version" internally.
+			When a newer software version encounters a database version it does not recognize as compatible, it will exit with a
+			warning. When you notice this warning, you will need to upgrade your database as described in the <a href="upgrading.htm">upgrade guide</a>.
+		</div>
+
+		<div class="section">
+			<h2>Interfacing the database</h2>
+			If you're considering writing a tool that interfaces with the cmail database, please take the following into account
+			<ul>
+				<li></li>
+			</ul>
 		</div>
 
 		<div class="section">
@@ -45,7 +118,7 @@
 		</div>
 
 		<div class="section">
-			<h2>User databases</h2>
+			<h2>Schema reference</h2>
 		</div>
 	</body>
 </html>
