@@ -53,8 +53,9 @@
 			<h2>Configuration file</h2>
 			The configuration file contains multiple lines, each specifying one of the following configuration
 			directives. Lines are read from this file consecutively. Most directives become active the moment 
-			they are read. An example configuration file with sane defaults (save for the <code>announce</code>
-			and <code>bounce_from</code> options) can be found in the example-configs/ folder in the main repo.
+			they are read. An example configuration file with sane defaults (save for the <code>announce</code>,
+			<code>bounce_from</code> and <code>bind</code> options) can be found in the example-configs/ folder
+			in the main repo.
 
 			<table border="1">
 				<tr>
@@ -171,6 +172,18 @@
 						Space separated list of additional recipients for bounce notifications
 					</td>
 					<td>Bounce notifications may be sent to additional recipients (such as the system administrator) in order to detect problems</td>
+				</tr>
+				<tr>
+					<td><code>bind</code></td>
+					<td>
+						<i>(optional)</i><br/>
+						Bind address for outbound connections
+					</td>
+					<td>
+						Hosts with multiple IP addresses may prefer to use those that have a corresponding PTR record (reverse DNS entry)
+						associated with them for outbound mail transfers. This should usually be set to the same value as the <code>announce</code>
+						option.
+					</td>
 				</tr>
 				<tr>
 					<td><code>portprio</code></td>
